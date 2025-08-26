@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhe da Patente — Portal de Propriedade Industrial</title>
+
+  <!-- Mesmas CDNs da tela de marca -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/dist/design-system.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <style>
+   :root{
+  --title:#3d4a63; --muted:#6b7280; --card:#fbfdff; --line:#e5e7eb; --edge:#d8dce3;
+  --ink:#111827; --soft:#f6f7fb; --accent:#1f2937;
+  --primary:#1351B4; --primary-hover:#0D3B8E; --focus:#79B0FF;
+}
+
+/* Base */
+body{font-family:Rawline, Raleway, Arial, sans-serif;background:#fff}
+.container-lg{max-width:1200px;margin:0 auto}
+
+/* Header minimalista */
+.mini-header{border-bottom:1px solid var(--line)}
+.mini-header .container-lg{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem}
+.brand{display:flex;align-items:center;gap:.5rem}
+.brand .logo{width:36px;height:28px;background:var(--accent);border-radius:6px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.8rem}
+.brand .title{color:#374151;font-weight:600}
+.links{display:flex;gap:1rem;align-items:center}
+.links a{color:#6b7280;font-size:.85rem;text-decoration:none}
+.links .enter{border:1px solid #d1d5db;padding:.35rem .7rem;border-radius:999px}
+
+/* Barra de ações */
+.actions-bar{position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:#fff}
+.actions-bar .container-lg{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.6rem 1rem}
+
+/* Botões estilo gov.br */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;height:40px;
+  padding:0 .95rem;border:2px solid transparent;font-weight:700;cursor:pointer;
+  text-decoration:none;transition:.15s
+}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+.btn.outline{background:#fff;border-color:var(--primary);color:var(--primary)}
+.btn.outline:hover{background:#E6EEFF}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn i{font-size:1rem}
+
+/* Hero / card principal */
+.hero{padding:1.25rem 1rem 0}
+.record-card{margin:1rem 0;padding:1rem 1.25rem;border:1px solid var(--edge);border-radius:18px;background:var(--card)}
+.record-head{display:grid;grid-template-columns:1fr;gap:1rem;align-items:start}
+.record-title{display:flex;gap:.75rem;align-items:baseline;flex-wrap:wrap}
+.record-title h1{font-family:Raleway, Rawline, Arial;color:var(--title);font-weight:800;font-size:clamp(1.2rem,2vw + .6rem,1.8rem);margin:0}
+.badge{border:1px solid var(--edge);background:#fff;color:#374151;border-radius:999px;padding:.2rem .6rem;font-weight:700;font-size:.75rem}
+.status{display:inline-flex;gap:.4rem;align-items:center;font-weight:700;color:#374151;font-size:.92rem;margin-top:.35rem}
+.status i{color:#0ea5e9}
+
+/* Seções (cards) */
+.section{border:1px solid var(--edge);border-radius:14px;background:#fff;margin:1rem 0;overflow:hidden}
+.section header{padding:.85rem 1rem;background:#f8fafc;border-bottom:1px solid var(--line);font-weight:800;color:#1f2937}
+.section .content{padding:1rem}
+
+/* Grids e key-values */
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.kv{border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem;background:#fbfbfd}
+.kv .k{font-size:.78rem;color:#6b7280;margin-bottom:.15rem}
+.kv .v{font-weight:700;color:#111827;word-break:break-word}
+
+/* Tabelas */
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+thead th{text-align:left;background:#f8fafc;border-bottom:1px solid var(--line);padding:.6rem .5rem;color:#334155;font-weight:800}
+tbody td{border-bottom:1px solid #eef2f7;padding:.55rem .5rem;color:#111827}
+tbody tr:hover{background:#f9fbff}
+.note{font-size:.85rem;color:#6b7280}
+
+/* Responsivo */
+@media (max-width:960px){.grid-3,.grid-2{grid-template-columns:1fr}}
+
+/* Stepper (prefixado) */
+.pi-timeline{margin-top:.75rem;border:1px solid var(--edge);background:var(--soft);border-radius:12px;padding:.9rem 1rem;display:none}
+.pi-timeline[aria-hidden="false"]{display:block}
+.pi-timeline-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.6rem}
+.pi-timeline-title{font-weight:800;color:#1f2937}
+.pi-timeline-note{font-size:.85rem;color:#6b7280}
+.pi-stepper{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:start;gap:.75rem;padding:.25rem 0}
+.pi-stepper::before{content:"";position:absolute;top:17px;left:0;right:0;height:2px;background:#e5e7eb}
+.pi-progress{position:absolute;top:17px;left:0;height:2px;background:#93c5fd;width:0}
+.pi-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center}
+.pi-dot{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;border:2px solid #e5e7eb;background:#fff;color:#6b7280;font-weight:700}
+.pi-step.pi-done .pi-dot{background:#e8f3ff;border-color:#93c5fd;color:#2563eb}
+.pi-step.pi-current .pi-dot{background:#2563eb;border-color:#2563eb;color:#fff}
+.pi-label{font-size:.82rem;color:#374151;margin-top:.45rem;font-weight:600;line-height:1.2}
+.pi-meta{font-size:.72rem;color:#6b7280;margin-top:.15rem}
+#status-acao-timeline[role="button"]{cursor:pointer}
+
+/* Viewer full-width (fora de card) */
+.media-strip{
+  display:flow-root; /* entra no fluxo e isola floats de cima */
+  clear:both;
+  position:relative; z-index:0;
+  margin:1.25rem 0;
+}
+.media-strip .stage{
+  height:auto; min-height:120px; display:grid; place-items:center;
+  background:#f9fafb; border:1px solid var(--edge); border-radius:12px;
+}
+.media-strip .stage img{
+  width:100%; height:auto; object-fit:contain; display:block;
+}
+.media-strip .meta{
+  display:flex; justify-content:space-between; align-items:center; gap:.75rem;
+  padding:.6rem 0; font-size:.95rem; color:#374151;
+}
+.media-strip .actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.media-strip .thumbs{display:flex;gap:.5rem;padding:.5rem 0;overflow-x:auto}
+.media-strip .thumbs button{
+  background:#fff;border:1px solid var(--edge);border-radius:8px;
+  height:70px;width:70px;display:grid;place-items:center;padding:0;cursor:pointer;
+}
+.media-strip .thumbs img{max-width:64px;max-height:64px;display:block}
+.media-strip .thumbs button[aria-current="true"]{outline:3px solid var(--focus);outline-offset:2px}
+@media (max-width:980px){.media-strip .stage{height:360px}}
+
+/* Primeiro bloco sem borda dupla */
+.section[aria-labelledby="sec-header"]{
+  border:0;background:transparent;padding:0;margin:0 0 1rem;
+}
+.section[aria-labelledby="sec-header"] > .record-card{margin:0}
+
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="mini-header">
+    <div class="container-lg">
+      <div class="brand">
+        <div class="logo">PI</div>
+        <div class="title">Portal de Propriedade Industrial</div>
+      </div>
+      <nav class="links" aria-label="Ações rápidas">
+        <a href="#" id="copyLink"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar link</a>
+        <a href="#" id="share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Compartilhar</a>
+        <a class="enter" href="#"><i class="fa-regular fa-user"></i> Entrar</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Barra de ações -->
+  <div class="actions-bar">
+    <div class="container-lg">
+      <div class="left">
+        <a href="#" class="btn outline"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+        <a href="#" class="btn outline" id="verPDF"><i class="fa-regular fa-file-pdf"></i> Ver PDF</a>
+      </div>
+      <div class="right">
+        <a href="#" class="btn primary"><i class="fa-regular fa-bookmark"></i> Salvar</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container-lg hero">
+    <!-- Card principal (1 coluna, sem viewer aqui) -->
+    <section class="section" aria-labelledby="sec-header">
+      <div class="record-card">
+        <div class="record-head">
+          <div>
+            <div class="record-title">
+              <h1>Patente • BR 10 2018 077076 4 A2</h1>
+              <span class="badge">Depósito de pedido nacional de Patente</span>
+            </div>
+            <div class="status" id="status-acao-timeline" role="button" tabindex="0" aria-expanded="false" aria-controls="pi-stepper-panel">
+              <i class="fa-solid fa-circle-info"></i>
+              <span>Publicado (RPI 2583)</span>
+            </div>
+
+            <!-- Stepper (abre pelo status) -->
+            <div id="pi-stepper-panel" class="pi-timeline" role="region" aria-labelledby="pi-timeline-title" aria-hidden="true">
+              <div class="pi-timeline-head">
+                <div class="pi-timeline-title" id="pi-timeline-title">Fluxo do pedido de patente</div>
+                <div class="pi-timeline-note">Etapas principais e estado atual</div>
+              </div>
+              <ol class="pi-stepper" role="list">
+                <div class="pi-progress" aria-hidden="true"></div>
+                <li class="pi-step pi-done"><span class="pi-dot"><span>1</span></span><span class="pi-label">Depósito</span><span class="pi-meta">26/12/2018</span></li>
+                <li class="pi-step pi-done"><span class="pi-dot"><span>2</span></span><span class="pi-label">Publicação</span><span class="pi-meta">07/07/2020</span></li>
+                <li class="pi-step pi-current" aria-current="step"><span class="pi-dot"><span>3</span></span><span class="pi-label">Exame</span><span class="pi-meta">Em andamento</span></li>
+                <li class="pi-step"><span class="pi-dot"><span>4</span></span><span class="pi-label">Decisão</span><span class="pi-meta">—</span></li>
+                <li class="pi-step"><span class="pi-dot"><span>5</span></span><span class="pi-label">Concessão / Manutenção</span><span class="pi-meta">—</span></li>
+              </ol>
+            </div>
+
+            <!-- Bibliografia curta -->
+            <div class="grid-3" style="margin-top:.8rem">
+              <div class="kv"><div class="k">(21) Nº do Pedido</div><div class="v">BR 10 2018 077076 4 A2</div></div>
+              <div class="kv"><div class="k">(22) Depósito</div><div class="v">26/12/2018</div></div>
+              <div class="kv"><div class="k">(43) Publicação</div><div class="v">07/07/2020</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dados bibliográficos -->
+    <section class="section" aria-labelledby="sec-biblio">
+      <header id="sec-biblio">Dados bibliográficos</header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="kv"><div class="k">(54) Título</div><div class="v">PROCESSO DE OBTENÇÃO E USO DE COMPOSIÇÃO INIBIDORA DE CORROSÃO DO AÇO CARBONO À BASE DE FUNGOS FILAMENTOSOS</div></div>
+          <div class="kv"><div class="k">(51) Classificação IPC</div><div class="v">C12N 1/14 ; C23F 11/10 ; C12R 1/77</div></div>
+          <div class="kv"><div class="k">(71) Nome do Depositante</div><div class="v">UNIVERSIDADE FEDERAL DE ALAGOAS (BR/AL)</div></div>
+          <div class="kv"><div class="k">(72) Nome do Inventor</div><div class="v">JOSEALDO TONHOLO ; JULIANO BUENO BARBOSA DA SILVA ; CARMEM LÚCIA DE PAIVA E SILVA ZANTA ; SONIA SALGUEIRO MACHADO ; SHEYLA FERREIRA LIMA COELHO</div></div>
+        </div>
+        <div class="kv" style="margin-top:1rem">
+          <div class="k">(57) Resumo</div>
+          <div class="v">A presente invenção se refere ao processo de obtenção e o uso como composição inibidora de corrosão do aço carbono à base de metabólitos obtidos a partir de filtrado...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anuidades -->
+    <section class="section" aria-labelledby="sec-annuities">
+      <header id="sec-annuities">Anuidades</header>
+      <div class="content">
+        <div class="note" style="margin-bottom:.5rem">Tabela de Retribuição — períodos ordinários e extraordinários</div>
+        <table role="table" aria-label="Anuidades">
+          <thead><tr><th>Parcela</th><th>Início (Ord.)</th><th>Fim (Ord.)</th><th>Início (Extra)</th><th>Fim (Extra)</th></tr></thead>
+        <tbody>
+          <tr><td>5ª Anuidade</td><td>26/12/2022</td><td>26/03/2023</td><td>27/03/2023</td><td>26/09/2023</td></tr>
+          <tr><td>6ª Anuidade</td><td>26/12/2023</td><td>26/03/2024</td><td>27/03/2024</td><td>26/09/2024</td></tr>
+          <tr><td>7ª Anuidade</td><td>26/12/2024</td><td>26/03/2025</td><td>27/03/2025</td><td>26/09/2025</td></tr>
+          <tr><td>8ª Anuidade</td><td>26/12/2025</td><td>26/03/2026</td><td>27/03/2026</td><td>26/09/2026</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Petições -->
+    <section class="section" aria-labelledby="sec-peticoes">
+      <header id="sec-peticoes">Petições</header>
+      <div class="content">
+        <table role="table" aria-label="Petições e serviços">
+          <thead><tr><th>Serviço</th><th>Protocolo</th><th>Data</th><th>Cliente</th><th>Delivery</th></tr></thead>
+          <tbody>
+            <tr><td>208</td><td>802024057803</td><td>20/12/2024</td><td>UNIVERSIDADE FEDERAL DE ALAGOAS</td><td>—</td></tr>
+            <tr><td>208</td><td>800202156839</td><td>06/05/2022</td><td>UNIVERSIDADE FEDERAL DE ALAGOAS</td><td>—</td></tr>
+            <tr><td>203</td><td>800202156829</td><td>06/05/2022</td><td>UNIVERSIDADE FEDERAL DE ALAGOAS</td><td>—</td></tr>
+            <tr><td>200</td><td>870180167506</td><td>26/12/2018</td><td>UNIVERSIDADE FEDERAL DE ALAGOAS</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Publicações na RPI -->
+    <section class="section" aria-labelledby="sec-rpi">
+      <header id="sec-rpi">Publicações na RPI</header>
+      <div class="content">
+        <table role="table" aria-label="Publicações RPI">
+          <thead><tr><th>RPI</th><th>Data RPI</th><th>Despacho</th><th>Complemento</th></tr></thead>
+          <tbody>
+            <tr><td>2819</td><td>14/10/2025</td><td>8.7</td><td>—</td></tr>
+            <tr><td>2808</td><td>29/10/2024</td><td>8.6</td><td>Referente à 6ª anuidade.</td></tr>
+            <tr><td>2687</td><td>21/06/2022</td><td>8.4</td><td>Referente à 6ª anuidade.</td></tr>
+            <tr><td>2684</td><td>14/06/2022</td><td>8.1</td><td>—</td></tr>
+            <tr><td>2647</td><td>05/04/2021</td><td>11.1</td><td>—</td></tr>
+            <tr><td>2583</td><td>07/07/2020</td><td>3.1</td><td>—</td></tr>
+            <tr><td>2505</td><td>08/01/2019</td><td>2.10</td><td>Nº de Protocolo ‘870180167506’ em 26/12/2018 (WB)</td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:.5rem">Dados atualizados em 19/08/2025 — Nº da Revista: 2850</div>
+      </div>
+    </section>
+
+    <!-- Documentos para download (modelo IP Australia) -->
+    <section class="section" aria-labelledby="sec-docs">
+      <header id="sec-docs">Documentos para download</header>
+      <div class="content" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem">
+        <a class="btn outline" href="#" download><i class="fa-regular fa-file-lines"></i> Descrição (PDF)</a>
+        <a class="btn outline" href="#" download><i class="fa-regular fa-file-lines"></i> Reivindicações (PDF)</a>
+        <a class="btn outline" href="#" download><i class="fa-regular fa-file-image"></i> Desenhos (PDF)</a>
+        <a class="btn outline" href="#" download><i class="fa-regular fa-file-lines"></i> Relatório de Busca</a>
+        <a class="btn outline" href="#" download><i class="fa-regular fa-file-lines"></i> Carta Patente</a>
+        <a class="btn outline" href="#" download><i class="fa-solid fa-file-arrow-down"></i> Dossiê completo</a>
+      </div>
+    </section>
+
+    <!-- Viewer full-width (fora de card) -->
+    <section id="media-strip" class="media-strip" role="region" aria-label="Desenhos e figuras da patente">
+      <div class="stage">
+        <img src="US_11136638_B2.png" alt="Figura 1">
+      </div>
+      <div class="meta">
+        <div id="strip-caption">Figura 1</div>
+        <div class="actions">
+			<a id="strip-open" class="btn outline" href="#" target="_blank" rel="noopener noreferrer">
+			  <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+			  Abrir em nova guia
+			</a>
+          <a id="strip-download" class="btn outline" href="#" download>
+            <i class="fa-regular fa-file-image"></i> Baixar imagem
+          </a>
+        </div>
+      </div>
+      <div id="strip-thumbs" class="thumbs" role="list" aria-label="Miniaturas das figuras"></div>
+    </section>
+  </main>
+
+  <footer class="mini-footer" style="border-top:1px solid var(--line);padding:1.25rem 0;color:#6b7280;text-align:center">
+    © INPI • Protótipo de interface — somente para validação de UX
+  </footer>
+
+  <script>
+    // utilitários simples
+    document.getElementById('copyLink')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+      catch { alert('Não foi possível copiar.'); }
+    });
+    document.getElementById('share')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (navigator.share) navigator.share({ title: document.title, url: location.href });
+      else alert('Seu navegador não suporta compartilhamento nativo.');
+    });
+    document.getElementById('verPDF')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.open('#', '_blank'); // troque pela URL real do PDF
+    });
+
+    // Stepper (toggle e barra de progresso)
+    (function(){
+      const trigger = document.getElementById('status-acao-timeline');
+      const panel   = document.getElementById('pi-stepper-panel');
+      if (trigger && panel){
+        const toggle = () => {
+          const expanded = trigger.getAttribute('aria-expanded') === 'true';
+          trigger.setAttribute('aria-expanded', String(!expanded));
+          panel.setAttribute('aria-hidden', String(expanded));
+        };
+        trigger.addEventListener('click', toggle);
+        trigger.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+        });
+      }
+      document.querySelectorAll('.pi-stepper').forEach(stepper => {
+        const steps = Array.from(stepper.querySelectorAll('.pi-step'));
+        const progress = stepper.querySelector('.pi-progress');
+        let idx = steps.findIndex(s => s.classList.contains('pi-current'));
+        if (idx < 0) idx = steps.reduce((last, s, i) => s.classList.contains('pi-done') ? i : last, -1);
+        const pct = steps.length > 1 ? (idx / (steps.length - 1)) * 100 : 0;
+        if (progress) progress.style.width = pct + '%';
+      });
+    })();
+
+    // ===== Viewer full-width =====
+    // Preencha com as URLs reais das figuras (PNG/JPG/SVG).
+    const DRAWINGS = [
+      {src:'https://via.placeholder.com/1200x800?text=Figura+1', alt:'Figura 1'},
+      {src:'https://via.placeholder.com/1200x800?text=Figura+2', alt:'Figura 2'},
+      {src:'https://via.placeholder.com/1200x800?text=Figura+3', alt:'Figura 3'}
+    ];
+
+    (function initStrip(){
+      const strip = document.getElementById('media-strip');
+      if(!strip){ return; }
+      if(!Array.isArray(DRAWINGS) || DRAWINGS.length === 0){
+        strip.remove(); // sem imagens -> não exibe viewer (modelo IP Australia)
+        return;
+      }
+      const img = document.getElementById('strip-img');
+      const cap = document.getElementById('strip-caption');
+      const open = document.getElementById('strip-open');
+      const dl = document.getElementById('strip-download');
+      const thumbs = document.getElementById('strip-thumbs');
+
+      function render(i){
+        const it = DRAWINGS[i];
+        img.src = it.src;
+        img.alt = it.alt || ('Figura ' + (i+1));
+        cap.textContent = it.alt || ('Figura ' + (i+1));
+        open.href = it.src;
+        dl.href = it.src;
+        [...thumbs.children].forEach((b,ix)=>b.setAttribute('aria-current', String(ix===i)));
+      }
+
+      DRAWINGS.forEach((d,i)=>{
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', d.alt || ('Figura '+(i+1)));
+        b.innerHTML = `<img src="${d.src}" alt="">`;
+        b.addEventListener('click', ()=>render(i));
+        thumbs.appendChild(b);
+      });
+
+      render(0);
+    })();
+  </script>
+</body>
+</html>
