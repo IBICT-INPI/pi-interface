@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhe do Desenho Industrial — Portal de Propriedade Industrial</title>
+  <meta name="description" content="Visualização detalhada do registro de Desenho Industrial.">
+
+  <!-- DS GOV.BR (Fonts + Core) -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+
+  <!-- Fontes/ícones auxiliares (mantidos) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ====== Base (igual ao arquivo de Patentes) ====== */
+    .record-title h1 {
+      margin: 0;
+      font-family: Raleway, Rawline, Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: .01em
+    }
+
+    .br-tag {
+      white-space: nowrap;
+      background-color: red;
+    }
+
+    .status {
+      display: inline-flex;
+      gap: .4rem;
+      align-items: center;
+      font-weight: 700;
+      color: #374151;
+      font-size: .95rem;
+    }
+
+    .kv {
+      border: 1px solid #e5e7eb;
+      border-radius: .5rem;
+      padding: .6rem .75rem;
+      background: #fbfbfd
+    }
+
+    .kv .k {
+      font-size: .78rem;
+      color: #6b7280;
+      margin-bottom: .15rem
+    }
+
+    .kv .v {
+      font-weight: 700;
+      color: #111827
+    }
+
+    .br-table table {
+      width: 100%
+    }
+
+    .record-title .br-tag {
+      margin-left: .5rem
+    }
+
+    /* Skiplinks */
+    .skip-links {
+      position: relative;
+      z-index: 1000
+    }
+
+    .skip-links a {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #fff;
+      border: 2px solid #1351b4;
+      border-radius: .25rem;
+      padding: .5rem .75rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+      font-weight: 700
+    }
+
+    .skip-links a:focus {
+      left: .5rem;
+      top: .5rem
+    }
+
+    /* Stepper */
+    .pi-timeline {
+      margin-top: .75rem;
+      border: 1px solid #e5e7eb;
+      background: #f6f7fb;
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      display: none
+    }
+
+    .pi-timeline[aria-hidden="false"] {
+      display: block
+    }
+
+    .pi-stepper {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1rem;
+      width: 100%
+    }
+
+    .pi-stepper::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e5e7eb
+    }
+
+    .pi-progress {
+      position: absolute;
+      top: 18px;
+      left: 0;
+      height: 2px;
+      background: #93c5fd;
+      width: 0
+    }
+
+    .pi-step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center
+    }
+
+    .pi-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #e5e7eb;
+      background: #fff;
+      color: #6b7280;
+      font-weight: 700
+    }
+
+    .pi-step.pi-done .pi-dot {
+      background: #e8f3ff;
+      border-color: #93c5fd;
+      color: #2563eb
+    }
+
+    .pi-step.pi-current .pi-dot {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff
+    }
+
+    .pi-label {
+      font-size: .82rem;
+      color: #374151;
+      margin-top: .45rem;
+      font-weight: 600;
+      line-height: 1.2
+    }
+
+    .pi-meta {
+      font-size: .72rem;
+      color: #6b7280;
+      margin-top: .15rem
+    }
+
+    #status-acao-timeline {
+      cursor: pointer
+    }
+
+    /* Navegação topo */
+    #navigation .br-button+.br-button {
+      margin-left: .5rem
+    }
+
+    /* Grid biblio + carrossel (mantido) */
+    .biblio-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(260px, 28vw, 360px);
+      gap: 1rem;
+      align-items: start
+    }
+
+    .biblio-left {
+      display: grid;
+      gap: .75rem
+    }
+
+    .biblio-right {
+      position: relative
+    }
+
+    .media-carousel {
+      position: relative;
+      width: 100%
+    }
+
+    .media-frame {
+      aspect-ratio: 3/4;
+      width: 100%;
+      border: 1px solid #d0d7de;
+      border-radius: .75rem;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px, #f7f9fb;
+      display: grid;
+      place-items: center
+    }
+
+    .media-frame .mc-slide {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none
+    }
+
+    .media-frame .mc-slide.is-active {
+      display: block
+    }
+
+    .mc-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+      cursor: pointer;
+      display: grid;
+      place-items: center
+    }
+
+    .mc-btn.prev {
+      left: .5rem
+    }
+
+    .mc-btn.next {
+      right: .5rem
+    }
+
+    .mc-btn:focus-visible {
+      outline: 2px solid #0B5ED7;
+      outline-offset: 2px
+    }
+
+    /* Tooltip */
+    .tt {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-left: .375rem;
+      color: #6b7280;
+      cursor: help;
+      position: relative;
+      vertical-align: middle;
+      transform: translateY(-3px)
+    }
+
+    .tt:hover,
+    .tt:focus-visible {
+      color: #0B5ED7
+    }
+
+    .tt::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%);
+      min-width: 240px;
+      max-width: min(520px, 80vw);
+      background: #0b0d12;
+      color: #fff;
+      border-radius: .5rem;
+      padding: .625rem .75rem;
+      line-height: 1.35;
+      font-size: .875rem;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+      white-space: pre-line;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 10
+    }
+
+    .tt::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translate(-50%, 2px);
+      border: 8px solid transparent;
+      border-top-color: #0b0d12;
+      opacity: 0;
+      visibility: hidden
+    }
+
+    .tt:is(:hover, :focus-visible)::after,
+    .tt:is(:hover, :focus-visible)::before {
+      opacity: 1;
+      visibility: visible
+    }
+
+    /* Documentos para download */
+    .doc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: .75rem
+    }
+
+    .doc-item {
+      display: flex;
+      flex-direction: column
+    }
+
+    .br-button.secondary.doc-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      text-decoration: none
+    }
+
+    .doc-btn .btn-label {
+      display: flex;
+      align-items: center;
+      gap: .5rem
+    }
+
+    .doc-btn .btn-meta {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .78rem;
+      color: #6b7280;
+      font-variant-numeric: tabular-nums
+    }
+
+    .doc-btn .btn-meta i {
+      opacity: .75
+    }
+
+    .br-button.secondary.doc-btn.doc-btn--stacked {
+      flex-direction: column;
+      align-items: flex-start
+    }
+
+    .br-button.secondary.doc-btn.doc-btn--stacked .btn-meta {
+      margin-top: .15rem
+    }
+
+    /* Tabelas simples */
+    .table-wrap {
+      overflow: auto
+    }
+
+    table.pi {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0
+    }
+
+    table.pi th,
+    table.pi td {
+      padding: .6rem .7rem;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top
+    }
+
+    table.pi th {
+      background: #f9fafb;
+      text-align: left;
+      font-weight: 700;
+      color: #374151
+    }
+
+    table.pi tr:hover td {
+      background: #fbfcff
+    }
+
+    /* Ajudante de acessibilidade */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Responsivo */
+    @media (max-width:992px) {
+      .biblio-grid {
+        grid-template-columns: 1fr
+      }
+
+      .biblio-right {
+        order: 2
+      }
+    }
+
+    @media (min-width:992px) {
+      .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
+        display: flex;
+        flex-direction: column;
+        justify-content: center
+      }
+
+      .record-title+.status {
+        margin-top: .4rem
+      }
+
+      #pi-stepper-panel {
+        margin-top: .75rem
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Skiplinks -->
+  <div class="skip-links" aria-label="Acesso rápido">
+    <a accesskey="1" href="#main-content">Ir para o conteúdo <strong class="accesskey">1</strong></a>
+    <a accesskey="2" href="#navigation">Ir para a navegação <strong class="accesskey">2</strong></a>
+    <a accesskey="3" href="#page-breadcrumb">Ir para o breadcrumb <strong class="accesskey">3</strong></a>
+  </div>
+
+  <!-- Header (idêntico) -->
+  <header class="br-header" id="header" data-sticky>
+    <div class="container-lg">
+      <div class="header-top">
+        <div class="header-logo">
+          <div class="logo">
+            <a href="#" title="Portal de Propriedade Industrial — Início">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28" decoding="async" />
+            </a>
+          </div>
+          <div class="header-sign">Portal de Propriedade Industrial</div>
+        </div>
+        <div class="header-actions">
+          <div class="header-links">
+            <a class="br-button circle small" href="#" aria-label="Acessar conta">
+              <i class="fa-regular fa-user" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Ações + breadcrumb -->
+  <div class="container-lg py-2" id="navigation">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <a href="#" class="br-button secondary">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="ml-1">Voltar aos resultados</span>
+        </a>
+        <nav class="br-breadcrumb" id="page-breadcrumb" aria-label="Breadcrumb" style="margin-left:.75rem">
+          <ol class="crumb-list">
+            <li class="crumb"><a href="#">Consulta</a></li>
+            <li class="crumb"><a href="#">Desenho Industrial</a></li>
+            <li class="crumb" aria-current="page">Detalhe</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="d-flex align-items-center">
+        <button class="br-button secondary" type="button" id="copyLink"><i class="fa-regular fa-copy"
+            aria-hidden="true"></i><span class="ml-1">Copiar link</span></button>
+        <a class="br-button secondary" href="#" id="share"><i class="fa-solid fa-share-nodes"
+            aria-hidden="true"></i><span class="ml-1">Compartilhar</span></a> <a class="br-button primary" href="#"
+          id="verPDF"><i class="fa-regular fa-file-pdf" aria-hidden="true"></i><span class="ml-1">Ver Dossiê</span></a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content" class="d-flex flex-fill">
+    <div class="container-lg">
+
+      <!-- CARD 1: Cabeçalho do registro (título/estado + tripla KV + stepper) -->
+      <div class="br-card mt-3">
+        <div class="card-content">
+          <div class="row g-3 align-items-center">
+            <div class="col-12 col-lg-8">
+              <div class="record-title d-flex flex-wrap align-items-baseline">
+                <h1>Desenho Industrial • BR302023003226-6</h1>
+                <span class="br-tag">Registro de DI extinto</span>
+              </div>
+              <div class="status mt-2" tabindex="0" aria-expanded="false">
+                <i class="fa-solid fa-circle-info"></i> <span>Depósito de pedido de registro de Desenho
+                  Industrial</span>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4"><!-- espaço reservado, sem mídia no topo --></div>
+          </div>
+
+
+          <!-- KV tripla -->
+          <div class="row g-2 mt-3">
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(21) Número</div>
+                <div class="v">BR302023003226-6</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(22) Data do depósito</div>
+                <div class="v">22/06/2023</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(45) Data da concessão</div>
+                <div class="v">20/02/2024</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: Dados do registro + Representações -->
+      <div class="br-card mt-3" aria-labelledby="sec-biblio">
+        <div class="card-header">
+          <h2 id="sec-biblio" class="h6 m-0">Dados do registro</h2>
+        </div>
+        <div class="card-content">
+          <div class="biblio-grid">
+            <!-- Esquerda -->
+            <div class="biblio-left">
+              <div class="kv">
+                <div class="k">Indicação de produto (título)</div>
+                <div class="v">CONFIGURAÇÃO APLICADA A/EM PEÇAS PARA ADAPTAÇÃO DE IMPRESSORA 3D</div>
+              </div>
+              <div class="kv">
+                <div class="k">Descrição</div>
+                <div class="v">—</div>
+              </div>
+
+              <div class="kv">
+                <div class="k">(51) Classificação Internacional de Locarno
+                  <span class="tt" role="button" tabindex="0"
+                    data-tooltip="Classificação específica para Desenho Industrial.">
+                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                    <span class="sr-only">Ajuda: Locarno</span>
+                  </span>
+                </div>
+                <div class="v">
+                  <div class="table-wrap" aria-label="Classificação Locarno">
+                    <table class="pi">
+                      <thead>
+                        <tr>
+                          <th style="width:90px">Edição</th>
+                          <th style="width:120px">Código</th>
+                          <th>Descrição</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>13</td>
+                          <td>15-09</td>
+                          <td>Máquinas operatrizes, maquinário de abrasão e fundição</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kv">
+                <div class="k">(72) Autor(es)</div>
+                <div class="v">WANIA APARECIDA CHRISTINELL / DANIEL CUNHA ELIAS / AIMORÉ DUTRA NETO</div>
+              </div>
+
+              <div class="kv">
+                <div class="k">(73) Titular</div>
+                <div class="v">COMISSÃO NACIONAL DE ENERGIA NUCLEAR (BR/RJ) / UNIVERSIDADE FEDERAL DE MINAS GERAIS
+                  (BR/MG)</div>
+              </div>
+
+              <div class="kv">
+                <div class="k">(74) Representante legal</div>
+                <div class="v">—</div>
+              </div>
+            </div>
+
+            <!-- Direita (Representações) -->
+            <div class="biblio-right">
+              <div class="media-carousel" id="biblio-carousel" tabindex="0" aria-label="Representações do desenho">
+                <button class="mc-btn prev" type="button" aria-label="Imagem anterior" title="Anterior">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15.5 19 8.5 12l7-7" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                </button>
+                <div class="media-frame" id="biblio-media-frame" role="group" aria-roledescription="carrossel"
+                  aria-live="polite">
+                  <img class="mc-slide is-active" loading="lazy" decoding="async" alt="Representação 1"
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1067'><rect width='100%25' height='100%25' fill='%23f3f6f9'/><rect x='40' y='40' width='720' height='987' fill='%23ffffff' stroke='%23d0d7de' stroke-width='3'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='32' fill='%239aa3ab'>Representações do DI</text></svg>">
+                  <!-- adicione mais <img class="mc-slide"> conforme necessário -->
+                </div>
+                <button class="mc-btn next" type="button" aria-label="Próxima imagem" title="Próxima">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.5 19l7-7-7-7" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: Datas -->
+      <div class="br-card mt-3" aria-labelledby="sec-datas">
+        <div class="card-header">
+          <h2 id="sec-datas" class="h6 m-0">Datas</h2>
+        </div>
+        <div class="card-content">
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(22) Data do depósito</div>
+                <div class="v">22/06/2023</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(45) Data da concessão</div>
+                <div class="v">20/02/2024</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">(17) Duração prevista do registro/renovação</div>
+                <div class="v">22/06/2033</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- CARD 5: Publicações -->
+      <div class="br-card mt-3" aria-labelledby="sec-pubs">
+        <div class="card-header">
+          <h2 id="sec-pubs" class="h6 m-0">Publicações</h2>
+        </div>
+        <div class="card-content">
+          <div class="table-wrap">
+            <table class="pi">
+              <thead>
+                <tr>
+                  <th style="width:80px">RPI</th>
+                  <th style="width:120px">Data da RPI</th>
+                  <th>Despacho</th>
+                  <th style="width:120px">Certificado</th>
+                  <th style="width:120px">Inteiro teor</th>
+                  <th>Complemento do despacho</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2772</td>
+                  <td>20/02/2024</td>
+                  <td> Extinção - Art. 119 inciso III da LPI. </br> Notificação da extinção do registro de desenho
+                    industrial pela falta de pagamento da retribuição prevista nos Arts. 108 e 120 da LPI./td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><b>Detalhes do despacho:</b> Registro extinto a contar de 28/03/2013</td>
+                </tr>
+                <td>2740</td>
+                <td>11/07/2023</td>
+                <td>Concessão do Registro.</br> Expedição do certificado de registro de desenho industrial. O título
+                  acha-se à disposição do interessado no setor competente do INPI. Desta data corre o prazo de 5 (cinco)
+                  anos para interposição de nulidade administrativa por qualquer interessado (Art. 113 § 1º da LPI ). Se
+                  interposto o pedido de nulidade no prazo de 60 (sessenta) dias contados da data da concessão, os
+                  efeitos da concessão do registro serão suspensos (Art. 113 § 2º).</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <footer class="mt-3 py-3 text-center text-muted border-top">
+        © INPI • Protótipo de interface — somente para validação de UX
+      </footer>
+    </div>
+  </main>
+
+  <!-- DS GOV.BR (JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window?.br?.initAll) window.br.initAll();
+
+      // Ações simples
+      document.getElementById('copyLink')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+        catch { alert('Não foi possível copiar.'); }
+      });
+      document.getElementById('share')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (navigator.share) navigator.share({ title: document.title, url: location.href });
+        else alert('Seu navegador não suporta compartilhamento nativo.');
+      });
+      document.getElementById('verPDF')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open('#', '_blank'); // trocar pela URL real do PDF
+      });
+
+      // Carrossel
+      (function () {
+        const root = document.getElementById('biblio-carousel');
+        if (!root) return;
+        const prev = root.querySelector('.prev');
+        const next = root.querySelector('.next');
+        const slides = [...root.querySelectorAll('.mc-slide')].filter(el => (el.getAttribute('src') || '').trim() !== '');
+        let i = 0;
+        function update(idx) {
+          if (!slides.length) return;
+          i = (idx + slides.length) % slides.length;
+          slides.forEach((el, j) => el.classList.toggle('is-active', j === i));
+          const hide = slides.length < 2; prev.hidden = hide; next.hidden = hide;
+        }
+        prev?.addEventListener('click', () => update(i - 1));
+        next?.addEventListener('click', () => update(i + 1));
+        root.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') update(i - 1);
+          if (e.key === 'ArrowRight') update(i + 1);
+        });
+        update(0);
+      })();
+    });
+  </script>
+</body>
+
+</html>

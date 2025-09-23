@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhe da Marca — Portal de Propriedade Industrial</title>
+  <meta name="description"
+    content="Visualização detalhada do processo de registro de marca no Portal de Propriedade Industrial.">
+
+  <!-- DS Gov.br (Fonts + CSS via CDN) -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+
+  <!-- Font Awesome (ícones) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Raleway (mantida para os títulos) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+
+  <style>
+    /* === Ajustes mínimos (compatíveis com DS) ============================== */
+    .record-title h1 {
+      margin: 0;
+      font-family: Raleway, Rawline, Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: .01em
+    }
+
+    .status {
+      display: inline-flex;
+      gap: .4rem;
+      align-items: center;
+      font-weight: 700;
+      color: #374151;
+      font-size: .95rem;
+      cursor: pointer
+    }
+
+    .kv {
+      border: 1px solid #e5e7eb;
+      border-radius: .5rem;
+      padding: .6rem .75rem;
+      background: #fbfbfd
+    }
+
+    .kv .k {
+      font-size: .78rem;
+      color: #6b7280;
+      margin-bottom: .15rem
+    }
+
+    .kv .v {
+      font-weight: 700;
+      color: #111827
+    }
+
+    /* Moldura da mídia da marca: igual ao frame da patente */
+    .mark-media {
+      border: 1px solid #d0d7de;
+      border-radius: .75rem;
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px,
+        #f7f9fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: .85rem;
+    }
+
+    .mark-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Skiplinks: visíveis só no foco */
+    .skip-links {
+      position: relative;
+      z-index: 1000
+    }
+
+    .skip-links a {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #fff;
+      border: 2px solid #1351b4;
+      border-radius: .25rem;
+      padding: .5rem .75rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+      font-weight: 700
+    }
+
+    .skip-links a:focus {
+      left: .5rem;
+      top: .5rem
+    }
+
+    /* Respiro entre título e tag do nº do processo */
+    .record-title .br-tag {
+      margin-left: .5rem
+    }
+
+    /* Stepper/timeline custom (mantido) */
+    .pi-timeline {
+      margin-top: .75rem;
+      border: 1px solid #e5e7eb;
+      background: #f6f7fb;
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      display: none
+    }
+
+    .pi-timeline[aria-hidden="false"] {
+      display: block
+    }
+
+    .pi-stepper {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1rem;
+      width: 100%
+    }
+
+    .pi-stepper::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e5e7eb
+    }
+
+    .pi-progress {
+      position: absolute;
+      top: 18px;
+      left: 0;
+      height: 2px;
+      background: #93c5fd;
+      width: 0
+    }
+
+    .pi-step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center
+    }
+
+    .pi-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #e5e7eb;
+      background: #fff;
+      color: #6b7280;
+      font-weight: 700
+    }
+
+    .pi-step.pi-done .pi-dot {
+      background: #e8f3ff;
+      border-color: #93c5fd;
+      color: #2563eb
+    }
+
+    .pi-step.pi-current .pi-dot {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff
+    }
+
+    .pi-label {
+      font-size: .82rem;
+      color: #374151;
+      margin-top: .45rem;
+      font-weight: 600;
+      line-height: 1.2
+    }
+
+    .pi-meta {
+      font-size: .72rem;
+      color: #6b7280;
+      margin-top: .15rem
+    }
+
+    /* Espaço entre botões do topo */
+    #navigation .br-button+.br-button {
+      margin-left: .5rem
+    }
+
+    /* CTA do rodapé (card "Atalhos"): respiro organizado */
+    .br-card[aria-label="Atalhos"] .card-content {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: .5rem;
+      row-gap: .5rem
+    }
+
+    .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
+      margin-left: .5rem
+    }
+
+    @media (max-width:576px) {
+      .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
+        margin-left: 0
+      }
+    }
+
+    /* Centralização vertical do bloco título+status quando há mídia à direita */
+    @media (min-width:992px) {
+      .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
+        display: flex;
+        flex-direction: column;
+        justify-content: center
+      }
+
+      .record-title+.status {
+        margin-top: .4rem
+      }
+
+      #pi-stepper-panel {
+        margin-top: .75rem
+      }
+    }
+  </style>
+</head>
+
+<body class="template-base">
+  <!-- Skiplinks -->
+  <div class="skip-links" aria-label="Acesso rápido">
+    <a accesskey="1" href="#main-content">Ir para o conteúdo <strong class="accesskey">1</strong></a>
+    <a accesskey="2" href="#navigation">Ir para a navegação <strong class="accesskey">2</strong></a>
+    <a accesskey="3" href="#page-breadcrumb">Ir para o breadcrumb <strong class="accesskey">3</strong></a>
+  </div>
+
+  <!-- Cabeçalho DS -->
+  <header class="br-header" id="header" data-sticky>
+    <div class="container-lg">
+      <div class="header-top">
+        <div class="header-logo">
+          <div class="logo">
+            <a href="#" title="Portal de Propriedade Industrial — Início">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28" decoding="async" />
+            </a>
+          </div>
+          <div class="header-sign">Portal de Propriedade Industrial</div>
+        </div>
+        <div class="header-actions">
+          <div class="header-links">
+            <a class="br-button circle small" href="#" aria-label="Acessar conta"><i class="fa-regular fa-user"
+                aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra fixa de ações + breadcrumb -->
+  <div class="container-lg py-2" id="navigation">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <button class="br-button secondary" type="button" onclick="history.back()">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="ml-1">Voltar aos resultados</span>
+        </button>
+        <nav class="br-breadcrumb" id="page-breadcrumb" aria-label="Breadcrumb" style="margin-left:.75rem">
+          <ol class="crumb-list">
+            <li class="crumb"><a href="#">Consulta</a></li>
+            <li class="crumb"><a href="#">Marca</a></li>
+            <li class="crumb" aria-current="page">Detalhe</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="d-flex align-items-center">
+        <button class="br-button secondary" type="button" id="copyLink"><i class="fa-regular fa-copy"
+            aria-hidden="true"></i><span class="ml-1">Copiar link</span></button>
+        <a class="br-button secondary" href="#" id="share"><i class="fa-solid fa-share-nodes"
+            aria-hidden="true"></i><span class="ml-1">Compartilhar</span></a>
+        <a class="br-button primary" href="#" id="verPDF"><i class="fa-regular fa-file-pdf" aria-hidden="true"></i><span
+            class="ml-1">Ver Dossiê</span></a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content" class="d-flex flex-fill">
+    <div class="container-lg">
+
+      <!-- Card: Cabeçalho do registro -->
+      <div class="br-card mt-3">
+        <div class="card-content">
+          <!-- Título/status (esq.) + mídia (dir.) -->
+          <div class="row g-3 align-items-center">
+            <div class="col-12 col-lg-8">
+              <div class="record-title d-flex flex-wrap align-items-baseline">
+                <h1>Marca • CAR MATCH</h1>
+              </div>
+
+              <!-- NOVO: box do Nº do Processo abaixo do título -->
+              <div class="process-tag">
+                <span class="br-tag" role="status" aria-label="Número do Processo">Nº do Processo:
+                  <strong>933602448</strong>
+                </span>
+              </div>
+              <div class="status mt-2" id="status-acao-timeline" role="button" tabindex="0" aria-expanded="false"
+                aria-controls="pi-stepper-panel">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i><span>Aguardando exame de mérito</span>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="mark-media p-2" aria-label="Representação gráfica da marca">
+                <img src="old/LogoMarcasServletController.jpg" alt="Logotipo apresentado no pedido" loading="lazy"
+                  decoding="async" class="w-100" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Stepper (largura total do card) -->
+          <section id="pi-stepper-panel" class="pi-timeline" role="region" aria-labelledby="pi-timeline-title"
+            aria-hidden="true">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h2 id="pi-timeline-title" class="h6 m-0">Fluxo do registro de marca</h2>
+              <span class="text-muted small">Etapas principais e estado atual</span>
+            </div>
+            <ol class="pi-stepper" role="list">
+              <div class="pi-progress" aria-hidden="true"></div>
+              <li class="pi-step pi-done" aria-label="Depósito do pedido">
+                <span class="pi-dot" aria-hidden="true"><span class="pi-ico">1</span></span>
+                <span class="pi-label">Depósito</span><span class="pi-meta">12/04/2024</span>
+              </li>
+              <li class="pi-step pi-done" aria-label="Exame formal">
+                <span class="pi-dot" aria-hidden="true"><span class="pi-ico">2</span></span>
+                <span class="pi-label">Exame formal</span><span class="pi-meta">20/04/2024</span>
+              </li>
+              <li class="pi-step pi-done" aria-label="Publicação na RPI">
+                <span class="pi-dot" aria-hidden="true"><span class="pi-ico">3</span></span>
+                <span class="pi-label">Publicação RPI</span><span class="pi-meta">05/05/2024</span>
+              </li>
+              <li class="pi-step pi-current" aria-current="step" aria-label="Exame de mérito">
+                <span class="pi-dot" aria-hidden="true"><span class="pi-ico">4</span></span>
+                <span class="pi-label">Exame de mérito</span><span class="pi-meta">Em andamento</span>
+              </li>
+              <li class="pi-step" aria-label="Decisão / Concessão">
+                <span class="pi-dot" aria-hidden="true"><span class="pi-ico">5</span></span>
+                <span class="pi-label">Decisão / Concessão</span><span class="pi-meta">—</span>
+              </li>
+            </ol>
+          </section>
+
+          <!-- KV (3 colunas) -->
+          <div class="row g-2 mt-3">
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Apresentação</div>
+                <div class="v">Mista</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Natureza</div>
+                <div class="v">Produtos e/ou Serviço</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Titular</div>
+                <div class="v">CAR FINDER</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classificação de Produtos/Serviços -->
+      <div class="br-card mt-3" aria-labelledby="sec-ncl">
+        <div class="card-header">
+          <h2 id="sec-ncl" class="h6 m-0">Classificação de Produtos / Serviços</h2>
+        </div>
+        <div class="card-content">
+          <div class="br-table" role="region" aria-label="Classificação de Nice e situação">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:120px">Classe de Nice</th>
+                  <th style="width:220px">Situação da Classe</th>
+                  <th>Especificação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>NCL(12) 9</strong></td>
+                  <td>Vide Situação do Processo</td>
+                  <td>Aplicativo baixável para ambientes virtuais; Aplicativos; …</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classificação Internacional de Viena -->
+      <div class="br-card mt-3" aria-labelledby="sec-cfe">
+        <div class="card-header">
+          <h2 id="sec-cfe" class="h6 m-0">Classificação Internacional de Viena</h2>
+        </div>
+        <div class="card-content">
+          <div class="br-table" role="region" aria-label="Classificação de Viena">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:80px">Edição</th>
+                  <th style="width:120px">Código</th>
+                  <th>Descrição</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>4</td>
+                  <td>26.11.3</td>
+                  <td>Mais de duas linhas ou de duas faixas</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>26.11.7</td>
+                  <td>Linhas ou faixas verticais</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>27.5.17</td>
+                  <td>Letras em caracteres cheios</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Titulares e Representante -->
+      <div class="br-card mt-3" aria-labelledby="sec-titular">
+        <div class="card-header">
+          <h2 id="sec-titular" class="h6 m-0">Titulares e Representante Legal</h2>
+        </div>
+        <div class="card-content">
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <div class="kv">
+                <div class="k">Titular</div>
+                <div class="v">CAR FINDER</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="kv">
+                <div class="k">Procurador</div>
+                <div class="v">Otávio Jorge Assef</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datas -->
+      <div class="br-card mt-3" aria-labelledby="sec-datas">
+        <div class="card-header">
+          <h2 id="sec-datas" class="h6 m-0">Datas</h2>
+        </div>
+        <div class="card-content">
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Data de Depósito</div>
+                <div class="v">22/02/2024</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Data de Concessão</div>
+                <div class="v">—</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="kv">
+                <div class="k">Data de Vigência</div>
+                <div class="v">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Publicações (RPI) -->
+      <div class="br-card mt-3" aria-labelledby="sec-publicacoes">
+        <div class="card-header">
+          <h2 id="sec-publicacoes" class="h6 m-0">Publicações</h2>
+        </div>
+        <div class="card-content">
+          <div class="br-table" role="region" aria-label="Publicações na RPI">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:80px">RPI</th>
+                  <th style="width:120px">Data</th>
+                  <th style="width:240px">Despacho</th>
+                  <th>Complemento</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2774</td>
+                  <td>05/03/2024</td>
+                  <td>Publicação de pedido de registro</td>
+                  <td>Exame formal concluído</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-muted mt-2 small">Dados atualizados até <strong>12/08/2025</strong> • Nº da Revista:
+            <strong>2849</strong>
+          </p>
+        </div>
+      </div>
+
+
+      <!-- CTA secundário -->
+      <div class="br-card mt-3" aria-label="Atalhos">
+        <div class="card-content">
+          <a class="br-button secondary" href="#"><i class="fa-solid fa-arrow-up-right-from-square"
+              aria-hidden="true"></i> <span class="ml-1">Ver no sistema antigo</span></a>
+          <a class="br-button secondary" href="#"><i class="fa-solid fa-download" aria-hidden="true"></i> <span
+              class="ml-1">Exportar JSON/XML</span></a>
+          <a class="br-button secondary" href="#" onclick="window.print()"><i class="fa-solid fa-print"
+              aria-hidden="true"></i> <span class="ml-1">Imprimir</span></a>
+        </div>
+      </div>
+
+      <footer class="mt-3 py-3 text-center text-muted border-top">© INPI • Protótipo de interface — somente para
+        validação de UX</footer>
+    </div>
+  </main>
+
+  <!-- DS Gov.br (JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      /* Inicialização DS */
+      if (window?.br?.initAll) window.br.initAll();
+
+      /* Toggle da timeline (click/teclado) */
+      const trigger = document.getElementById('status-acao-timeline');
+      const panel = document.getElementById('pi-stepper-panel');
+      if (trigger && panel) {
+        const toggle = () => {
+          const expanded = trigger.getAttribute('aria-expanded') === 'true';
+          trigger.setAttribute('aria-expanded', String(!expanded));
+          panel.setAttribute('aria-hidden', String(expanded));
+        };
+        trigger.addEventListener('click', toggle);
+        trigger.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+        });
+      }
+
+      /* Barra de progresso do stepper */
+      document.querySelectorAll('.pi-stepper').forEach(stepper => {
+        const steps = [...stepper.querySelectorAll('.pi-step')];
+        const progress = stepper.querySelector('.pi-progress');
+        let idx = steps.findIndex(s => s.classList.contains('pi-current'));
+        if (idx < 0) idx = steps.reduce((last, s, i) => s.classList.contains('pi-done') ? i : last, -1);
+        const pct = steps.length > 1 ? (idx / (steps.length - 1)) * 100 : 0;
+        if (progress) progress.style.width = pct + '%';
+      });
+
+      /* Ações simples (copiar/compartilhar/ver PDF) */
+      document.getElementById('copyLink')?.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+        catch { alert('Não foi possível copiar.'); }
+      });
+      document.getElementById('share')?.addEventListener('click', e => {
+        e.preventDefault();
+        if (navigator.share) navigator.share({ title: document.title, url: location.href });
+        else alert('Seu navegador não suporta compartilhamento nativo.');
+      });
+      document.getElementById('verPDF')?.addEventListener('click', e => {
+        e.preventDefault();
+        window.open('#', '_blank'); /* troque pela URL real do PDF */
+      });
+    });
+  </script>
+</body>
+
+</html>
