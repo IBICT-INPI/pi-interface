@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhe do Contrato — Portal de Propriedade Industrial</title>
+  <meta name="description"
+    content="Detalhe de Contrato de Transferência de Tecnologia no Portal de Propriedade Industrial.">
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    .record-title h1 {
+      margin: 0;
+      font-family: Raleway, Rawline, Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: .01em
+    }
+
+    .record-tags {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: .25rem
+    }
+
+    .br-tag {
+      white-space: nowrap
+    }
+
+    .kv {
+      border: 1px solid #e5e7eb;
+      border-radius: .5rem;
+      padding: .6rem .75rem;
+      background: #fbfbfd
+    }
+
+    .kv .k {
+      font-size: .78rem;
+      color: #6b7280;
+      margin-bottom: .15rem
+    }
+
+    .kv .v {
+      font-weight: 700;
+      color: #111827
+    }
+
+    .br-table table {
+      width: 100%
+    }
+
+    /* Grid do card de dados (uma coluna; se quiser migrar para 2, é só trocar para grid-2 como no software) */
+    .biblio-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .75rem
+    }
+
+    .tt-inline {
+      position: relative;
+      display: inline-block;
+      cursor: help
+    }
+
+    .tt::after,
+    .tt-inline::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%);
+      min-width: 240px;
+      max-width: min(520px, 80vw);
+      background: #0b0d12;
+      color: #fff;
+      border-radius: .5rem;
+      padding: .625rem .75rem;
+      line-height: 1.35;
+      font-size: .875rem;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+      white-space: pre-line;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 10
+    }
+
+    .tt::before,
+    .tt-inline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translate(-50%, 2px);
+      border: 8px solid transparent;
+      border-top-color: #0b0d12;
+      opacity: 0;
+      visibility: hidden
+    }
+
+    .tt:is(:hover, :focus-visible)::after,
+    .tt:is(:hover, :focus-visible)::before,
+    .tt-inline:is(:hover, :focus-visible)::after,
+    .tt-inline:is(:hover, :focus-visible)::before {
+      opacity: 1;
+      visibility: visible
+    }
+
+    .tt {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-left: .375rem;
+      color: #6b7280;
+      cursor: help;
+      position: relative;
+      vertical-align: middle;
+      transform: translateY(-3px)
+    }
+
+    .tt:hover,
+    .tt:focus-visible {
+      color: #0B5ED7
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0
+    }
+
+    .pub-complement {
+      max-height: 8.5rem;
+      overflow: hidden;
+      position: relative
+    }
+
+    .pub-complement.expanded {
+      max-height: none
+    }
+
+    .pub-fade {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3rem;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff)
+    }
+
+    .doc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: .75rem
+    }
+
+    .doc-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start
+    }
+
+    .br-button.secondary.doc-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      text-decoration: none
+    }
+
+    .doc-btn .btn-label {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      min-width: 0
+    }
+
+    .doc-btn .btn-label span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .doc-btn .btn-meta {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .78rem;
+      color: #6b7280;
+      font-variant-numeric: tabular-nums
+    }
+
+    .doc-btn .btn-meta i {
+      opacity: .75
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* GRID do card "Dados do software": 1 ou 2 colunas automaticamente */
+    .biblio-grid.grid-2 {
+      display: grid;
+      gap: .75rem;
+      /* vira 2 colunas assim que houver ~640px de área (2 x 320) */
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    /* quando quiser que um item ocupe a linha toda (ex.: Título) */
+    .span-2 {
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="br-header" id="header" data-sticky>
+    <div class="container-lg">
+      <div class="header-top">
+        <div class="header-logo">
+          <div class="logo">
+            <a href="#" title="Portal de Propriedade Industrial — Início">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28" decoding="async" />
+            </a>
+          </div>
+          <div class="header-sign">Portal de Propriedade Industrial</div>
+        </div>
+        <div class="header-actions">
+          <div class="header-links">
+            <a class="br-button circle small" href="#" aria-label="Acessar conta"><i class="fa-regular fa-user"
+                aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container-lg py-2" id="navigation">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <a href="#" class="br-button secondary"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span
+            class="ml-1">Voltar aos resultados</span></a>
+        <nav class="br-breadcrumb" id="page-breadcrumb" aria-label="Breadcrumb" style="margin-left:.75rem">
+          <ol class="crumb-list">
+            <li class="crumb"><a href="#">Consulta</a></li>
+            <li class="crumb"><a href="#">Contrato</a></li>
+            <li class="crumb" aria-current="page">Detalhe</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="d-flex align-items-center">
+        <a class="br-button secondary ml-1" href="#" id="share"><i class="fa-solid fa-share-nodes"
+            aria-hidden="true"></i><span class="ml-1">Compartilhar</span></a>
+        <a class="br-button primary ml-1" href="#" id="verPDF"><i class="fa-regular fa-file-pdf"
+            aria-hidden="true"></i><span class="ml-1">Ver Dossiê</span></a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content" class="d-flex flex-fill">
+    <div class="container-lg">
+
+      <!-- Cabeçalho -->
+      <div class="br-card mt-3">
+        <div class="card-content">
+          <div class="row g-3 align-items-center">
+            <div class="col-12">
+              <div class="record-title d-flex flex-wrap align-items-baseline">
+                <h1>Contrato • BR702018000381-2</h1>
+              </div>
+              <div class="record-tags"><span class="br-tag">Transferência de Tecnologia</span></div>
+            </div>
+          </div>
+
+          <div class="row g-2 mt-3">
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Nº do Requerimento</div>
+                <div class="v">BR702018000381-2</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Nº do Protocolo</div>
+                <div class="v">880180001542</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Entrada</div>
+                <div class="v"><time datetime="2018-07-04">04/07/2018</time></div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Prazo de vigência declarado</div>
+                <div class="v">25.41-1-00</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-2 mt-2">
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Situação</div>
+                <div class="v">Averbado</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Última RPI</div>
+                <div class="v">2855</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Data da RPI</div>
+                <div class="v"><time datetime="2025-09-23">23/09/2025</time></div>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="kv">
+                <div class="k">Atualização</div>
+                <div class="v"><time datetime="2025-09-23">23/09/2025</time></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados do contrato (apenas cadastrais, com campos separados) -->
+      <div class="br-card mt-3" aria-labelledby="sec-biblio">
+        <div class="card-header">
+          <h2 id="sec-biblio" class="h6 m-0">Dados do contrato</h2>
+        </div>
+        <div class="card-content">
+          <div class="biblio-grid grid-2">
+            <div class="kv">
+              <div class="k">Categoria Contratual</div>
+              <div class="v">FORNECIMENTO DE TECNOLOGIA</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Cedente</div>
+              <div class="v">IK INTERKLIMAT SPA</div>
+            </div>
+            <div class="kv">
+              <div class="k">País da Cedente</div>
+              <div class="v">ITÁLIA</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Cessionária</div>
+              <div class="v">TRAMONTINA FARROUPILHA S/A INDÚSTRIA METALÚRGICA</div>
+            </div>
+            <div class="kv">
+              <div class="k">País da Cessionária</div>
+              <div class="v">BRASIL (RS)</div>
+            </div>
+            <div class="kv">
+              <div class="k">Setor da Cessionária</div>
+              <div class="v">fabricação de artigos de cutelaria (25.41-1-00)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Publicações (complementos ficam aqui) -->
+      <div class="br-card mt-3" aria-labelledby="sec-rpi">
+        <div class="card-header">
+          <h2 id="sec-rpi" class="h6 m-0">
+            Publicações na RPI
+            <span class="tt" role="button" tabindex="0"
+              data-tooltip="Detalhes como objeto, condições econômicas e vigência aparecem no complemento do despacho.">
+              <i class="fa-regular fa-circle-question" aria-hidden="true"></i><span class="sr-only">Ajuda</span>
+            </span>
+          </h2>
+        </div>
+        <div class="card-content">
+          <div class="br-table" role="region" aria-label="Publicações RPI">
+            <table>
+              <thead>
+                <tr>
+                  <th>RPI</th>
+                  <th>Data RPI</th>
+                  <th>Doc</th>
+                  <th>Carta</th>
+                  <th>Despacho</th>
+                  <th>Complemento do Despacho</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2762</td>
+                  <td><time datetime="2023-12-12">12/12/2023</time></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>185</td>
+                  <td>
+                    <div class="pub-complement" id="c1">
+                      Certificado de Averbação: 702018000381/01. Cedente: IK INTERKLIMAT SPA (ITÁLIA). Cessionária:
+                      TRAMONTINA FARROUPILHA S/A INDÚSTRIA METALÚRGICA (BRASIL/RS).
+                      Objeto: Fornecimento de tecnologia para fabricação de fornos das linhas SNACKERY e MEGA, conforme
+                      anexos. Moeda: EURO. Demais condições e vigência conforme contrato.
+                      <div class="pub-fade" aria-hidden="true"></div>
+                    </div>
+                    <button class="br-button small secondary pub-toggle" data-target="#c1" type="button">Mostrar
+                      mais</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2762</td>
+                  <td><time datetime="2023-12-12">12/12/2023</time></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>800</td>
+                  <td>
+                    <div class="pub-complement" id="c2">
+                      Certidão nº 8850320000255 referente ao certificado 702018000381/01. Requerente: TRAMONTINA
+                      FARROUPILHA S/A INDÚSTRIA METALÚRGICA. Data de protocolo: 04/07/2018.
+                      <div class="pub-fade" aria-hidden="true"></div>
+                    </div>
+                    <button class="br-button small secondary pub-toggle" data-target="#c2" type="button">Mostrar
+                      mais</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2724</td>
+                  <td><time datetime="2023-03-21">21/03/2023</time></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>350</td>
+                  <td>
+                    <div class="pub-complement" id="c3">
+                      Aditivo de 20/02/2023 ao Contrato nº SED 8600 de 28/04/2021; 1º Aditivo de 06/08/2021; 2º Aditivo
+                      de 05/11/2021. Modalidade: SAT – Serviços de assessoria e consultoria técnica. Alteração de prazo
+                      de vigência. Forma de pagamento (exemplos): taxa/hora EUR 50,00 e EUR 60,00.
+                      <div class="pub-fade" aria-hidden="true"></div>
+                    </div>
+                    <button class="br-button small secondary pub-toggle" data-target="#c3" type="button">Mostrar
+                      mais</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-muted mt-2 small">Dados atualizados em <time datetime="2025-09-23">23/09/2025</time> — Nº da
+            Revista: 2855</p>
+        </div>
+      </div>
+
+
+      <footer class="mt-3 py-3 text-center text-muted border-top">© INPI • Protótipo de interface — somente para
+        validação de UX</footer>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+  <script>
+    (() => {
+      const DEFAULT_THRESHOLD = 320;
+      function bindActions() {
+        document.getElementById('copyLink')?.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+          catch { alert('Não foi possível copiar.'); }
+        });
+        document.getElementById('share')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (navigator.share) navigator.share({ title: document.title, url: location.href });
+          else alert('Seu navegador não suporta compartilhamento nativo.');
+        });
+        document.getElementById('verPDF')?.addEventListener('click', (e) => {
+          e.preventDefault(); window.open('#', '_blank');
+        });
+      }
+      const DESP = { '185': 'Certificado de Averbação.', '800': 'Certidão vinculada ao ato.', '350': 'Despacho de análise/publicação (aditivos/alterações).', '150': 'Petições e comunicações (informativas).' };
+      const getDesp = (c) => DESP[c] || `Despacho ${c}`;
+      const TooltipEngine = (() => { function tooltipifyCells(root, sel, get) { const r = typeof root === 'string' ? document.querySelector(root) : root; if (!r) return; r.querySelectorAll(sel).forEach(td => { const code = (td.textContent || '').trim(); if (!code || code === '—') return; td.textContent = ''; const span = document.createElement('span'); span.className = 'tt-inline'; span.tabIndex = 0; span.dataset.tooltip = get(code); span.textContent = code; td.appendChild(span); }); } return { tooltipifyCells }; })();
+      function applyTooltips() { TooltipEngine.tooltipifyCells('.br-card[aria-labelledby="sec-rpi"]', 'tbody tr td:nth-child(5)', getDesp); }
+
+      const normLen = (el) => (el.textContent || '').replace(/\s+/g, ' ').trim().length;
+      const isOverflowing = (el) => (el.scrollHeight - el.clientHeight) > 1;
+      function hideBtn(btn) { if (!btn) return; btn.hidden = true; btn.setAttribute('aria-hidden', 'true'); btn.style.display = 'none'; btn.tabIndex = -1; }
+      function showBtn(btn) { if (!btn) return; btn.hidden = false; btn.removeAttribute('aria-hidden'); btn.style.display = ''; btn.tabIndex = 0; }
+      function evalOne(comp) {
+        const id = comp.id; if (!id) return;
+        const btn = document.querySelector(`.pub-toggle[data-target="#${id}"]`);
+        const fade = comp.querySelector('.pub-fade');
+        const th = Number(comp.getAttribute('data-threshold-chars')) || DEFAULT_THRESHOLD;
+        const len = normLen(comp); const ov = isOverflowing(comp); const need = (len > th) && ov;
+        if (!need) { comp.classList.add('expanded'); if (fade) fade.style.display = 'none'; hideBtn(btn); }
+        else { comp.classList.remove('expanded'); if (fade) fade.style.display = ''; if (btn) { showBtn(btn); btn.textContent = 'Mostrar mais'; } }
+      }
+      function setupToggles() { document.querySelectorAll('.pub-complement').forEach(evalOne); }
+      function togglePub(btn) {
+        const sel = btn.getAttribute('data-target'); const comp = sel && document.querySelector(sel); if (!comp) return;
+        const fade = comp.querySelector('.pub-fade'); const expanded = comp.classList.toggle('expanded');
+        if (fade) fade.style.display = expanded ? 'none' : ''; btn.textContent = expanded ? 'Mostrar menos' : 'Mostrar mais';
+      }
+      function delegate() { document.addEventListener('click', (e) => { const b = e.target.closest('button.pub-toggle'); if (!b) return; e.preventDefault(); togglePub(b); }); document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('button.pub-toggle')) { e.preventDefault(); togglePub(e.target); } }); }
+      function installObservers() {
+        const card = document.querySelector('.br-card[aria-labelledby="sec-rpi"]'); const recalc = () => setupToggles();
+        if (card && 'ResizeObserver' in window) { new ResizeObserver(recalc).observe(card); }
+        else { let raf = null; window.addEventListener('resize', () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(recalc); }); }
+        if (document.fonts?.ready) { document.fonts.ready.then(recalc).catch(() => { }); }
+        const tbody = card?.querySelector('tbody'); if (tbody && 'MutationObserver' in window) { new MutationObserver(recalc).observe(tbody, { childList: true, subtree: true, characterData: true }); }
+      }
+      function init() { if (window?.br?.initAll) window.br.initAll(); bindActions(); applyTooltips(); setupToggles(); delegate(); installObservers(); }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init, { once: true }); } else { init(); }
+      window.recalcPubToggles = setupToggles;
+    })();
+  </script>
+</body>
+
+</html>
