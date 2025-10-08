@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalhe da Patente — Portal de Propriedade Industrial</title>
+    <meta name="description" content="Visualização detalhada do pedido de patente.">
+
+    <!-- DS GOV.BR (Fonts + Core) -->
+    <link rel="stylesheet"
+        href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+
+    <!-- Fontes/ícones auxiliares (mantidos) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* ===========================
+   Vars e base
+   =========================== */
+        :root {
+            /* largura "elástica" da coluna de mídia (direita) */
+            --biblio-right-w: clamp(320px, 34vw, 520px);
+        }
+
+        .record-title h1 {
+            margin: 0;
+            font-family: Raleway, Rawline, Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: .01em
+        }
+
+        .br-tag {
+            white-space: nowrap
+        }
+
+        .status {
+            display: inline-flex;
+            gap: .4rem;
+            align-items: center;
+            font-weight: 700;
+            color: #374151;
+            font-size: .95rem
+        }
+
+        .kv {
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            padding: .6rem .75rem;
+            background: #fbfbfd
+        }
+
+        .kv .k {
+            font-size: .78rem;
+            color: #6b7280;
+            margin-bottom: .15rem
+        }
+
+        .kv .v {
+            font-weight: 700;
+            color: #111827
+        }
+
+        .br-table table {
+            width: 100%
+        }
+
+        .record-title .br-tag {
+            margin-left: .5rem
+        }
+
+        /* Skiplinks (acessível) */
+        .skip-links {
+            position: relative;
+            z-index: 1000
+        }
+
+        .skip-links a {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            background: #fff;
+            border: 2px solid #1351b4;
+            border-radius: .25rem;
+            padding: .5rem .75rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+            font-weight: 700
+        }
+
+        .skip-links a:focus {
+            left: .5rem;
+            top: .5rem
+        }
+
+        /* Stepper (mantido) */
+        .pi-timeline {
+            margin-top: .75rem;
+            border: 1px solid #e5e7eb;
+            background: #f6f7fb;
+            border-radius: .75rem;
+            padding: 1rem 1.25rem;
+            display: none
+        }
+
+        .pi-timeline[aria-hidden="false"] {
+            display: block
+        }
+
+        .pi-stepper {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 1rem;
+            width: 100%
+        }
+
+        .pi-stepper::before {
+            content: "";
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb
+        }
+
+        .pi-progress {
+            position: absolute;
+            top: 18px;
+            left: 0;
+            height: 2px;
+            background: #93c5fd;
+            width: 0
+        }
+
+        .pi-step {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center
+        }
+
+        .pi-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            color: #6b7280;
+            font-weight: 700
+        }
+
+        .pi-step.pi-done .pi-dot {
+            background: #e8f3ff;
+            border-color: #93c5fd;
+            color: #2563eb
+        }
+
+        .pi-step.pi-current .pi-dot {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff
+        }
+
+        .pi-label {
+            font-size: .82rem;
+            color: #374151;
+            margin-top: .45rem;
+            font-weight: 600;
+            line-height: 1.2
+        }
+
+        .pi-meta {
+            font-size: .72rem;
+            color: #6b7280;
+            margin-top: .15rem
+        }
+
+        /* Ações topo */
+        #navigation .br-button+.br-button {
+            margin-left: .5rem
+        }
+
+        /* ===========================
+   Layout do card bibliográfico
+   =========================== */
+        .biblio-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) var(--biblio-right-w);
+            gap: 1rem;
+            align-items: start
+        }
+
+        .biblio-left {
+            display: grid;
+            gap: .75rem
+        }
+
+        .biblio-right {
+            position: relative
+        }
+
+        .media-carousel {
+            position: relative;
+            width: 100%
+        }
+
+        .media-frame {
+            width: 100%;
+            border: 1px solid #d0d7de;
+            border-radius: .75rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px, #f7f9fb;
+            display: grid;
+            place-items: center
+        }
+
+        .media-frame .mc-slide {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none
+        }
+
+        .media-frame .mc-slide.is-active {
+            display: block
+        }
+
+        .mc-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+            cursor: pointer;
+            display: grid;
+            place-items: center
+        }
+
+        .mc-btn.prev {
+            left: .5rem
+        }
+
+        .mc-btn.next {
+            right: .5rem
+        }
+
+        .mc-btn:focus-visible {
+            outline: 2px solid #0B5ED7;
+            outline-offset: 2px
+        }
+
+        /* ===========================
+   Documentos para download
+   =========================== */
+        .doc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: .75rem
+        }
+
+        .doc-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start
+        }
+
+        .doc-item .br-button {
+            width: 100%;
+            justify-content: flex-start
+        }
+
+        /* Botão com meta dentro */
+        .br-button.secondary.doc-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            text-decoration: none;
+        }
+
+        .doc-btn .btn-label {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            min-width: 0
+        }
+
+        .doc-btn .btn-label span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .doc-btn .btn-meta {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            font-size: .78rem;
+            color: #6b7280;
+            font-variant-numeric: tabular-nums
+        }
+
+        .doc-btn .btn-meta i {
+            opacity: .75
+        }
+
+        /* ===========================
+   Tooltips (bolha única para .tt e .tt-inline)
+   =========================== */
+        /* Atalhos inline (códigos em linha) */
+        .tt-inline {
+            position: relative;
+            display: inline-block;
+            cursor: help
+        }
+
+        /* Bolha compartilhada */
+        .tt::after,
+        .tt-inline::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            min-width: 240px;
+            max-width: min(520px, 80vw);
+            background: #0b0d12;
+            color: #fff;
+            border-radius: .5rem;
+            padding: .625rem .75rem;
+            line-height: 1.35;
+            font-size: .875rem;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+            white-space: pre-line;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 10
+        }
+
+        .tt::before,
+        .tt-inline::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 100%;
+            transform: translate(-50%, 2px);
+            border: 8px solid transparent;
+            border-top-color: #0b0d12;
+            opacity: 0;
+            visibility: hidden
+        }
+
+        .tt:is(:hover, :focus-visible)::after,
+        .tt:is(:hover, :focus-visible)::before,
+        .tt-inline:is(:hover, :focus-visible)::after,
+        .tt-inline:is(:hover, :focus-visible)::before {
+            opacity: 1;
+            visibility: visible
+        }
+
+        /* O "pino" .tt original continua com ícone/medidas próprias */
+        .tt {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-left: .375rem;
+            color: #6b7280;
+            cursor: help;
+            position: relative;
+            vertical-align: middle;
+            transform: translateY(-3px)
+        }
+
+        .tt:hover,
+        .tt:focus-visible {
+            color: #0B5ED7
+        }
+
+        /* Ajudante de acessibilidade */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+
+        /* ===========================
+   Responsivo
+   =========================== */
+        @media (max-width:992px) {
+            .biblio-grid {
+                grid-template-columns: 1fr
+            }
+
+            .biblio-right {
+                order: 2
+            }
+        }
+
+        @media (min-width:992px) {
+            .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
+                display: flex;
+                flex-direction: column;
+                justify-content: center
+            }
+
+            .record-title+.status {
+                margin-top: .4rem
+            }
+
+            #pi-stepper-panel {
+                margin-top: .75rem
+            }
+        }
+
+        /* Validação visual: RPI cancelada (suave) */
+        table.tbl-publicacoes tbody tr.rpi-cancelada td {
+            background-color: rgba(220, 53, 69, 0.08);
+            /* vermelho pouco saturado */
+        }
+
+        /* Pequeno indicador visual na 1ª célula */
+        table.tbl-publicacoes tbody tr.rpi-cancelada td:first-child {
+            border-left: 4px solid rgba(220, 53, 69, 0.28);
+        }
+
+        /* Container de readmore (sem alterações visuais no tema) */
+        .rm-container[aria-expanded="false"] .rm-full {
+            display: none;
+        }
+
+        .rm-container[aria-expanded="true"] .rm-short {
+            display: none;
+        }
+
+        /* Link textual (mantém estilo de link padrão do DS GOV.BR) */
+        .rm-toggle {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .rm-toggle:focus {
+            outline: 2px solid transparent;
+            /* deixe o foco do seu tema agir */
+            outline-offset: 2px;
+        }
+
+        /* Comportamento "ver mais/menos" (sem afetar o visual do DS gov.br) */
+        .rm-container[aria-expanded="false"] .rm-full {
+            display: none;
+        }
+
+        .rm-container[aria-expanded="true"] .rm-short {
+            display: none;
+        }
+
+        .rm-toggle {
+            cursor: pointer;
+            text-decoration: underline;
+            /* herda cor do tema */
+        }
+
+        /* RPI cancelada — taxado (substitui o bloco anterior) */
+        table.tbl-publicacoes tbody tr.rpi-cancelada td {
+            text-decoration: line-through;
+            text-decoration-thickness: 1.25px;
+            text-decoration-color: currentColor;
+            opacity: .8;
+        }
+
+
+        /* (atualização) Remover fundo/borda da linha cancelada */
+        table.tbl-publicacoes tbody tr.rpi-cancelada td {
+            background: transparent !important;
+            /* remove o vermelho e qualquer zebra */
+        }
+
+        table.tbl-publicacoes tbody tr.rpi-cancelada td:first-child {
+            border-left: 0 !important;
+            /* remove o marcador vermelho na 1ª célula */
+        }
+
+        /* (garantia) Despacho também taxado (mesmo com .tt-inline) */
+        table.tbl-publicacoes tbody tr.rpi-cancelada td:nth-child(3),
+        table.tbl-publicacoes tbody tr.rpi-cancelada td:nth-child(3) .tt-inline {
+            text-decoration: line-through;
+            text-decoration-thickness: 1.25px;
+            text-decoration-color: currentColor;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Skiplinks -->
+    <div class="skip-links" aria-label="Acesso rápido">
+        <a accesskey="1" href="#main-content">Ir para o conteúdo <strong class="accesskey">1</strong></a>
+        <a accesskey="2" href="#navigation">Ir para a navegação <strong class="accesskey">2</strong></a>
+        <a accesskey="3" href="#page-breadcrumb">Ir para o breadcrumb <strong class="accesskey">3</strong></a>
+    </div>
+
+    <!-- Header DS (mesmo de Marcas) -->
+    <header class="br-header" id="header" data-sticky>
+        <div class="container-lg">
+            <div class="header-top">
+                <div class="header-logo">
+                    <div class="logo">
+                        <a href="#" title="Portal de Propriedade Industrial — Início">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28"
+                                decoding="async" />
+                        </a>
+                    </div>
+                    <div class="header-sign">Portal de Propriedade Industrial</div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-links">
+                        <a class="br-button circle small" href="#" aria-label="Acessar conta">
+                            <i class="fa-regular fa-user" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de ações + breadcrumb -->
+    <div class="container-lg py-2" id="navigation">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="#" class="br-button secondary">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="ml-1">Voltar aos
+                        resultados</span>
+                </a>
+                <nav class="br-breadcrumb" id="page-breadcrumb" aria-label="Breadcrumb" style="margin-left:.75rem">
+                    <ol class="crumb-list">
+                        <li class="crumb"><a href="#">Consulta</a></li>
+                        <li class="crumb"><a href="#">Patente</a></li>
+                        <li class="crumb" aria-current="page">Detalhe</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center">
+                <a class="br-button secondary" href="#" id="share"><i class="fa-solid fa-share-nodes"
+                        aria-hidden="true"></i><span class="ml-1">Compartilhar</span></a>
+                <a class="br-button primary" href="#" id="verPDF"><i class="fa-regular fa-file-pdf"
+                        aria-hidden="true"></i><span class="ml-1">Ver Dossiê</span></a>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="d-flex flex-fill">
+        <div class="container-lg">
+
+            <!-- CARD 1: Cabeçalho do registro (título/estado + tripla KV + stepper) -->
+            <div class="br-card mt-3">
+                <div class="card-content">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12 col-lg-8">
+                            <div class="record-title d-flex flex-wrap align-items-baseline">
+                                <h1>Patente • BR102018077076-4 A2</h1>
+                                <span class="br-tag">Depósito de pedido nacional de Patente</span>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-lg-4"><!-- vazio por padrão (sem imagem aqui) --></div>
+                    </div>
+                    <!-- KV quintupla -->
+                    <div class="row g-2 mt-3">
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(21) Nº do Pedido</div>
+                                <div class="v">BR102018077076-4 A2</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md" id="pedido-antigo-box">
+                            <div class="kv">
+                                <div class="k">Nº anterior do pedido</div>
+                                <div class="v" id="numero-pedido-anterior">BR102018077076-4 A2</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(22) Data do depósito</div>
+                                <div class="v">26/12/2018</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(43) Data da publicação</div>
+                                <div class="v">07/07/2020</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(47) Data da concessão</div>
+                                <div class="v">07/07/2020</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: Dados bibliográficos (grid esquerda + carrossel direita) -->
+            <div class="br-card mt-3" aria-labelledby="sec-biblio" data-readmore-scope="biblio">
+                <div class="card-header">
+                    <h2 id="sec-biblio" class="h6 m-0">Dados bibliográficos</h2>
+                </div>
+                <div class="card-content">
+                    <div class="biblio-grid">
+                        <!-- esquerda -->
+                        <div class="biblio-left">
+                            <div class="kv">
+                                <div class="k">(54) Título</div>
+                                <div class="v">COMPOSIÇÃO DE POLIÉSTER, ARTIGO DE MANUFATURA, E, PROCESSO PARA A
+                                    PRODUÇÃO DE PELO MENOS UM POLIÉSTER</div>
+                            </div>
+                            <div class="kv" data-readmore-cut="700">
+                                <div class="k">(57) Resumo</div>
+                                <div>A presente invenção se refere ao processo de obtenção e o uso como composição
+                                    inibidora de corrosão é baseada em metabólitos obtidos a partir do filtrado do meio
+                                    de cultura batata-dextrose utilizado no crescimento ou propagação do fungo
+                                    filamentoso Fusarium solani. Esta invenção permite o uso do inibidor em aço carbono
+                                    e outras ligas metálicas a base de ferro, em meio neutro ou básico, tanto como
+                                    aditivo de soluções ou líquidos que ficam em contato permanente com o aço, como por
+                                    exemplo em fluídos de refrigeração/aquecimento e de fluídos de perfuração, ou mesmo
+                                    como protetor de corrosão de estruturas armadas quando usado como aditivo de mistura
+                                    de concreto. A presente invenção se refere ao processo de obtenção e o uso como
+                                    composição
+                                    inibidora de corrosão é baseada em metabólitos obtidos a partir do filtrado do meio
+                                    de cultura batata-dextrose utilizado no crescimento ou propagação do fungo
+                                    filamentoso Fusarium solani. Esta invenção permite o uso do inibidor em aço carbono
+                                    e outras ligas metálicas a base de ferro, em meio neutro ou básico, tanto como
+                                    aditivo de soluções ou líquidos que ficam em contato permanente com o aço, como por
+                                    exemplo em fluídos de refrigeração/aquecimento e de fluídos de perfuração, ou mesmo
+                                    como protetor de corrosão de estruturas armadas quando usado como aditivo de mistura
+                                    de concreto.</div>
+                            </div>
+                            <!-- (30) Prioridade Unionista -->
+                            <div class="kv">
+                                <div class="k">(30) Prioridade Unionista</div>
+                                <div id="prioridade-unionista">
+                                    <!-- Repita as linhas abaixo conforme o número de prioridades -->
+                                    <div>
+                                        <span class="pu-pais">KR </span>
+                                        <span class="pu-numero"> 10-2011-0048939</span>
+                                        <time class="pu-data" datetime="2011-05-23"> 23/05/2011;</time>
+                                        <span class="pu-pais">KR </span>
+                                        <span class="pu-numero"> 10-2011-0048939</span>
+                                        <time class="pu-data" datetime="2011-05-23"> 23/05/2011;</time>
+                                        <span class="pu-pais">KR </span>
+                                        <span class="pu-numero"> 10-2011-0048939</span>
+                                        <time class="pu-data" datetime="2011-05-23"> 23/05/2011;</time>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="kv" data-readmore-cut="200">
+                                <div class="k">(51) Classificação IPC
+                                </div>
+                                <div id="ipc-codes">H04L 29/06 ;
+                                    G01S 1/02 ;
+                                    G01S 5/02 ;
+                                    G01S 5/06 ;
+                                    G06F 1/16 ;
+                                    G06F 3/0481 ;
+                                    G06F 21/30 ;
+                                    G06F 21/62 ;
+                                    G06F 21/74 ;
+                                    G06F 21/88 ;
+                                    G11B 20/10 ;
+                                    H03L 7/091 ;
+                                    H04B 7/26 ;
+                                    H04B 10/2575 ;
+                                    H04J 13/00 ;
+                                    H04J 13/16 ;
+                                    H04L 1/00 ;
+                                    H04L 1/16 ;
+                                    H04L 1/18 ;
+                                    H04L 9/08 ;
+                                    H04L 9/30 ;
+                                    H04L 12/46 ;
+                                    H04L 25/03 ;
+                                    H04L 25/49 ;
+                                    H04L 25/497 ;
+                                    H04L 27/156 ;
+                                    H04L 29/12 ;
+                                    H04L 12/24 ;
+                                    H04L 12/801 ;
+                                    H04L 12/911 ;
+                                    H04L 12/919 ;
+                                    H04L 12/58 ;
+                                    H04M 1/725 ;
+                                    H04M 7/00 ;
+                                    H04M 7/12 ;
+                                    H04N 1/00 ;
+                                    H04N 1/32 ;
+                                    H04N 1/40 ;
+                                    H04N 5/225 ;
+                                    H04N 5/44 ;
+                                    H04N 5/46 ;
+                                    H04N 5/64 ;
+                                    H04N 5/76 ;
+                                    H04N 7/01 ;
+                                    H04N 7/16 ;
+                                    H04N 7/173 ;
+                                    H04N 9/31 ;
+                                    H04N 9/64 ;
+                                    H04N 9/79 ;
+                                    H04N 19/109 ;
+                                    H04N 19/139 ;
+                                    H04N 19/51 ;
+                                    H04N 19/517 ;
+                                    H04N 19/527 ;
+                                    H04N 19/625 ;
+                                    H04N 19/70 ;
+                                    H04N 19/91 ;
+                                    H04N 21/2543 ;
+                                    H04N 21/418 ;
+                                    H04N 21/433 ;
+                                    H04N 21/4623 ;
+                                    H04N 21/472 ;
+                                    H04N 21/61 ;
+                                    H04N 21/658 ;
+                                    H04Q 3/00 ;
+                                    H04W 4/14 ;
+                                    H04W 8/26 ;
+                                    H04W 12/10 ;
+                                    H04W 28/00 ;
+                                    H04W 36/02 ;
+                                    H04W 52/30 ;
+                                    H04W 56/00 ;
+                                    H04W 64/00 ;
+                                    H04W 74/00 ;
+                                    H04W 76/12 ;
+                                    H04W 76/34 ;
+                                    H04W 84/08 ;
+                                    G11B 20/22 ;
+                                    H04J 3/06 ;
+                                    H04L 12/26 ;
+                                    H04M 3/42 ;
+                                    H04N 5/38 ;
+                                    H04N 5/445 ;
+                                    H04N 5/45 ;
+                                    H04N 5/66 ;
+                                    H04N 5/775 ;
+                                    H04N 5/85 ;
+                                    H04N 5/907 ;
+                                    H04N 9/804 ;
+                                    H04W 4/10 ;
+                                    H04W 4/12 ;
+                                    H04W 8/24 ;
+                                    H04W 24/00 ;
+                                    H04W 28/18 ;
+                                    H04W 28/26 ;
+                                    H04W 40/00 ;
+                                    H04W 48/08 ;
+                                    H04W 72/04 ;
+                                    H04W 74/08 ;
+                                    H04W 76/10 ;
+                                    H04W 76/18 ;
+                                    H04W 76/30 ;
+                                    H04W 76/45 ;
+                                    H04W 84/04 ;
+                                    H04W 84/12 ;
+                                    H04W 88/06 ;
+                                    H04W 88/08 ;
+                                    H04W 88/16</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">(52) Classificação CPC</div>
+                                <div id="cpc-codes">C12N1/145; C12N 1/145; C23F 11/122</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">(71) Nome do Depositante</div>
+                                <div>UNIVERSIDADE FEDERAL DE ALAGOAS (BR/AL)</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">(xx) Nome do Titular</div>
+                                <div>UNIVERSIDADE FEDERAL DE ALAGOAS (BR/AL)</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">(72) Nome do Inventor</div>
+                                <div>JOSEALDO TONHOLO ; JULIANO BUENO BARBOSA DA SILVA ; CARMEM LÚCIA DE PAIVA E SILVA
+                                    ZANTA ; SONIA SALGUEIRO MACHADO ; SHEYLA FERREIRA LIMA COELHO</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">(xx) Nome do Procurador</div>
+                                <div>JULIANO BUENO BARBOSA DA SILVA</div>
+                            </div>
+                            <!-- (86) PCT -->
+                            <div class="kv">
+                                <div class="k">(86) PCT</div>
+                                <div>
+                                    <span id="pct-numero">KR2012003614</span>
+                                    <time id="pct-data" datetime="2012-05-09">09/05/2012</time>
+                                </div>
+                            </div>
+
+                            <!-- (87) W.O. -->
+                            <div class="kv">
+                                <div class="k">(87) W.O.</div>
+                                <div>
+                                    <span id="wo-numero">2012/161435</span>
+                                    <time id="wo-data" datetime="2012-11-29">29/11/2012</time>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- direita (carrossel) -->
+                        <div class="biblio-right">
+                            <div class="media-carousel" id="biblio-carousel" tabindex="0"
+                                aria-label="Imagens da patente">
+
+                                <div class="media-frame" id="biblio-media-frame" role="group"
+                                    aria-roledescription="carrossel" aria-live="polite">
+                                    <img class="mc-slide is-active" loading="lazy" decoding="async"
+                                        alt="Imagem da patente 1" src="ImagemDocumentoPdfController.jpg">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="br-card mt-3" aria-labelledby="sec-rpi">
+                <div class="card-header">
+                    <h2 id="sec-rpi" class="h6 m-0">
+                        Publicações na RPI
+                        <span class="tt" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0"
+                            data-tooltip="Prazos e observações relacionadas às publicações.">
+                            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                            <span class="sr-only">Ajuda: PRAZOS</span>
+                        </span>
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Publicações RPI">
+                        <table class="tbl-publicacoes">
+                            <thead>
+                                <tr>
+                                    <th>RPI</th>
+                                    <th>Data RPI</th>
+                                    <th>Despacho</th>
+                                    <th>Complemento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2819</td>
+                                    <td>14/10/2025</td>
+                                    <td>8.7</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr class="rpi-cancelada">
+                                    <td>2808</td>
+                                    <td>29/10/2024</td>
+                                    <td>8.6</td>
+                                    <td>Referente à 6ª anuidade.</td>
+                                </tr>
+                                <tr>
+                                    <td>2687</td>
+                                    <td>21/06/2022</td>
+                                    <td>8.4</td>
+                                    <td>Referente à 6ª anuidade.</td>
+                                </tr>
+                                <tr>
+                                    <td>2684</td>
+                                    <td>14/06/2022</td>
+                                    <td>8.1</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>2647</td>
+                                    <td>05/04/2021</td>
+                                    <td>11.1</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr class="rpi-cancelada">
+                                    <td>2583</td>
+                                    <td>07/07/2020</td>
+                                    <td>3.1</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>2505</td>
+                                    <td>08/01/2019</td>
+                                    <td>2.10</td>
+                                    <td>Nº de Protocolo ‘870180167506’ em 26/12/2018 (WB)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted mt-2 small">Dados atualizados em 19/08/2025 — Nº da Revista: 2850</p>
+                </div>
+            </div>
+
+            <!-- CARD 6: Documentos -->
+            <div class="br-card mt-3" aria-labelledby="sec-docs">
+                <div class="card-header">
+                    <h2 id="sec-docs" class="h6 m-0">Documentos de Informação Tecnológica</h2>
+                </div>
+                <div class="card-content">
+                    <div class="doc-list">
+
+                        <!-- 1) Publicação -->
+                        <div class="doc-item">
+                            <a class="br-button secondary doc-btn" href="#" download aria-describedby="meta-publ">
+                                <span class="btn-label">
+                                    <i class="fa-regular fa-file-image" aria-hidden="true"></i>
+                                    <span>Folheto de publicação</span>
+                                </span>
+                                <!-- meta visível, fora do nome acessível -->
+                                <span class="btn-meta" aria-hidden="true">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <time datetime="2025-09-02">02/09/2025</time>
+                                    <span>• RPI 2852</span>
+                                </span>
+                            </a>
+                            <!-- descrição para leitores de tela -->
+                            <span id="meta-publ" class="sr-only">Publicado em 02/09/2025, RPI 2852</span>
+                        </div>
+                        <!-- 3) Retificação -->
+                        <div class="doc-item">
+                            <a class="br-button secondary doc-btn" href="#" download aria-describedby="meta-reti">
+                                <span class="btn-label">
+                                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                                    <span>Folheto de retificação</span>
+                                </span>
+                                <span class="btn-meta" aria-hidden="true">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <time datetime="2025-08-27">27/08/2025</time>
+                                    <span>• RPI 2850</span>
+                                </span>
+                            </a>
+                            <span id="meta-reti" class="sr-only">Publicado em 27/08/2025, RPI 2850</span>
+                        </div>
+
+                        <!-- 2) Concessão -->
+                        <div class="doc-item">
+                            <a class="br-button secondary doc-btn" href="#" download aria-describedby="meta-cons">
+                                <span class="btn-label">
+                                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                                    <span>Folheto de concessão</span>
+                                </span>
+                                <span class="btn-meta" aria-hidden="true">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <time datetime="2025-08-20">20/08/2025</time>
+                                    <span>• RPI 2849</span>
+                                </span>
+                            </a>
+                            <span id="meta-cons" class="sr-only">Publicado em 20/08/2025, RPI 2849</span>
+                        </div>
+
+                        <!-- 3) Retificação -->
+                        <div class="doc-item">
+                            <a class="br-button secondary doc-btn" href="#" download aria-describedby="meta-reti">
+                                <span class="btn-label">
+                                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                                    <span>Folheto de retificação</span>
+                                </span>
+                                <span class="btn-meta" aria-hidden="true">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <time datetime="2025-08-27">27/08/2025</time>
+                                    <span>• RPI 2850</span>
+                                </span>
+                            </a>
+                            <span id="meta-reti" class="sr-only">Publicado em 27/08/2025, RPI 2850</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <footer class="mt-3 py-3 text-center text-muted border-top">
+                © INPI • Protótipo de interface — somente para validação de UX
+            </footer>
+        </div>
+    </main>
+
+    <!-- DS GOV.BR (JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DS GOV.BR
+            if (window?.br?.initAll) window.br.initAll();
+
+            // Ações simples
+            document.getElementById('copyLink')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+                catch { alert('Não foi possível copiar.'); }
+            });
+            document.getElementById('share')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (navigator.share) navigator.share({ title: document.title, url: location.href });
+                else alert('Seu navegador não suporta compartilhamento nativo.');
+            });
+            document.getElementById('verPDF')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open('#', '_blank'); // trocar pela URL real do PDF
+            });
+
+            // Carrossel (mínimo necessário)
+            (function () {
+                const root = document.getElementById('biblio-carousel');
+                if (!root) return;
+                const prev = root.querySelector('.prev');
+                const next = root.querySelector('.next');
+                const slides = [...root.querySelectorAll('.mc-slide')].filter(el => (el.getAttribute('src') || '').trim() !== '');
+                let i = 0;
+                function update(idx) {
+                    if (!slides.length) return;
+                    i = (idx + slides.length) % slides.length;
+                    slides.forEach((el, j) => el.classList.toggle('is-active', j === i));
+                    const hide = slides.length < 2;
+                    if (prev) prev.hidden = hide;
+                    if (next) next.hidden = hide;
+                }
+                prev?.addEventListener('click', () => update(i - 1));
+                next?.addEventListener('click', () => update(i + 1));
+                root.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') update(i - 1);
+                    if (e.key === 'ArrowRight') update(i + 1);
+                });
+                update(0);
+            })();
+
+            // ================== TooltipEngine (genérico) ==================
+            const TooltipEngine = (() => {
+                // Envolve tokens inline com <span.tt-inline> + data-tooltip
+                function decorateInlineCodes(containerId, {
+                    split = /[;,\n]+/,
+                    sep = ' ; ',
+                    getDesc = (c) => c
+                } = {}) {
+                    const el = typeof containerId === 'string'
+                        ? document.getElementById(containerId)
+                        : containerId;
+                    if (!el) return;
+                    const raw = (el.textContent || '').trim();
+                    if (!raw) return;
+                    el.innerHTML = '';
+                    raw.split(split).map(s => s.trim()).filter(Boolean).forEach((code, i, arr) => {
+                        const span = document.createElement('span');
+                        span.className = 'tt-inline';
+                        span.tabIndex = 0;                 // teclado
+                        span.dataset.tooltip = getDesc(code);
+                        span.textContent = code;
+                        el.appendChild(span);
+                        if (i < arr.length - 1) el.appendChild(document.createTextNode(sep));
+                    });
+                }
+
+                // Aplica tooltip em células de tabela (ex.: nº do despacho)
+                function tooltipifyCells(rootSelector, cellSelector, getDesc) {
+                    const root = typeof rootSelector === 'string'
+                        ? document.querySelector(rootSelector)
+                        : rootSelector;
+                    if (!root) return;
+                    root.querySelectorAll(cellSelector).forEach(td => {
+                        const code = (td.textContent || '').trim();
+                        if (!code || code === '—') return;
+                        td.textContent = '';
+                        const span = document.createElement('span');
+                        span.className = 'tt-inline';
+                        span.tabIndex = 0;
+                        span.dataset.tooltip = getDesc(code);
+                        span.textContent = code;
+                        td.appendChild(span);
+                    });
+                }
+
+                return { decorateInlineCodes, tooltipifyCells };
+            })();
+
+            // ================== Textos mock (trocar pelos oficiais quando tiver) ==================
+            const getIpcDesc = (code) => `Descrição da classificação IPC ${code}.\nTexto ilustrativo para validação de UX.`;
+            const getCpcDesc = (code) => `Descrição da classificação CPC ${code}.\nTexto ilustrativo para UX.`;
+            const DESPACHO_DESC = {
+                '8.7': 'Descrição ilustrativa do Despacho 8.7.',
+                '8.6': 'Descrição ilustrativa do Despacho 8.6.',
+                '8.4': 'Descrição ilustrativa do Despacho 8.4.',
+                '8.1': 'Descrição ilustrativa do Despacho 8.1.',
+                '11.1': 'Descrição ilustrativa do Despacho 11.1.',
+                '3.1': 'Descrição ilustrativa do Despacho 3.1.',
+                '2.10': 'Descrição ilustrativa do Despacho 2.10.'
+            };
+            const getDespDesc = (code) => DESPACHO_DESC[code] || `Descrição do despacho ${code}.\nTexto ilustrativo para validação de UX.`;
+
+            // ================== Aplicações ==================
+            TooltipEngine.decorateInlineCodes('ipc-codes', { getDesc: getIpcDesc });
+            TooltipEngine.decorateInlineCodes('cpc-codes', { getDesc: getCpcDesc }); // se houver CPC múltiplo, já funciona
+            TooltipEngine.tooltipifyCells('.br-card[aria-labelledby="sec-rpi"]', 'tbody tr td:nth-child(3)', getDespDesc);
+        });
+
+        // Cortar conteudo
+
+        document.addEventListener('DOMContentLoaded', function () {
+            (function () {
+                let uid = 0;
+
+                const escapeHTML = (str) =>
+                    str.replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
+
+                function findCutIndex(text, limit) {
+                    const slice = text.slice(0, limit + 1);
+                    const breakers = [' ', ';', ',', '.'];
+                    let best = -1;
+                    for (const b of breakers) {
+                        const i = slice.lastIndexOf(b);
+                        if (i > best) best = i;
+                    }
+                    return best > 0 ? best : limit;
+                }
+
+                // Monta preview curto preservando tokens .tt-inline (mantém tooltips)
+                function buildShortFromTokens(valueEl, cut, contentId) {
+                    const tokens = Array.from(valueEl.querySelectorAll('.tt-inline'));
+                    if (!tokens.length) return null;
+
+                    let accLen = 0;
+                    const frag = document.createDocumentFragment();
+                    tokens.some((tok, idx) => {
+                        const text = (tok.textContent || '').trim();
+                        const sep = idx > 0 ? ' ; ' : '';
+                        const addLen = (sep + text).length;
+                        if (accLen + addLen > cut) return true; // parar
+                        if (idx > 0) frag.appendChild(document.createTextNode(sep));
+                        frag.appendChild(tok.cloneNode(true)); // preserva data-tooltip
+                        accLen += addLen;
+                        return false;
+                    });
+
+                    const wrap = document.createElement('span');
+                    wrap.className = 'rm-short';
+                    wrap.appendChild(frag);
+                    wrap.appendChild(document.createTextNode('… '));
+
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'rm-toggle';
+                    a.dataset.rm = 'more';
+                    a.setAttribute('aria-expanded', 'false');
+                    a.setAttribute('aria-controls', contentId);
+                    a.textContent = 'Ver mais';
+                    wrap.appendChild(a);
+
+                    return wrap.outerHTML;
+                }
+
+                // Agora aceita data-readmore-cut tanto na .kv quanto na .k
+                const kvBlocks = Array.from(document.querySelectorAll('.kv')).filter(kv => {
+                    const own = kv.getAttribute('data-readmore-cut');
+                    const kEl = kv.querySelector('.k[data-readmore-cut]');
+                    return (own && !isNaN(parseInt(own, 10))) || !!kEl;
+                });
+
+                kvBlocks.forEach(kv => {
+                    // 1) Tenta na .kv; 2) senão, na .k
+                    let cut = parseInt(kv.getAttribute('data-readmore-cut'), 10);
+                    if (!Number.isFinite(cut) || cut <= 0) {
+                        const kEl = kv.querySelector('.k[data-readmore-cut]');
+                        if (kEl) cut = parseInt(kEl.getAttribute('data-readmore-cut'), 10);
+                    }
+                    if (!Number.isFinite(cut) || cut <= 0) return;
+
+                    // Valor = primeiro filho da .kv que não seja a label .k
+                    const valueEl = Array.from(kv.children).find(el => !el.classList.contains('k'));
+                    if (!valueEl || valueEl.dataset.rmInit === '1') return;
+
+                    // Captura HTML já decorado (com .tt-inline) e texto plano
+                    const fullHTML = valueEl.innerHTML.trim();
+                    const fullText = valueEl.textContent.replace(/\s+/g, ' ').trim();
+
+                    if (!fullText || fullText.length <= cut) return;
+
+                    // Texto puro (fallback) – caso não haja tokens
+                    const cutAt = findCutIndex(fullText, cut);
+                    const shortText = fullText.slice(0, cutAt);
+
+                    valueEl.dataset.rmInit = '1';
+                    valueEl.classList.add('rm-container');
+                    valueEl.setAttribute('aria-expanded', 'false');
+
+                    const contentId = 'rm-content-' + (++uid);
+
+                    // PRIORIDADE: se houver tokens .tt-inline, preserva-os no preview
+                    let shortHTML = buildShortFromTokens(valueEl, cut, contentId);
+                    if (!shortHTML) {
+                        shortHTML = escapeHTML(shortText) + '… ' +
+                            `<a href="#" class="rm-toggle" data-rm="more" aria-expanded="false" aria-controls="${contentId}">Ver mais</a>`;
+                    }
+
+                    const fullTail = ' <a href="#" class="rm-toggle" data-rm="less" aria-expanded="true" aria-controls="' + contentId + '">Ver menos</a>';
+
+                    valueEl.innerHTML =
+                        `<span class="rm-short">${shortHTML.replace(/^<span class="rm-short">|<\/span>$/g, '')}</span>` +
+                        `<span class="rm-full" id="${contentId}">${fullHTML}${fullTail}</span>`;
+                });
+
+                // Delegação de eventos global
+                document.addEventListener('click', function (ev) {
+                    const a = ev.target.closest('.rm-toggle');
+                    if (!a) return;
+                    ev.preventDefault();
+                    const container = a.closest('.rm-container');
+                    if (!container) return;
+                    const isMore = a.dataset.rm === 'more';
+                    container.setAttribute('aria-expanded', isMore ? 'true' : 'false');
+                });
+            })();
+        });
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>
