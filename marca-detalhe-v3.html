@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalhe da Marca — Portal de Propriedade Industrial</title>
+    <meta name="description"
+        content="Visualização detalhada do processo de registro de marca no Portal de Propriedade Industrial.">
+
+    <!-- DS Gov.br (Fonts + CSS via CDN) -->
+    <link rel="stylesheet"
+        href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+
+    <!-- Font Awesome (ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Raleway (mantida para os títulos) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+
+    <style>
+        /* === Ajustes mínimos (compatíveis com DS) ============================== */
+        .record-title h1 {
+            margin: 0;
+            font-family: Raleway, Rawline, Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: .01em
+        }
+
+        .status {
+            display: inline-flex;
+            gap: .4rem;
+            align-items: center;
+            font-weight: 700;
+            color: #374151;
+            font-size: .95rem;
+            cursor: pointer
+        }
+
+        .kv {
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            padding: .6rem .75rem;
+            background: #fbfbfd
+        }
+
+        .kv .k {
+            font-size: .78rem;
+            color: #6b7280;
+            margin-bottom: .15rem
+        }
+
+        .kv .v {
+            font-weight: 700;
+            color: #111827
+        }
+
+        /* Moldura da mídia da marca: igual ao frame da patente */
+        .mark-media {
+            border: 1px solid #d0d7de;
+            border-radius: .75rem;
+            background:
+                linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px,
+                #f7f9fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: .85rem;
+        }
+
+        .mark-media img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Skiplinks: visíveis só no foco */
+        .skip-links {
+            position: relative;
+            z-index: 1000
+        }
+
+        .skip-links a {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            background: #fff;
+            border: 2px solid #1351b4;
+            border-radius: .25rem;
+            padding: .5rem .75rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+            font-weight: 700
+        }
+
+        .skip-links a:focus {
+            left: .5rem;
+            top: .5rem
+        }
+
+        /* Respiro entre título e tag do nº do processo */
+        .record-title .br-tag {
+            margin-left: .5rem
+        }
+
+        /* Stepper/timeline custom (mantido) */
+        .pi-timeline {
+            margin-top: .75rem;
+            border: 1px solid #e5e7eb;
+            background: #f6f7fb;
+            border-radius: .75rem;
+            padding: 1rem 1.25rem;
+            display: none
+        }
+
+        .pi-timeline[aria-hidden="false"] {
+            display: block
+        }
+
+        .pi-stepper {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 1rem;
+            width: 100%
+        }
+
+        .pi-stepper::before {
+            content: "";
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb
+        }
+
+        .pi-progress {
+            position: absolute;
+            top: 18px;
+            left: 0;
+            height: 2px;
+            background: #93c5fd;
+            width: 0
+        }
+
+        .pi-step {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center
+        }
+
+        .pi-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            color: #6b7280;
+            font-weight: 700
+        }
+
+        .pi-step.pi-done .pi-dot {
+            background: #e8f3ff;
+            border-color: #93c5fd;
+            color: #2563eb
+        }
+
+        .pi-step.pi-current .pi-dot {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff
+        }
+
+        .pi-label {
+            font-size: .82rem;
+            color: #374151;
+            margin-top: .45rem;
+            font-weight: 600;
+            line-height: 1.2
+        }
+
+        .pi-meta {
+            font-size: .72rem;
+            color: #6b7280;
+            margin-top: .15rem
+        }
+
+        /* Espaço entre botões do topo */
+        #navigation .br-button+.br-button {
+            margin-left: .5rem
+        }
+
+        /* CTA do rodapé (card "Atalhos"): respiro organizado */
+        .br-card[aria-label="Atalhos"] .card-content {
+            display: flex;
+            flex-wrap: wrap;
+            column-gap: .5rem;
+            row-gap: .5rem
+        }
+
+        .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
+            margin-left: .5rem
+        }
+
+        @media (max-width:576px) {
+            .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
+                margin-left: 0
+            }
+        }
+
+        /* Centralização vertical do bloco título+status quando há mídia à direita */
+        @media (min-width:992px) {
+            .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
+                display: flex;
+                flex-direction: column;
+                justify-content: center
+            }
+
+            .record-title+.status {
+                margin-top: .4rem
+            }
+
+            #pi-stepper-panel {
+                margin-top: .75rem
+            }
+        }
+
+        /* Tabela Classificação de Produtos / Serviços — SEM HOVER */
+        .tb-nice tbody tr:hover,
+        .tb-nice tbody tr:hover>*,
+        .tb-nice tbody td:hover,
+        .tb-nice tbody th:hover {
+            background-color: inherit !important;
+            box-shadow: none !important;
+        }
+
+        .tb-nice tbody tr {
+            cursor: default !important;
+        }
+
+        /* Remove qualquer hover apenas na tabela .no-hover */
+        .br-table .table.no-hover tbody tr:hover,
+        .br-table .table.no-hover tbody tr:hover>td,
+        .br-table .table.no-hover tbody tr:hover>th {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Evita efeitos de transição que alguns temas aplicam no hover */
+        .br-table .table.no-hover tbody tr>td,
+        .br-table .table.no-hover tbody tr>th {
+            transition: none !important;
+            cursor: default !important;
+        }
+
+        .kv .old-owners {
+            margin-top: .35rem;
+            border-left: 2px solid #e5e7eb;
+            padding-left: .5rem;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .old-owners-toggle {
+            font-weight: 400;
+            color: #1351b4;
+            text-decoration: underline;
+            background: transparent;
+            padding: 0;
+            border: 0;
+        }
+
+        .old-owners-toggle:hover,
+        .old-owners-toggle:focus {
+            color: #1351b4;
+            text-decoration: underline;
+            /* mantém aparência de link */
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* ——— Toolbar superior (navegação + expandir/recolher) ——— */
+        .detail-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            margin: .5rem 0 .75rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-toolbar .group-left,
+        .detail-toolbar .group-right {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .detail-toolbar .br-button {
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .detail-toolbar .br-button.circle.small {
+            width: 44px;
+            height: 44px;
+        }
+
+        .detail-toolbar .hint-nav {
+            font-size: .875rem;
+            color: #6c757d;
+        }
+
+        .detail-toolbar .br-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .detail-toolbar .text-divider {
+            opacity: .45;
+            margin: 0 .25rem;
+        }
+
+        @media (max-width:768px) {
+            .detail-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .detail-toolbar .group-left,
+            .detail-toolbar .group-right {
+                justify-content: space-between;
+            }
+
+            .detail-toolbar .hint-nav {
+                display: none;
+            }
+        }
+
+        /* ——— Colapsar cards (igual à Patente) ——— */
+        .br-card.is-collapsed .card-content {
+            display: none;
+        }
+
+        .br-card .card-header {
+            position: relative;
+        }
+
+        .collapse-btn {
+            position: absolute;
+            right: .75rem;
+            top: .5rem;
+        }
+
+        /* ——— Botão flutuante “Voltar ao topo” ——— */
+        .back-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 1040;
+            display: none;
+        }
+
+        .back-to-top.is-visible {
+            display: inline-flex;
+        }
+
+        /* ——— Espaçamento entre os botões do topo (já existe, garantido aqui) ——— */
+        #navigation .br-button+.br-button {
+            margin-left: .5rem;
+        }
+    </style>
+</head>
+
+<body class="template-base">
+    <!-- Skiplinks -->
+    <div class="skip-links" aria-label="Acesso rápido">
+        <a accesskey="1" href="#main-content">Ir para o conteúdo <strong class="accesskey">1</strong></a>
+        <a accesskey="2" href="#navigation">Ir para a navegação <strong class="accesskey">2</strong></a>
+        <a accesskey="3" href="#page-breadcrumb">Ir para o breadcrumb <strong class="accesskey">3</strong></a>
+    </div>
+
+    <!-- Cabeçalho DS -->
+    <header class="br-header" id="header" data-sticky>
+        <div class="container-lg">
+            <div class="header-top">
+                <div class="header-logo">
+                    <div class="logo">
+                        <a href="#" title="Portal de Propriedade Industrial — Início">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28"
+                                decoding="async" />
+                        </a>
+                    </div>
+                    <div class="header-sign">Portal de Propriedade Industrial</div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-links">
+                        <a class="br-button circle small" href="#" aria-label="Acessar conta"><i
+                                class="fa-regular fa-user" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra fixa de ações + breadcrumb -->
+    <div class="container-lg py-2" id="navigation">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <button class="br-button secondary" type="button" onclick="history.back()">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="ml-1">Voltar aos
+                        resultados</span>
+                </button>
+                <nav class="br-breadcrumb" id="page-breadcrumb" aria-label="Breadcrumb" style="margin-left:.75rem">
+                    <ol class="crumb-list">
+                        <li class="crumb"><a href="#">Consulta</a></li>
+                        <li class="crumb"><a href="#">Marca</a></li>
+                        <li class="crumb" aria-current="page">Detalhe</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center">
+                <a class="br-button secondary" href="#" id="share">
+                    <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+                    <span class="ml-1">Compartilhar</span>
+                </a>
+                <a class="br-button secondary" href="#" id="baixarPDF" title="Baixar PDF da página">
+                    <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
+                    <span class="ml-1">Baixar PDF</span>
+                </a>
+                <a class="br-button primary" href="#" id="verPDF">
+                    <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
+                    <span class="ml-1">Ver Dossiê</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <main id="main-content" class="d-flex flex-fill">
+        <div class="container-lg">
+            <!-- Toolbar do detalhe: seq-nav (esq) + expandir/recolher (dir) -->
+            <div class="detail-toolbar lite" aria-label="Controles da página">
+                <div class="group-left">
+                    <a class="br-button circle small" id="btnPrev" rel="prev" href="#" aria-label="Registro anterior"
+                        title="Registro anterior">
+                        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                    </a>
+                    <a class="br-button circle small" id="btnNext" rel="next" href="#" aria-label="Próximo registro"
+                        title="Próximo registro">
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                    <span class="hint-nav">Use as setas para navegar pelos registros</span>
+                </div>
+
+                <div class="group-right" aria-label="Exibição das seções">
+                    <a href="#" id="expandAll" class="br-link" role="button">
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                        <span>Expandir tudo</span>
+                    </a>
+                    <span class="text-divider" aria-hidden="true">•</span>
+                    <a href="#" id="collapseAll" class="br-link" role="button">
+                        <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                        <span>Recolher tudo</span>
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- Card: Cabeçalho do registro -->
+            <div class="br-card mt-3">
+                <div class="card-content">
+                    <!-- Título/status (esq.) + mídia (dir.) -->
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12 col-lg-8">
+                            <div class="record-title d-flex flex-wrap align-items-baseline">
+                                <h1>Marca • 933602448</h1>
+                            </div>
+
+                            <!-- NOVO: box do Nº do Processo abaixo do título -->
+                            <div class="process-tag">
+                                <span class="br-tag" role="status" aria-label="Número do Processo">
+                                    <strong> Aguardando processamento da concessão do registro de marca</strong>
+                                </span>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="mark-media p-2" aria-label="Representação gráfica da marca">
+                                <img src="old/LogoMarcasServletController.jpg" alt="Logotipo apresentado no pedido"
+                                    loading="lazy" decoding="async" class="w-100" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KV (3 colunas) -->
+                    <div class="row g-2 mt-3">
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Elemento nominativo</div>
+                                <div class="v">CarMatch</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Apresentação</div>
+                                <div class="v">Mista</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">IRN</div>
+                                <div class="v">1694503A</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Natureza</div>
+                                <div class="v">Produtos e/ou Serviço</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Titular</div>
+                                <div class="v">CAR FINDER</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-3">
+                        <div class="col-12">
+                            <div class="kv">
+                                <div class="k">Apostila</div>
+                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                    tempor incididunt ut </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classificação de Produtos/Serviços -->
+            <div class="br-card mt-3" aria-labelledby="sec-ncl">
+                <div class="card-header">
+                    <h2 id="sec-ncl" class="h6 m-0">Classificação de Produtos / Serviços</h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table">
+                        <table class="table table-striped tb-nice no-hover">
+
+                            <thead>
+                                <tr>
+                                    <th>Classe de Nice</th>
+                                    <th>Situação da Classe</th>
+                                    <th>Especificação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pair-start">
+                                    <td rowspan="2"><strong>NCL(12) 9</strong></td>
+                                    <td rowspan="2">Vide Situação do Processo</td>
+                                    <td lang="en">Electronic game programs; downloadable electronic game programs;
+                                        computer game software.</td>
+                                </tr>
+                                <tr class="pair-end">
+                                    <td lang="pt-BR">Programas de jogos eletrônicos; programas de jogos eletrônicos para
+                                        download; software de jogos para computador.</td>
+                                </tr>
+
+                                <tr class="pair-start">
+                                    <td rowspan="2"><strong>NCL(12) 28</strong></td>
+                                    <td rowspan="2">Vide Situação do Processo</td>
+                                    <td lang="en">Games; card games; trading card games; toys; ride-on toys.</td>
+                                </tr>
+                                <tr class="pair-end">
+                                    <td lang="pt-BR">Jogos; jogos de cartas; jogos de figurinhas; brinquedos; brinquedos
+                                        de montar.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="br-table mt-3" role="region" aria-label="Identificação da Marca (Madri)">
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Classificação Internacional de Viena -->
+            <div class="br-card mt-3" aria-labelledby="sec-cfe">
+                <div class="card-header">
+                    <h2 id="sec-cfe" class="h6 m-0">Classificação Internacional de Viena</h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Classificação de Viena">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:80px">Edição</th>
+                                    <th style="width:120px">Código</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>4</td>
+                                    <td>26.11.3</td>
+                                    <td>Mais de duas linhas ou de duas faixas</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>26.11.7</td>
+                                    <td>Linhas ou faixas verticais</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>27.5.17</td>
+                                    <td>Letras em caracteres cheios</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="br-card mt-3" aria-labelledby="sec-titular">
+                <div class="card-header">
+                    <h2 id="sec-titular" class="h6 m-0">Titulares e Representante Legal</h2>
+                </div>
+                <div class="card-content">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <div class="kv">
+                                <div class="k">Titular</div>
+                                <div class="v">
+                                    CAR FINDER <span class="text-muted fw-normal">— desde 22/02/2024</span>
+                                    <span class="nowrap"> - <a href="#" id="toggle-old-owners" class="old-owners-toggle"
+                                            aria-controls="old-owners" aria-expanded="false">Titulares
+                                            anteriores</a></span>
+                                </div>
+
+                                <!-- Lista colapsável -->
+                                <div id="old-owners" class="old-owners" hidden>
+                                    <ul class="list-unstyled small m-0">
+                                        <li><strong>Virtual Drive Tecnologia Ltda.</strong> — de 15/08/2022 até
+                                            22/02/2024</li>
+                                        <li><strong>Car Match Tecnologia EIRELI</strong> — de 03/05/2020 até 15/08/2022
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="kv">
+                                <div class="k">Procurador</div>
+                                <div class="v">Otávio Jorge Assef</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- CARD: (30) Prioridade Unionista -->
+            <div class="br-card mt-3" aria-labelledby="sec-prioridade">
+                <div class="card-header">
+                    <h2 id="sec-prioridade" class="h6 m-0">
+                        (30) Prioridade Unionista
+                        <!-- (opcional) tooltip de ajuda como nos outros cards
+      <span class="tt" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0"
+            data-tooltip="Prioridades reivindicadas conforme a Convenção de Paris.">
+        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+        <span class="sr-only">Ajuda: Prioridade Unionista</span>
+      </span>
+      -->
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Prioridade Unionista">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>(33) País</th>
+                                    <th>(31) Número</th>
+                                    <th>(32) Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Exemplos ilustrativos; substitua pelos dados reais -->
+                                <tr>
+                                    <td>KR</td>
+                                    <td>10-2011-0048939</td>
+                                    <td><time datetime="2011-05-23">23/05/2011</time></td>
+                                </tr>
+                                <!-- mais linhas, se houver -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datas -->
+            <div class="br-card mt-3" aria-labelledby="sec-datas">
+                <div class="card-header">
+                    <h2 id="sec-datas" class="h6 m-0">Datas</h2>
+                </div>
+                <div class="card-content">
+                    <div class="row g-2">
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data de Depósito</div>
+                                <div class="v">22/02/2024</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data de Concessão</div>
+                                <div class="v">-</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data de Vigência</div>
+                                <div class="v">22/02/2024</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data recebimento INPI</div>
+                                <div class="v">22/02/2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publicações (RPI) -->
+            <div class="br-card mt-3" aria-labelledby="sec-publicacoes">
+                <div class="card-header">
+                    <h2 id="sec-publicacoes" class="h6 m-0">Publicações</h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Publicações na RPI">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:80px">RPI</th>
+                                    <th style="width:120px">Data RPI</th>
+                                    <th style="width:240px">Despacho</th>
+                                    <th>Complemento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2774</td>
+                                    <td>05/03/2024</td>
+                                    <td>Publicação de pedido de registro</td>
+                                    <td>Exame formal concluído</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted mt-2 small">Dados atualizados até <strong>12/08/2025</strong> • Nº da Revista:
+                        <strong>2849</strong>
+                    </p>
+                </div>
+            </div>
+
+            <footer class="mt-3 py-3 text-center text-muted border-top">© INPI • Protótipo de interface — somente para
+                validação de UX</footer>
+        </div>
+    </main>
+
+    <!-- DS Gov.br (JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* Inicialização DS */
+            if (window?.br?.initAll) window.br.initAll();
+
+            /* Toggle da timeline (click/teclado) */
+            const trigger = document.getElementById('status-acao-timeline');
+            const panel = document.getElementById('pi-stepper-panel');
+            if (trigger && panel) {
+                const toggle = () => {
+                    const expanded = trigger.getAttribute('aria-expanded') === 'true';
+                    trigger.setAttribute('aria-expanded', String(!expanded));
+                    panel.setAttribute('aria-hidden', String(expanded));
+                };
+                trigger.addEventListener('click', toggle);
+                trigger.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+                });
+            }
+
+            /* Barra de progresso do stepper */
+            document.querySelectorAll('.pi-stepper').forEach(stepper => {
+                const steps = [...stepper.querySelectorAll('.pi-step')];
+                const progress = stepper.querySelector('.pi-progress');
+                let idx = steps.findIndex(s => s.classList.contains('pi-current'));
+                if (idx < 0) idx = steps.reduce((last, s, i) => s.classList.contains('pi-done') ? i : last, -1);
+                const pct = steps.length > 1 ? (idx / (steps.length - 1)) * 100 : 0;
+                if (progress) progress.style.width = pct + '%';
+            });
+
+            /* Ações simples (copiar/compartilhar/ver PDF) */
+            document.getElementById('copyLink')?.addEventListener('click', async () => {
+                try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+                catch { alert('Não foi possível copiar.'); }
+            });
+            document.getElementById('share')?.addEventListener('click', e => {
+                e.preventDefault();
+                if (navigator.share) navigator.share({ title: document.title, url: location.href });
+                else alert('Seu navegador não suporta compartilhamento nativo.');
+            });
+            document.getElementById('verPDF')?.addEventListener('click', e => {
+                e.preventDefault();
+                window.open('#', '_blank'); /* troque pela URL real do PDF */
+            });
+        });
+
+        /* Toggle "Titulares anteriores" (link inline) */
+        const toggleOldOwners = document.getElementById('toggle-old-owners');
+        const oldOwnersPanel = document.getElementById('old-owners');
+        if (toggleOldOwners && oldOwnersPanel) {
+            const toggle = (e) => {
+                e.preventDefault();
+                const expanded = toggleOldOwners.getAttribute('aria-expanded') === 'true';
+                toggleOldOwners.setAttribute('aria-expanded', String(!expanded));
+                oldOwnersPanel.hidden = expanded;
+            };
+            toggleOldOwners.addEventListener('click', toggle);
+            toggleOldOwners.addEventListener('keydown', e => {
+                if (e.key === ' ' || e.key === 'Enter') { toggle(e); }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // 0) DS
+            if (window?.br?.initAll) window.br.initAll();
+
+            // 1) Ações simples (compartilhar, ver PDF, baixar PDF da página)
+            document.getElementById('share')?.addEventListener('click', e => {
+                e.preventDefault();
+                if (navigator.share) navigator.share({ title: document.title, url: location.href });
+                else alert('Seu navegador não suporta compartilhamento nativo.');
+            });
+            document.getElementById('verPDF')?.addEventListener('click', e => {
+                e.preventDefault();
+                window.open('#', '_blank'); // TROCAR pela URL real do dossiê
+            });
+            document.getElementById('baixarPDF')?.addEventListener('click', e => {
+                e.preventDefault();
+                window.print(); // usa a caixa de diálogo nativa (Salvar como PDF)
+            });
+
+            // 2) Voltar ao topo
+            (function setupBackToTop() {
+                const btn = document.getElementById('backToTop');
+                if (!btn) return;
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const onScroll = () => btn.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.6);
+                window.addEventListener('scroll', onScroll, { passive: true });
+                onScroll();
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (prefersReduced) window.scrollTo(0, 0);
+                    else window.scrollTo({ top: 0, behavior: 'smooth' });
+                    document.getElementById('topo')?.focus?.();
+                });
+            })();
+
+            // 3) Navegação Anterior/Próximo (mesma lógica da Patente)
+            (function setupSequentialNav() {
+                const entity = 'marca';
+
+                function getCurrentRecordId() {
+                    const fromData = (document.body.dataset.recordId || '').trim();
+                    if (fromData) return fromData;
+
+                    // H1: "Marca • 933602448"
+                    const h1 = document.querySelector('.record-title h1');
+                    const m = h1?.textContent?.match(/Marca\s*•\s*([^\s]+)/i);
+                    if (m) return m[1];
+
+                    // Algum KV rotulado como Nº do Processo
+                    const k = [...document.querySelectorAll('.kv .k')].find(el => /N[ºo]\s*do\s*Processo/i.test(el.textContent));
+                    if (k) return k.parentElement.querySelector('.v')?.textContent?.trim() || null;
+
+                    // Tabela de identificação (Madri)
+                    const cell = document.querySelector('.tb-identificacao tbody tr td:first-child');
+                    if (cell) return cell.textContent.trim();
+
+                    return null;
+                }
+
+                const recordId = getCurrentRecordId();
+                const btnPrev = document.getElementById('btnPrev');
+                const btnNext = document.getElementById('btnNext');
+                if (!btnPrev || !btnNext || !recordId) return;
+
+                let ctx = null;
+                try { ctx = JSON.parse(sessionStorage.getItem('pi:ctx') || 'null'); } catch { }
+
+                function buildRecordUrl(entity, id, query) {
+                    const base = location.pathname; // mantém rota
+                    const params = new URLSearchParams(query || {});
+                    params.set('ent', entity);
+                    params.set('id', id);
+                    return `${base}?${params.toString()}`;
+                }
+                function wire(btn, targetId, rel) {
+                    if (!targetId) {
+                        btn.setAttribute('disabled', 'disabled');
+                        btn.classList.add('disabled');
+                        btn.removeAttribute('href');
+                        return;
+                    }
+                    btn.removeAttribute('disabled');
+                    const url = buildRecordUrl(entity, targetId, ctx?.query);
+                    btn.setAttribute('href', url);
+                    btn.setAttribute('rel', rel);
+                    btn.addEventListener('click', (e) => { e.preventDefault(); location.href = url; }, { once: true });
+                }
+
+                if (ctx && Array.isArray(ctx.ids)) {
+                    const index = ctx.ids.indexOf(recordId);
+                    if (index !== -1) {
+                        wire(btnPrev, ctx.ids[index - 1], 'prev');
+                        wire(btnNext, ctx.ids[index + 1], 'next');
+                    }
+                }
+            })();
+
+            // 4) Colapsar cards + Expandir/Recolher tudo (idêntico)
+            (function setupCollapsibles() {
+                const entity = 'marca';
+                const stateKey = `pi:collapse:${entity}`;
+                let state = {};
+                try { state = JSON.parse(sessionStorage.getItem(stateKey) || '{}'); } catch { }
+
+                const cards = [...document.querySelectorAll('main .br-card')];
+                cards.forEach((card, idx) => {
+                    const header = card.querySelector('.card-header');
+                    const content = card.querySelector('.card-content');
+                    if (!header || !content) return;
+
+                    header.classList.add('d-flex', 'align-items-center');
+                    const h = header.querySelector('h2,h3,h4,h5,h6') || header.firstElementChild;
+                    const cid = content.id || `card-content-${idx}`;
+                    content.id = cid;
+
+                    const isOpen = state[cid] !== false; // padrão: aberto
+                    card.classList.toggle('is-collapsed', !isOpen);
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'br-button circle small collapse-btn';
+                    btn.setAttribute('aria-controls', cid);
+                    btn.setAttribute('aria-expanded', String(isOpen));
+                    btn.innerHTML = `<i class="fa-solid ${isOpen ? 'fa-chevron-up' : 'fa-chevron-down'}" aria-hidden="true"></i><span class="sr-only">${isOpen ? 'Recolher' : 'Expandir'} seção ${(h?.textContent || '').trim()}</span>`;
+                    header.appendChild(btn);
+
+                    function toggle(force) {
+                        const openNow = btn.getAttribute('aria-expanded') === 'true';
+                        const next = (typeof force === 'boolean') ? force : !openNow;
+                        btn.setAttribute('aria-expanded', String(next));
+                        btn.querySelector('i').className = `fa-solid ${next ? 'fa-chevron-up' : 'fa-chevron-down'}`;
+                        card.classList.toggle('is-collapsed', !next);
+                        state[cid] = next;
+                        sessionStorage.setItem(stateKey, JSON.stringify(state));
+                    }
+
+                    btn.addEventListener('click', () => toggle());
+                    header.addEventListener('click', (e) => { if (!e.target.closest('a,button')) toggle(); });
+                });
+
+                document.getElementById('expandAll')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.collapse-btn[aria-expanded="false"]').forEach(b => b.click());
+                });
+                document.getElementById('collapseAll')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.collapse-btn[aria-expanded="true"]').forEach(b => b.click());
+                });
+
+                // abrir seção do hash, se houver
+                function openForHash() {
+                    if (!location.hash) return;
+                    const target = document.querySelector(location.hash);
+                    const card = target?.closest('.br-card');
+                    const btn = card?.querySelector('.collapse-btn');
+                    if (btn && btn.getAttribute('aria-expanded') === 'false') btn.click();
+                }
+                openForHash();
+                window.addEventListener('hashchange', openForHash);
+            })();
+        });
+    </script>
+
+
+    <a href="#topo" class="br-button circle large back-to-top" id="backToTop" aria-label="Voltar para o topo">
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    </a>
+
+</body>
+
+</html>
