@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="https://www.gov.br/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Patentes</title>
+
+    <!-- DS GOV.BR -->
+    <link rel="stylesheet"
+        href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css" />
+    <!-- Fonts / Icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <style>
+        /* utilitários mínimos */
+        .mb-4 {
+            margin-bottom: 1.5rem !important
+        }
+
+        .mb-5 {
+            margin-bottom: 3rem !important
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem !important
+        }
+
+        .pl-sm-3 {
+            padding-left: 1rem !important
+        }
+
+        body {
+            font-family: "Rawline", "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif
+        }
+
+        /* placeholder da logo */
+        .logo-ph {
+            width: 72px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #c7cdd1;
+            border-radius: 4px;
+            background: #fff;
+            color: #5c6b7a;
+            font-weight: 600;
+            font-size: .875rem;
+            gap: .25rem
+        }
+
+        .logo-ph i {
+            font-size: 1rem
+        }
+
+        /* header: tamanhos */
+        .header-sign {
+            font-size: .875rem;
+            font-weight: 500
+        }
+
+        .header-actions .header-links .br-item {
+            font-size: .875rem;
+            line-height: 1.25rem
+        }
+
+        .header-actions .header-links .br-item+.br-item {
+            margin-left: 1rem
+        }
+
+        /* ajuda (círculo azul) */
+        .help-btn {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid #1351B4;
+            color: #1351B4;
+            background: transparent;
+            margin-left: .5rem;
+            vertical-align: middle
+        }
+
+        .help-btn i {
+            font-size: 12px;
+            line-height: 1
+        }
+
+        .help-btn:focus {
+            outline: 2px solid #1351B4;
+            outline-offset: 2px
+        }
+
+        /* =======================
+       BARRA DE BUSCA - do zero
+       ======================= */
+        .pi-search-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .pi-search-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            /* permite expandir no flex */
+        }
+
+        /* mata limites vindos do DS e garante 100% */
+        .pi-search-input input {
+            width: 100% !important;
+            max-width: none !important;
+            height: 44px;
+            padding: .5rem .75rem;
+            box-sizing: border-box;
+        }
+
+        .pi-search-input input::placeholder {
+            font-style: italic;
+            opacity: .85
+        }
+
+        .pi-search-btn {
+            height: 44px;
+            min-width: 112px;
+            border-radius: 9999px;
+            padding: 0 16px;
+            margin-top: 20px;
+        }
+
+        /* Remove o limite do wrapper do DS e faz o bloco crescer */
+        .pi-search-row .br-input {
+            max-width: none !important;
+            width: 100% !important;
+            flex: 1 1 auto;
+            min-width: 0;
+            /* evita “explodir” no flex */
+        }
+
+        .pi-search-row .br-input input {
+            width: 100% !important;
+            max-width: none !important;
+            height: 44px;
+            padding: .5rem .75rem;
+        }
+
+        /* Link alternativo para outras formas de busca */
+        .pi-search-alt {
+            margin-top: 12px;
+            /* respiro: não gruda no input */
+        }
+
+        .pi-search-alt .br-button {
+            height: 36px;
+            border-radius: 9999px;
+            padding: 0 .75rem;
+            font-weight: 500;
+        }
+
+        .pi-search-alt .br-button i {
+            margin-right: .5rem;
+        }
+
+        /* grid da hierárquica */
+        .pi-hier-grid {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: .75rem
+        }
+
+        @media (max-width:576px) {
+            .pi-hier-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* builder: tamanhos mínimos para não quebrar em linha */
+        .crit-row .br-select select,
+        .crit-row .br-input input {
+            min-width: 12ch;
+        }
+
+        .crit-field-wrap select {
+            min-width: 22ch;
+        }
+
+        .crit-op-wrap select {
+            min-width: 14ch;
+        }
+
+        .crit-val {
+            min-width: 28ch;
+        }
+
+        /* mensagem-resumo com cantos suaves */
+        #summary.br-message {
+            border-radius: .5rem;
+        }
+
+        /* Modo de busca — alinhamento horizontal e responsivo */
+        #modo-busca-group {
+            display: flex;
+            align-items: center;
+            /* centraliza verticalmente círculo + texto */
+            gap: 1rem;
+            /* espaçamento uniforme entre opções */
+            flex-wrap: wrap;
+            /* quebra em telas menores */
+        }
+
+        #modo-busca-group .br-radio {
+            display: flex;
+            align-items: center;
+            /* garante baseline perfeito */
+            margin: 0;
+            /* zera qualquer margem herdada */
+        }
+
+        #modo-busca-group .br-radio input {
+            margin: 0;
+            /* remove deslocamentos laterais */
+        }
+
+        #modo-busca-group .br-radio label {
+            margin: 0 0 0 .5rem;
+            /* espaço entre o círculo e o rótulo */
+            line-height: 1.25;
+            /* previne “saltos” verticais do texto */
+        }
+
+        /* Ajuste sutil no espaço entre legend e os rádios */
+        .br-fieldset>legend {
+            margin-bottom: .25rem;
+        }
+
+        /* Ícone de ajuda: círculo com borda azul e “i” azul (padrão do print) */
+        .help-icon {
+            --help-color: #1351B4;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            background: #fff;
+            color: var(--help-color);
+            border: 1px solid var(--help-color);
+            box-shadow: none;
+        }
+
+        .help-icon i {
+            font-size: .875rem;
+            line-height: 1;
+        }
+
+        .help-icon:hover {
+            background: rgba(19, 81, 180, .06);
+        }
+
+        .help-icon:focus {
+            outline: 2px solid rgba(19, 81, 180, .35);
+            outline-offset: 2px;
+        }
+
+        /* H5 + ícone: alinhar pela baseline */
+        .title-with-help {
+            display: inline-flex;
+            /* garante baseline entre os itens */
+            align-items: baseline;
+        }
+
+        /* Nudge óptico: 2px para baixo (fontes do DS-Gov tendem a deixar o botão 1–2px acima) */
+        .title-with-help .help-icon {
+            position: relative;
+            top: .125rem;
+            /* ≈ 2px; ajuste se precisar .1–.2rem */
+        }
+
+        /* Mantém o visual do ícone */
+        .help-icon {
+            --help-color: #1351B4;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            background: #fff;
+            color: var(--help-color);
+            border: 1px solid var(--help-color);
+            box-shadow: none;
+        }
+
+        .help-icon i {
+            font-size: .875rem;
+            line-height: 1;
+        }
+
+        .help-icon:hover {
+            background: rgba(19, 81, 180, .06);
+        }
+
+        .help-icon:focus {
+            outline: 2px solid rgba(19, 81, 180, .35);
+            outline-offset: 2px;
+        }
+
+        /* H5 + ícone: alinhar pela baseline */
+        .title-with-help {
+            display: inline-flex;
+            /* garante baseline entre os itens */
+            align-items: baseline;
+        }
+
+        /* Nudge óptico: 2px para baixo (fontes do DS-Gov tendem a deixar o botão 1–2px acima) */
+        .title-with-help .help-icon {
+            position: relative;
+
+            /* ≈ 2px; ajuste se precisar .1–.2rem */
+        }
+
+        /* Mantém o visual do ícone */
+        .help-icon {
+            --help-color: #1351B4;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            background: #fff;
+            color: var(--help-color);
+            border: 1px solid var(--help-color);
+            box-shadow: none;
+        }
+
+        .help-icon i {
+            font-size: .875rem;
+            line-height: 1;
+        }
+
+        .help-icon:hover {
+            background: rgba(19, 81, 180, .06);
+        }
+
+        .help-icon:focus {
+            outline: 2px solid rgba(19, 81, 180, .35);
+            outline-offset: 2px;
+        }
+
+        /* =========================
+   Busca Avançada — Refinos
+   ========================= */
+
+        /* Linha de critérios em GRID para ocupar toda a largura do card */
+        #panel-avancada .crit-row {
+            display: grid;
+            grid-template-columns: 260px 140px 1fr auto;
+            /* campo | operador | valor (flex) | remover */
+            gap: .75rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Responsivo: quebra em 2 colunas e, no mobile, empilha */
+        @media (max-width: 1100px) {
+            #panel-avancada .crit-row {
+                grid-template-columns: minmax(200px, 1fr) minmax(120px, 200px) 1fr auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #panel-avancada .crit-row {
+                grid-template-columns: 1fr;
+                gap: .5rem;
+            }
+
+            #panel-avancada .crit-row .br-button.circle.danger {
+                justify-self: start;
+            }
+
+            /* botão remover vai pra esquerda no mobile */
+        }
+
+        /* Alturas/espacamentos idênticos ao DS-Gov */
+        #panel-avancada .br-select select,
+        #panel-avancada .br-input input {
+            height: 40px;
+            /* altura padrão dos inputs do DS */
+            padding: .5rem .75rem;
+            /* padding interno consistente */
+            width: 100%;
+            /* garante que ocupem seu grid-area inteira */
+            box-sizing: border-box;
+        }
+
+        /* Garante que os wrappers ocupem a coluna toda */
+        #panel-avancada .crit-field-wrap,
+        #panel-avancada .crit-op-wrap,
+        #panel-avancada .crit-val-wrap {
+            width: 100%;
+        }
+
+        /* Botão remover com alinhamento central na linha */
+        #panel-avancada .br-button.circle.danger {
+            align-self: center;
+        }
+
+        /* Padding e visual do resumo (chips) */
+        #summary {
+            display: block;
+            margin-top: .75rem;
+            padding: .5rem .75rem;
+            border: 1px solid #B5D0FF;
+            /* azul claro */
+            border-left: 4px solid #1351B4;
+            /* destaque lateral */
+            background: #EAF3FF;
+            /* fundo info */
+            color: #0C326F;
+            /* texto azul escuro */
+            border-radius: .375rem;
+            font-size: .95rem;
+        }
+
+        /* Linha fina acima dos botões para separar visualmente */
+        #panel-avancada .card-actions {
+            border-top: 1px solid #E6E6E6;
+            margin-top: .75rem;
+            padding-top: .75rem;
+        }
+
+        /* Espaço após o botão “Adicionar critério” e checkbox */
+        #panel-avancada #btn-add-criterio {
+            margin-top: .5rem;
+        }
+
+        #panel-avancada #granted-wrap {
+            margin-top: .5rem;
+        }
+
+        /* Evita overflow horizontal do card */
+        #panel-avancada .card-content {
+            overflow-x: hidden;
+        }
+
+        /* Linha de critérios: forçar GRID mesmo se tiver .d-flex */
+        #panel-avancada .crit-row {
+            display: grid !important;
+        }
+
+        /* Colunas: Campo | Operador | Valor (flexível) | Remover */
+        #panel-avancada .crit-row {
+            grid-template-columns: minmax(220px, 340px) minmax(120px, 200px) 1fr auto;
+            gap: .75rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Permitir encolhimento dentro do grid (evita “pular” de linha) */
+        #panel-avancada .crit-field-wrap,
+        #panel-avancada .crit-op-wrap,
+        #panel-avancada .crit-val-wrap {
+            min-width: 0;
+            width: 100%;
+        }
+
+        /* Inputs/selects: altura e largura consistentes */
+        #panel-avancada .br-select select,
+        #panel-avancada .br-input input {
+            height: 40px;
+            padding: .5rem .75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Botão remover na 4ª coluna, centralizado */
+        #panel-avancada .br-button.circle.danger {
+            grid-column: 4;
+            align-self: center;
+        }
+
+        /* Grid dos campos do modo Hierárquico */
+        #panel-hierarquica .pi-hier-grid {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            /* IPC expande, Lógica com largura fixa */
+            gap: .75rem 1rem;
+            align-items: end;
+            /* alinha controles pela base */
+        }
+
+        /* Alturas/espacamentos dos controles */
+        #panel-hierarquica .br-input input,
+        #panel-hierarquica .br-select select {
+            height: 40px;
+            padding: .5rem .75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Labels consistentes acima dos controles */
+        #panel-hierarquica .br-input>label,
+        #panel-hierarquica .br-select>label {
+            display: inline-block;
+            margin-bottom: .25rem;
+            line-height: 1.25;
+        }
+
+        /* Responsivo: empilha no mobile */
+        @media (max-width: 640px) {
+
+            #panel-hierarquica .pi-hierarquica,
+            #panel-hierarquica .pi-hier-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Autocomplete — container e itens */
+        #ipc-autocomplete {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #DADCE0;
+            border-radius: .375rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #ipc-autocomplete[hidden] {
+            display: none;
+        }
+
+        #ipc-autocomplete .ac-item {
+            padding: .5rem .75rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        #ipc-autocomplete .ac-item:hover,
+        #ipc-autocomplete .ac-item[aria-selected="true"] {
+            background: #EAF3FF;
+        }
+
+        #ipc-autocomplete .ac-item small {
+            color: #6B778C;
+            white-space: nowrap;
+        }
+
+        /* garante que o wrapper do input seja o referencial do dropdown */
+        #ipc-symbol-wrap {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <!-- Skiplinks -->
+        <nav class="br-skiplink" role="menubar">
+            <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span
+                    aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+            <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span
+                    aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+            <a class="br-item" href="#searchbox" role="menuitem" accesskey="3">Ir para a busca <span
+                    aria-hidden="true">(3/4)</span> <span aria-hidden="true" class="br-tag text ml-1">3</span></a>
+            <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span
+                    aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+        </nav>
+
+        <!-- Header -->
+        <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+            <div class="container-fluid">
+                <div class="header-top">
+                    <div class="header-logo">
+                        <span class="logo-ph" aria-hidden="true"><i class="fas fa-image"></i><span>.Img</span></span>
+                        <span class="br-divider vertical"></span>
+                        <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="header-links d-none d-md-flex" aria-label="Acesso rápido">
+                            <a class="br-item text-nowrap" href="#">Link de acesso 1</a>
+                            <a class="br-item text-nowrap" href="#">Link de acesso 2</a>
+                            <a class="br-item text-nowrap" href="#">Link de acesso 3</a>
+                            <a class="br-item text-nowrap" href="#">Link de acesso 4</a>
+                        </div>
+                        <span class="br-divider vertical mx-half mx-sm-1"></span>
+                        <div class="header-functions dropdown">
+                            <button class="br-button circle small" type="button" data-toggle="dropdown"
+                                aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th"
+                                    aria-hidden="true"></i></button>
+                            <div class="br-list">
+                                <div class="header">
+                                    <div class="title">Funcionalidades do Sistema</div>
+                                </div>
+                                <div class="br-item"><button class="br-button circle small" type="button"
+                                        aria-label="Funcionalidade 1"><i class="fas fa-chart-bar"
+                                            aria-hidden="true"></i><span class="text">Funcionalidade 1</span></button>
+                                </div>
+                                <div class="br-item"><button class="br-button circle small" type="button"
+                                        aria-label="Funcionalidade 2"><i class="fas fa-headset"
+                                            aria-hidden="true"></i><span class="text">Funcionalidade 2</span></button>
+                                </div>
+                                <div class="br-item"><button class="br-button circle small" type="button"
+                                        aria-label="Funcionalidade 3"><i class="fas fa-comment"
+                                            aria-hidden="true"></i><span class="text">Funcionalidade 3</span></button>
+                                </div>
+                                <div class="br-item"><button class="br-button circle small" type="button"
+                                        aria-label="Funcionalidade 4"><i class="fas fa-adjust"
+                                            aria-hidden="true"></i><span class="text">Funcionalidade 4</span></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="header-search-trigger">
+                            <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search"
+                                data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="dropdown">
+                            <button class="br-button circle small" type="button" aria-label="Selecionar idioma"
+                                title="Change language"><i class="fas fa-globe" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="header-login">
+                            <div class="header-sign-in"><button class="br-sign-in small" type="button"
+                                    data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span
+                                        class="d-sm-inline">Entrar</span></button></div>
+                            <div class="header-avatar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-bottom">
+                    <div class="header-menu">
+                        <div class="header-menu-trigger" id="header-navigation">
+                            <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu"
+                                data-target="#main-navigation" id="navigation"><i class="fas fa-bars"
+                                    aria-hidden="true"></i></button>
+                        </div>
+                        <div class="header-info">
+                            <div class="header-title">Portal de Propriedade Industrial</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Menu lateral (idêntico) -->
+        <div class="br-menu" id="main-navigation" style="width:250px">
+            <div class="menu-container">
+                <div class="menu-panel">
+                    <div class="menu-header" data-visible="false">
+                        <div class="menu-title"><span class="logo-ph"><i
+                                    class="fas fa-image"></i><span>.Img</span></span><span>Propriedade Industrial</span>
+                        </div>
+                        <div class="menu-close"><button class="br-button circle" type="button"
+                                aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times"
+                                    aria-hidden="true"></i></button></div>
+                    </div>
+                    <div class="menu-body" role="tree">
+                        <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0"
+                                aria-level="1"><span class="icon"><i class="fas fa-home"
+                                        aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+                        <div class="menu-folder drop-menu"><a href="#" class="menu-item active" role="treeitem"
+                                tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i
+                                        class="fas fa-copyright" aria-hidden="true"></i></span><span
+                                    class="content">Patentes</span></a></div>
+                    </div>
+                </div>
+                <div class="menu-scrim" data-dismiss="menu"></div>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="d-flex flex-fill mb-5" id="main">
+            <div class="container">
+                <main class="row" id="main-content">
+                    <div class="col mb-5">
+                        <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+                            <ol class="crumb-list" role="list">
+                                <li class="crumb home"><a class="br-button circle" href="/"><span class="sr-only">Página
+                                            inicial</span><i class="fas fa-home"></i></a></li>
+                                <li class="crumb" data-active="active"><i
+                                        class="icon fas fa-chevron-right"></i><span>Patentes</span></li>
+                            </ol>
+                        </nav>
+
+                        <!-- MODO DE BUSCA -->
+                        <fieldset class="br-fieldset mt-3">
+                            <legend class="h6 mb-1">Modo de busca</legend>
+                            <div id="modo-busca-group" role="radiogroup" aria-label="Modo de busca">
+                                <div class="br-radio">
+                                    <input id="modo-basica" type="radio" name="modo-busca" value="basica">
+                                    <label for="modo-basica">Básica</label>
+                                </div>
+                                <div class="br-radio">
+                                    <input id="modo-avancada" type="radio" name="modo-busca" value="avancada">
+                                    <label for="modo-avancada">Avançada</label>
+                                </div>
+                                <div class="br-radio">
+                                    <input id="modo-hierarquica" type="radio" name="modo-busca" value="hierarquica">
+                                    <label for="modo-hierarquica">Hierárquica</label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Painel: BÁSICA -->
+                        <section id="panel-basica" class="br-card mt-3">
+                            <div class="card-header">
+                                <div class="d-flex title-with-help" style="gap:.5rem; align-items:baseline">
+                                    <div class="h5 mb-0">Busca básica</div>
+                                    <button type="button" class="br-button circle small help-icon"
+                                        data-tooltip-text="Como usar a busca básica…" aria-label="Ajuda: Busca básica">
+                                        <i class="fas fa-info"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card-content">
+                                <!-- Use aqui o MESMO markup de busca rápida do v3. 
+         Se não tiver um bloco pronto, o mínimo funcional está abaixo. -->
+                                <form class="mt-1" id="form-basica" role="search" aria-label="Busca básica">
+                                    <div class="d-flex align-items-end" style="gap:.5rem">
+                                        <div class="br-input flex-fill">
+                                            <label for="q-basica">Busca rápida
+
+                                            </label>
+                                            <input id="q-basica" type="search"
+                                                placeholder="Ex.: título, titular, nº do pedido…" autocomplete="off">
+                                        </div>
+                                        <button class="br-button primary" type="submit">
+                                            <i class="fas fa-search" aria-hidden="true"></i><span
+                                                class="ml-1">Buscar</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+
+                        <!-- Painel: AVANÇADA -->
+                        <section id="panel-avancada" class="br-card mt-3" hidden aria-hidden="true">
+                            <div class="card-header">
+                                <div class="d-flex title-with-help" style="gap:.5rem; align-items:baseline">
+                                    <div class="h5 mb-0">Busca Avançada</div>
+                                    <button type="button" class="br-button circle small help-icon"
+                                        data-tooltip-text="Como usar a busca avançada" aria-label="Ajuda: Busca básica">
+                                        <i class="fas fa-info"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div id="criteria-list"></div>
+                                <div class="mt-2">
+                                    <button class="br-button secondary" type="button" id="btn-add-criterio">
+                                        <i class="fas fa-plus" aria-hidden="true"></i><span class="ml-1">Adicionar
+                                            critério</span>
+                                    </button>
+                                </div>
+
+                                <div id="granted-wrap" class="mt-3" hidden>
+                                    <div class="br-checkbox">
+                                        <input type="checkbox" id="grantedOnly"><label for="grantedOnly">Patente
+                                            concedida</label>
+                                    </div>
+                                </div>
+
+                                <div class="br-message info mt-3" role="status" aria-live="polite" id="summary" hidden>
+                                </div>
+
+                                <div class="card-actions mt-2 d-flex flex-wrap">
+                                    <button class="br-button primary" type="button" id="btn-search-adv">
+                                        <i class="fas fa-search" aria-hidden="true"></i><span class="ml-1">Buscar</span>
+                                    </button>
+                                    <button class="br-button secondary" type="button" id="btn-clear-adv">
+                                        <i class="fas fa-eraser" aria-hidden="true"></i><span class="ml-1">Limpar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Painel: HIERÁRQUICA -->
+                        <section id="panel-hierarquica" class="br-card mt-3" hidden aria-hidden="true">
+                            <div class="card-header">
+                                <div class="d-flex title-with-help" style="gap:.5rem; align-items:baseline">
+                                    <div class="h5 mb-0">Busca Hierárquica</div>
+                                    <button type="button" class="br-button circle small help-icon"
+                                        data-tooltip-text="Como usar a busca Hierárquica"
+                                        aria-label="Ajuda: Busca básica">
+                                        <i class="fas fa-info"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <form id="form-hier" role="search" aria-label="Busca hierárquica (IPC)">
+                                    <div class="pi-hier-grid">
+                                        <!-- Símbolo IPC -->
+                                        <div class="br-input">
+                                            <label for="ipc-symbol">Símbolo IPC:</label>
+                                            <input id="ipc-symbol" name="ipc" placeholder="Ex.: A01B 1/00"
+                                                autocomplete="off">
+                                        </div>
+
+                                        <!-- Lógica -->
+                                        <div class="br-select">
+                                            <label for="ipc-logic">Lógica:</label>
+                                            <select id="ipc-logic" name="logic">
+                                                <option value="=">=</option>
+                                                <option value="LOW">LOW</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-actions mt-2 d-flex flex-wrap">
+                                        <button class="br-button primary" type="submit">
+                                            <i class="fas fa-search" aria-hidden="true"></i><span
+                                                class="ml-1">Buscar</span>
+                                        </button>
+                                        <button class="br-button secondary" type="reset">
+                                            <i class="fas fa-eraser" aria-hidden="true"></i><span
+                                                class="ml-1">Limpar</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Footer (igual) -->
+        <footer class="br-footer" id="footer">
+            <div class="container-lg">
+                <div class="logo"><span class="logo-ph"><i class="fas fa-image"></i><span>.Img</span></span></div>
+                <!-- …demais colunas do footer… -->
+            </div>
+            <span class="br-divider my-3"></span>
+            <div class="container-lg">
+                <div class="info">
+                    <div class="text-down-01 text-medium pb-3">Texto destinado a exibição de informações relacionadas à
+                        <strong>licença de uso.</strong>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => { if (window.BR && typeof BR.init === 'function') BR.init(); });
+    </script>
+    <script>
+        (function () {
+            // ==== Config ====
+            const CONNECTORS = ["OR", "AND", "NOT"];
+            const FIELDS = [
+                { value: "numero_pedido", label: "(21) Nº do Pedido", ops: ["=", "contém", "começa com", "termina com"] },
+                { value: "titulo", label: "(54) Título", ops: ["contém", "=", "começa com", "termina com"] },
+                { value: "titular", label: "(71) Titular", ops: ["contém", "=", "começa com", "termina com"] },
+                { value: "inventor", label: "(72) Inventor", ops: ["contém", "=", "começa com", "termina com"] },
+                { value: "ipc", label: "(51) Classificação IPC", ops: ["=", "contém", "LOW (hierárq.)"] },
+                { value: "deposito", label: "(22) Data de Depósito", ops: [">=", ">", "=", "<", "<="] }
+            ];
+
+            // ==== DOM refs ====
+            const els = {
+                radios: document.querySelectorAll('input[name="modo-busca"]'),
+                panels: {
+                    basica: document.getElementById("panel-basica"),
+                    avancada: document.getElementById("panel-avancada"),
+                    hierarquica: document.getElementById("panel-hierarquica"),
+                },
+                // Avançada
+                list: document.getElementById("criteria-list"),
+                addBtn: document.getElementById("btn-add-criterio"),
+                summary: document.getElementById("summary"),
+                grantedWrap: document.getElementById("granted-wrap"),
+                granted: document.getElementById("grantedOnly"),
+                btnSearch: document.getElementById("btn-search-adv"),
+                btnClear: document.getElementById("btn-clear-adv"),
+                // Básica / Hierárquica
+                formBasica: document.getElementById("form-basica"),
+                qBasica: document.getElementById("q-basica"),
+                formHier: document.getElementById("form-hier"),
+                ipc: document.getElementById("ipc-symbol"),
+                logic: document.getElementById("ipc-logic"),
+            };
+
+            // ==== Alternância de modo ====
+            function setMode(mode, updateURL = true) {
+                Object.entries(els.panels).forEach(([m, node]) => {
+                    const visible = m === mode;
+                    node.hidden = !visible;
+                    node.setAttribute("aria-hidden", String(!visible));
+                });
+                if (updateURL) {
+                    const url = new URL(location.href);
+                    url.searchParams.set("modo", mode);
+                    history.replaceState({}, "", url);
+                }
+                // UX: foca no primeiro controle do painel ativo
+                const focusable = els.panels[mode].querySelector("input, select, textarea, button, a[href]");
+                if (focusable) focusable.focus({ preventScroll: true });
+                // Seed inicial do builder ao entrar no modo avançado
+                if (mode === "avancada" && els.list.childElementCount === 0) addCriterion();
+            }
+
+            function getInitialMode() {
+                const m = new URL(location.href).searchParams.get("modo");
+                return (m === "avancada" || m === "hierarquica") ? m : "basica";
+            }
+
+            els.radios.forEach(r => {
+                r.addEventListener("change", () => r.checked && setMode(r.value));
+            });
+
+            // ==== Builder (Avançada) ====
+            function makeSelect(options, attrs = {}) {
+                const s = document.createElement("select");
+                Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
+                options.forEach(opt => {
+                    const o = document.createElement("option");
+                    if (typeof opt === "string") { o.value = opt; o.textContent = opt; }
+                    else { o.value = opt.value; o.textContent = opt.label; }
+                    s.appendChild(o);
+                });
+                return s;
+            }
+
+            function renumberConnectors() {
+                const rows = els.list.querySelectorAll(".crit-row");
+                rows.forEach((row, idx) => {
+                    row.querySelector(".crit-conn-wrap").style.display = (idx === 0) ? "none" : "";
+                });
+            }
+
+            function updateSummary() {
+                const rows = [...els.list.querySelectorAll(".crit-row")];
+                if (!rows.length) {
+                    els.summary.hidden = true;
+                    els.grantedWrap.hidden = true;
+                    return;
+                }
+                els.grantedWrap.hidden = false;
+                const chips = rows.map((row, idx) => {
+                    const conn = idx > 0 ? row.querySelector(".crit-conn").value + " " : "";
+                    const fieldTxt = row.querySelector(".crit-field").selectedOptions[0].textContent;
+                    const opTxt = row.querySelector(".crit-op").selectedOptions[0].textContent;
+                    const valTxt = row.querySelector(".crit-val").value || "…";
+                    return conn + fieldTxt + " " + opTxt + " \"" + valTxt + "\"";
+                }).join("  ");
+                els.summary.textContent = chips + (els.granted.checked ? "  • Patente concedida" : "");
+                els.summary.hidden = false;
+            }
+
+            function addCriterion() {
+                const row = document.createElement("div");
+                row.className = "crit-row d-flex flex-wrap align-items-center";
+                row.style.gap = ".5rem";
+
+                // Conector
+                const connWrap = document.createElement("div");
+                connWrap.className = "crit-conn-wrap";
+                const conn = makeSelect(CONNECTORS, { class: "crit-conn", "aria-label": "Conector" });
+                connWrap.appendChild(conn);
+                row.appendChild(connWrap);
+
+                // Campo
+                const fieldWrap = document.createElement("div");
+                fieldWrap.className = "crit-field-wrap br-select";
+                const field = makeSelect(FIELDS.map(f => ({ value: f.value, label: f.label })), { class: "crit-field", "aria-label": "Campo" });
+                fieldWrap.appendChild(field);
+                row.appendChild(fieldWrap);
+
+                // Operador (muda conforme campo)
+                const opWrap = document.createElement("div");
+                opWrap.className = "crit-op-wrap br-select";
+                const op = makeSelect(FIELDS[0].ops, { class: "crit-op", "aria-label": "Operador" });
+                opWrap.appendChild(op);
+                row.appendChild(opWrap);
+
+                // Valor
+                const valWrap = document.createElement("div");
+                valWrap.className = "crit-val-wrap br-input";
+                const val = document.createElement("input");
+                val.type = "text"; val.placeholder = "Valor"; val.className = "crit-val";
+                valWrap.appendChild(val);
+                row.appendChild(valWrap);
+
+                // Remover
+                const rm = document.createElement("button");
+                rm.type = "button";
+                rm.className = "br-button circle danger";
+                rm.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i><span class="sr-only">Remover critério</span>';
+                rm.addEventListener("click", () => {
+                    row.remove();
+                    updateSummary();
+                    renumberConnectors();
+                });
+                row.appendChild(rm);
+
+                // Variação de operador por campo
+                field.addEventListener("change", () => {
+                    const cfg = FIELDS.find(f => f.value === field.value);
+                    op.innerHTML = "";
+                    (cfg?.ops || ["=", "contém"]).forEach(o => {
+                        const opt = document.createElement("option");
+                        opt.value = o; opt.textContent = o;
+                        op.appendChild(opt);
+                    });
+                    updateSummary();
+                });
+
+                [conn, op, val].forEach(e => e.addEventListener("input", updateSummary));
+                els.list.appendChild(row);
+                renumberConnectors();
+                updateSummary();
+            }
+
+            els.addBtn?.addEventListener("click", addCriterion);
+            els.btnClear?.addEventListener("click", () => {
+                els.list.innerHTML = "";
+                els.granted.checked = false;
+                updateSummary();
+            });
+            els.granted?.addEventListener("change", updateSummary);
+
+            els.btnSearch?.addEventListener("click", () => {
+                const rows = [...els.list.querySelectorAll(".crit-row")];
+                const query = rows.map((row, idx) => ({
+                    conn: idx > 0 ? row.querySelector(".crit-conn").value : null,
+                    field: row.querySelector(".crit-field").value,
+                    op: row.querySelector(".crit-op").value,
+                    val: row.querySelector(".crit-val").value
+                }));
+                const params = new URLSearchParams();
+                params.set("modo", "avancada");
+                params.set("q", JSON.stringify(query));
+                if (els.granted.checked) params.set("granted", "1");
+                console.log("Consulta avançada:", params.toString());
+                alert("Consulta avançada construída:\n" + params.toString());
+            });
+
+            // ==== Submits mínimos ====
+            els.formBasica?.addEventListener("submit", (ev) => {
+                ev.preventDefault();
+                const q = (els.qBasica?.value || "").trim();
+                if (!q) { els.qBasica?.focus(); return; }
+                const params = new URLSearchParams({ modo: "basica", q });
+                console.log("Busca básica:", params.toString());
+                alert("Busca básica:\n" + params.toString());
+            });
+
+            els.formHier?.addEventListener("submit", (ev) => {
+                ev.preventDefault();
+                const params = new URLSearchParams({
+                    modo: "hierarquica",
+                    ipc: (els.ipc?.value || "").trim(),
+                    logic: els.logic?.value || "="
+                });
+                console.log("Busca hierárquica:", params.toString());
+                alert("Busca hierárquica:\n" + params.toString());
+            });
+
+            // ==== Boot ====
+            document.addEventListener("DOMContentLoaded", () => {
+                // respeita ?modo= na chegada
+                const initial = getInitialMode();
+                const r = document.querySelector('input[name="modo-busca"][value="' + initial + '"]');
+                if (r) r.checked = true;
+                setMode(initial, false);
+            });
+        })();
+
+        (function () {
+            // ==== Dataset de demonstração (3 gatilhos × 5 sugestões) ====
+            const DEMO = {
+                aco: [
+                    { label: "Aço inoxidável", code: "C22C 38/00" },
+                    { label: "Aço galvanizado", code: "C23C 2/00" },
+                    { label: "Liga de aço (baixa liga)", code: "C22C 38/60" },
+                    { label: "Tratamento térmico do aço", code: "C21D 1/00" },
+                    { label: "Fabricação de aço", code: "C21C 5/00" }
+                ],
+                bateria: [
+                    { label: "Bateria íons de lítio", code: "H01M 10/0525" },
+                    { label: "Bateria estado sólido", code: "H01M 10/0562" },
+                    { label: "Gestão de bateria (BMS)", code: "H01M 10/44" },
+                    { label: "Cátodo NMC", code: "H01M 4/485" },
+                    { label: "Reciclagem de baterias", code: "H01M 10/54" }
+                ],
+                polimero: [
+                    { label: "Polímero biodegradável", code: "C08L 101/00" },
+                    { label: "Polímero condutor", code: "C08G 61/12" },
+                    { label: "Fotopolimerização", code: "C08F 2/50" },
+                    { label: "Copolímero em bloco", code: "C08F 297/00" },
+                    { label: "PEEK (alto desempenho)", code: "C08G 26/04" }
+                ]
+            };
+
+            // ==== Helpers ====
+            const norm = s => (s || "").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+            const byId = id => document.getElementById(id);
+
+            // ==== Alvos ====
+            const ipcInput = byId("ipc-symbol");
+            if (!ipcInput) return;
+
+            // cria (ou marca) um wrapper com posição relativa p/ ancorar a lista
+            let wrap = ipcInput.closest(".br-input") || ipcInput.parentElement;
+            if (!wrap.id) wrap.id = "ipc-symbol-wrap";
+            wrap.style.position = "relative";
+
+            // cria a lista de sugestões
+            const list = document.createElement("div");
+            list.id = "ipc-autocomplete";
+            list.setAttribute("role", "listbox");
+            list.hidden = true;
+            wrap.appendChild(list);
+
+            let activeIndex = -1; // item focado na lista
+
+            // ==== Renderização ====
+            function render(items) {
+                list.innerHTML = "";
+                activeIndex = -1;
+                items.forEach((it, idx) => {
+                    const el = document.createElement("div");
+                    el.className = "ac-item";
+                    el.setAttribute("role", "option");
+                    el.setAttribute("id", "ac-opt-" + idx);
+                    el.dataset.value = `${it.label} — ${it.code}`;
+
+                    el.innerHTML = `<span>${it.label}</span><small>${it.code}</small>`;
+
+                    // mouse
+                    el.addEventListener("mousedown", (ev) => { // mousedown para não perder foco antes de setar valor
+                        ev.preventDefault();
+                        choose(el.dataset.value);
+                    });
+
+                    list.appendChild(el);
+                });
+                list.hidden = items.length === 0;
+            }
+
+            function choose(value) {
+                ipcInput.value = value;
+                hide();
+            }
+
+            function hide() { list.hidden = true; activeIndex = -1; }
+            function show() { list.hidden = false; }
+
+            function move(delta) {
+                const items = [...list.querySelectorAll(".ac-item")];
+                if (!items.length) return;
+                activeIndex = (activeIndex + delta + items.length) % items.length;
+                items.forEach((it, i) => it.setAttribute("aria-selected", i === activeIndex ? "true" : "false"));
+                items[activeIndex].scrollIntoView({ block: "nearest" });
+            }
+
+            // ==== Lógica de filtro (≥ 3 chars e bate com um dos gatilhos) ====
+            function onInput() {
+                const q = norm(ipcInput.value);
+                if (q.length < 3) { hide(); return; }
+
+                // Agora checa se O *TERMO DO DATASET* COMEÇA pelo que foi digitado
+                // (ex.: "pol" casa com "polimero"; "bat" com "bateria")
+                const keys = Object.keys(DEMO);
+                const hit =
+                    keys.find(k => k.startsWith(q)) ||   // prefixo do dataset bate com o que foi digitado
+                    keys.find(k => q.startsWith(k));     // (fallback) usuário digitou o termo completo
+
+                if (!hit) { hide(); return; }
+
+                render(DEMO[hit]);
+                show();
+            }
+
+
+            // ==== Eventos ====
+            ipcInput.addEventListener("input", onInput);
+
+            ipcInput.addEventListener("keydown", (ev) => {
+                if (list.hidden) return;
+                switch (ev.key) {
+                    case "ArrowDown": ev.preventDefault(); move(+1); break;
+                    case "ArrowUp": ev.preventDefault(); move(-1); break;
+                    case "Enter":
+                        if (activeIndex >= 0) {
+                            ev.preventDefault();
+                            const el = list.querySelectorAll(".ac-item")[activeIndex];
+                            if (el) choose(el.dataset.value);
+                        }
+                        break;
+                    case "Escape":
+                        hide();
+                        break;
+                }
+            });
+
+            // fecha ao clicar fora
+            document.addEventListener("click", (ev) => {
+                if (!wrap.contains(ev.target)) hide();
+            });
+
+        })();
+    </script>
+
+
+
+</body>
+
+</html>
