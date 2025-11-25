@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalhe do Programa de Computador — Portal de Propriedade Industrial</title>
+    <meta name="description" content="Visualização detalhada do registro de Programa de Computador.">
+
+    <!-- DS GOV.BR -->
+    <link rel="stylesheet"
+        href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
+    <!-- Identidade aprovada -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .record-title h1 {
+            margin: 0;
+            font-family: Raleway, Rawline, Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: .01em
+        }
+
+        .record-tags {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            margin-top: .25rem
+        }
+
+        .br-tag {
+            white-space: nowrap
+        }
+
+        .kv {
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            padding: .6rem .75rem;
+            background: #fbfbfd
+        }
+
+        .kv .k {
+            font-size: .78rem;
+            color: #6b7280;
+            margin-bottom: .15rem;
+            display: flex;
+            align-items: center;
+            gap: .375rem
+        }
+
+        .kv .v {
+            font-weight: 700;
+            color: #111827
+        }
+
+        .br-table table {
+            width: 100%
+        }
+
+        /* Grid principal (software não usa coluna direita) */
+        .biblio-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: .75rem
+        }
+
+        /* Tooltips (mesmo padrão) */
+        .tt-inline {
+            position: relative;
+            display: inline-block;
+            cursor: help
+        }
+
+        .tt::after,
+        .tt-inline::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            min-width: 240px;
+            max-width: min(520px, 80vw);
+            background: #0b0d12;
+            color: #fff;
+            border-radius: .5rem;
+            padding: .625rem .75rem;
+            line-height: 1.35;
+            font-size: .875rem;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+            white-space: pre-line;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 10
+        }
+
+        .tt::before,
+        .tt-inline::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 100%;
+            transform: translate(-50%, 2px);
+            border: 8px solid transparent;
+            border-top-color: #0b0d12;
+            opacity: 0;
+            visibility: hidden
+        }
+
+        .tt:is(:hover, :focus-visible)::after,
+        .tt:is(:hover, :focus-visible)::before,
+        .tt-inline:is(:hover, :focus-visible)::after,
+        .tt-inline:is(:hover, :focus-visible)::before {
+            opacity: 1;
+            visibility: visible
+        }
+
+        .tt {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #6b7280;
+            cursor: help;
+            position: relative;
+            vertical-align: middle;
+            transform: translateY(-2px)
+        }
+
+        .tt:hover,
+        .tt:focus-visible {
+            color: #0B5ED7
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+
+        /* Publicações com colapso */
+        .pub-complement {
+            max-height: 8.5rem;
+            overflow: hidden;
+            position: relative
+        }
+
+        .pub-complement.expanded {
+            max-height: none
+        }
+
+        .pub-fade {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3rem;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff)
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* Grid do card "Dados do software" em 2 colunas a partir de 768px */
+        .biblio-grid.grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* mobile: 1 coluna */
+            gap: .75rem;
+        }
+
+        @media (min-width: 768px) {
+            .biblio-grid.grid-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Utilitário opcional: fazer um item ocupar toda a linha quando necessário */
+        @media (min-width: 768px) {
+            .span-2 {
+                grid-column: 1 / -1;
+            }
+        }
+
+
+        /* garante ocultação de botões quando não necessários */
+        #ex-holders {
+            margin: .25rem 0 0;
+            padding-left: 1rem;
+        }
+
+        #ex-holders li {
+            font-weight: 500;
+        }
+
+        /* Ações do topo (alinhamento) */
+        #navigation .actions-right {
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        #navigation .actions-right .br-button {
+            margin: 0
+        }
+
+        /* Toolbar (prev/próx + expandir/recolher) */
+        .detail-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            margin: .5rem 0 .75rem;
+            flex-wrap: wrap
+        }
+
+        .detail-toolbar .group-left,
+        .detail-toolbar .group-right {
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .detail-toolbar .hint-nav {
+            font-size: .875rem;
+            color: #6c757d
+        }
+
+        .detail-toolbar .text-divider {
+            opacity: .45;
+            margin: 0 .25rem
+        }
+
+        @media (max-width:768px) {
+            .detail-toolbar {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .detail-toolbar .group-left,
+            .detail-toolbar .group-right {
+                justify-content: space-between
+            }
+
+            .detail-toolbar .hint-nav {
+                display: none
+            }
+        }
+
+        /* Colapsar cards */
+        .br-card .card-header {
+            position: relative
+        }
+
+        .collapse-btn {
+            position: absolute;
+            right: .75rem;
+            top: .5rem
+        }
+
+        .br-card.is-collapsed .card-content {
+            display: none
+        }
+
+        /* Voltar ao topo (FAB) */
+        .back-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 1040;
+            display: none
+        }
+
+        .back-to-top.is-visible {
+            display: inline-flex
+        }
+
+        /* Espaço entre ícone e texto nos links Expandir/Recolher */
+        .detail-toolbar .group-right .br-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            /* <- afasta o ícone do texto */
+            white-space: nowrap;
+        }
+
+        /* Dá um respiro no pontinho separador */
+        .detail-toolbar .group-right .text-divider {
+            margin: 0 .5rem !important;
+        }
+
+        /* Controles globais de colapsar/expandir (abaixo do 1º card) */
+        .collapse-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: .25rem;
+            margin: .75rem 0 .25rem;
+        }
+
+        .collapse-toolbar .br-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .collapse-toolbar .text-divider {
+            opacity: .45;
+            margin: 0 .5rem;
+        }
+
+        /* Ações da barra superior (Copiar link, Certificado, Ver Dossiê, PDF, navegação) */
+        .nav-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .nav-actions .br-button {
+            display: inline-flex;
+            align-items: center;
+            margin: 0;
+        }
+
+        .nav-seq {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+            padding-top: 0;
+            /* mesmo ajuste das outras telas para alinhar com os botões */
+            transform: translateY(10px);
+        }
+
+        .nav-seq-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem;
+        }
+
+        .nav-seq-counter {
+            font-weight: 600;
+            min-width: 3.5rem;
+            text-align: center;
+        }
+
+        .nav-seq-pages {
+            font-size: .75rem;
+            color: #6c757d;
+            margin-top: .125rem;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="br-header" id="header" data-sticky>
+        <div class="container-lg">
+            <div class="header-top">
+                <div class="header-logo">
+                    <div class="logo">
+                        <a href="#" title="Portal de Propriedade Industrial — Início">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Crect rx='6' width='36' height='28' fill='%230B1F3F'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10' font-family='Rawline, Arial'%3EPI%3C/text%3E%3C/svg%3E"
+                                alt="Logotipo do Portal de Propriedade Industrial" width="36" height="28"
+                                decoding="async" />
+                        </a>
+                    </div>
+                    <div class="header-sign">Portal de Propriedade Industrial</div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-links">
+                        <a class="br-button circle small" href="#" aria-label="Acessar conta"><i
+                                class="fa-regular fa-user" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra fixa de ações + breadcrumb -->
+    <div class="container-lg pt-3 pb-2" id="navigation">
+        <!-- Linha 1: breadcrumb -->
+        <nav class="br-breadcrumb mb-2" id="page-breadcrumb" aria-label="Breadcrumb">
+            <ol class="crumb-list">
+                <li class="crumb"><a href="#">Consulta</a></li>
+                <li class="crumb"><a href="#">Programa de Computador</a></li>
+                <li class="crumb" aria-current="page">Detalhe</li>
+            </ol>
+        </nav>
+
+        <!-- Linha 2: Voltar aos resultados (esq.) + ações (dir.) -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <!-- Voltar aos resultados -->
+            <a href="#" class="br-button secondary">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                <span class="ml-1">Voltar aos resultados</span>
+            </a>
+
+            <!-- Ações à direita -->
+            <div class="nav-actions">
+                <!-- Copiar link (usa o mesmo id 'share' do JS) -->
+                <a class="br-button secondary" href="#" id="share">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                    <span class="ml-1">Copiar link</span>
+                </a>
+
+                <!-- Baixar Certificado -->
+                <a class="br-button secondary" href="#" id="baixarCertificado">
+                    <i class="fa-solid fa-award" aria-hidden="true"></i>
+                    <span class="ml-1">Baixar Certificado</span>
+                </a>
+
+                <!-- Baixar PDF -->
+                <a class="br-button secondary" href="#" id="baixarPDF">
+                    <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
+                    <span class="ml-1">Baixar PDF</span>
+                </a>
+
+                <!-- Ver dossiê -->
+                <a class="br-button primary" href="#" id="verPDF">
+                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                    <span class="ml-1">Ver Dossiê</span>
+                </a>
+
+                <!-- Navegação sequencial 9 / 10 -->
+                <div class="nav-seq text-end">
+                    <div class="nav-seq-controls">
+                        <a class="br-button secondary circle small" id="btnPrev" rel="prev" href="#"
+                            aria-label="Registro anterior" title="Registro anterior">
+                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                        </a>
+                        <span id="seqPosition" class="nav-seq-counter">9 / 10</span>
+                        <a class="br-button secondary circle small" id="btnNext" rel="next" href="#"
+                            aria-label="Próximo registro" title="Próximo registro">
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <small id="seqPages" class="nav-seq-pages">Página 1 de 1184</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <main id="main-content" class="d-flex flex-fill">
+
+        <div class="container-lg">
+            <!-- Âncora para "Voltar ao topo" -->
+            <div id="topo" tabindex="-1" aria-hidden="true"></div>
+
+            <!-- Toolbar do detalhe (navegação e expandir/recolher reposicionados) -->
+            <div class="detail-toolbar lite" aria-label="Controles da página">
+                <div class="group-left"></div>
+            </div>
+
+
+            <!-- CARD 1: Cabeçalho (linha única de KVs) -->
+            <div class="br-card mt-3">
+                <div class="card-content">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12">
+                            <div class="record-title d-flex flex-wrap align-items-baseline">
+                                <h1>Programa de Computador • BR512025002412-6</h1>
+                            </div>
+                            <div class="record-tags">
+                                <span class="tt-inline" tabindex="0"
+                                    data-tooltip="Status atual: registro concedido e vigente.">
+                                    <span class="br-tag">Registrado</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-3">
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Nº do processo </div>
+                                <div class="v">BR512025002412-6</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data do requerimento</div>
+                                <div class="v"><time datetime="2025-06-05">05/06/2025</time></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data de emissão do certificado</div>
+                                <div class="v"><time datetime="2025-06-05">05/06/2025</time></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles globais de colapsar/expandir, logo antes do primeiro card expansível -->
+            <div class="collapse-toolbar" aria-label="Exibição das seções">
+                <a href="#" id="expandAll" class="br-link" role="button">
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    <span>Expandir tudo</span>
+                </a>
+                <span class="text-divider" aria-hidden="true">•</span>
+                <a href="#" id="collapseAll" class="br-link" role="button">
+                    <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                    <span>Recolher tudo</span>
+                </a>
+            </div>
+
+
+            <!-- CARD 2: Dados do software -->
+            <div class="br-card mt-3" aria-labelledby="sec-biblio">
+                <div class="card-header">
+                    <h2 id="sec-biblio" class="h6 m-0">Dados do Programa de Computador</h2>
+                </div>
+                <div class="card-content">
+                    <div class="biblio-grid grid-2">
+                        <div class="kv">
+                            <div class="k">Título</div>
+                            <div>hf+e2e</div>
+                        </div>
+
+                        <div class="kv">
+                            <div class="k">
+                                Campo de Aplicação
+                                </span>
+                            </div>
+                            <div>FN-03 - Sist Finan (Instituiçäo financeira, operaçöes financeiras: operaçäo de crédito,
+                                bancária, de fiança, de câmbio, de sero, open market, hedge, overnight, cobrança;
+                                mercado de capitais);</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Titular(es)</div>
+                            <div>
+                                <span class="current-holder">
+                                    HOANG ANH TRINH — desde <time datetime="2025-07-29">29/07/2025</time>
+                                </span>
+                                <a href="#" id="toggle-holders" class="ml-1" aria-controls="ex-holders"
+                                    aria-expanded="false">
+                                    - Titulares anteriores
+                                </a>
+                                <ul id="ex-holders" class="mt-1" hidden>
+                                    <li>Ana Carolina Mendes Ltda. — de <time datetime="2024-04-12">12/04/2024</time> até
+                                        <time datetime="2025-07-28">28/07/2025</time>
+                                    </li>
+                                    <li>TechNova Sistemas S.A. — de <time datetime="2022-08-01">01/08/2022</time> até
+                                        <time datetime="2024-04-11">11/04/2024</time>
+                                    </li>
+                                    <li>Carlos Eduardo Moreira — de <time datetime="2019-03-15">15/03/2019</time> até
+                                        <time datetime="2022-07-31">31/07/2022</time>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        <div class="kv">
+                            <div class="k">Autor(es)</div>
+                            <div>HOANG ANH TRINH</div>
+                        </div>
+
+                        <div class="kv">
+                            <div class="k">
+                                Tipo de Programa
+                                </span>
+                            </div>
+                            <div>AT-04 - Atm Bancar - Automaçäo Bancária</div>
+                        </div>
+
+                        <div class="kv">
+                            <div class="k">Procurador</div>
+                            <div>Michele Cristina Severino</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 3: Publicações na RPI -->
+            <div class="br-card mt-3" aria-labelledby="sec-rpi">
+                <div class="card-header">
+                    <h2 id="sec-rpi" class="h6 m-0">
+                        Publicações na RPI
+                        <span class="tt" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0"
+                            data-tooltip="Lista cronológica das publicações relacionadas ao registro do software. O botão 'Mostrar mais' aparece apenas quando há conteúdo além da área visível.">
+                            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                            <span class="sr-only">Ajuda: Publicações na RPI</span>
+                        </span>
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Publicações RPI">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>RPI</th>
+                                    <th>Data RPI</th>
+                                    <th>Doc</th>
+                                    <th>Despacho</th>
+                                    <th>Complemento do Despacho</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2848</td>
+                                    <td><time datetime="2025-08-05">05/08/2025</time></td>
+                                    <td>—</td>
+                                    <td>709</td>
+                                    <td>
+                                        <div class="pub-complement" id="s1">
+                                            Certificado de publicação referente ao pedido BR 51 2025 002412-6. Titular:
+                                            HOANG ANH TRINH.
+                                            Linguagem: OUTROS. Tipo de Programa: AT-04. Campo de Aplicação: FN-03.
+                                            Título: “hf+e2e”.
+                                            <div class="pub-fade" aria-hidden="true"></div>
+                                        </div>
+                                        <button class="br-button small secondary pub-toggle" data-target="#s1"
+                                            type="button">Mostrar mais</button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>2848</td>
+                                    <td><time datetime="2025-08-05">05/08/2025</time></td>
+                                    <td>—</td>
+                                    <td>111</td>
+                                    <td>
+                                        <div class="pub-complement" id="s2" data-threshold-chars="420">
+                                            Anulado o despacho 742 publicado na RPI 2846 por ter sido indevido. Mantidas
+                                            as demais informações cadastrais do pedido e a numeração de protocolo
+                                            correspondente.
+                                            <div class="pub-fade" aria-hidden="true"></div>
+                                        </div>
+                                        <button class="br-button small secondary pub-toggle" data-target="#s2"
+                                            type="button">Mostrar mais</button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>2846</td>
+                                    <td><time datetime="2025-07-22">22/07/2025</time></td>
+                                    <td>—</td>
+                                    <td>742</td>
+                                    <td>
+                                        <div class="pub-complement" id="s3">
+                                            Pagamento da GRU fora do prazo não realizado referente ao protocolo
+                                            870250058572.
+                                            <div class="pub-fade" aria-hidden="true"></div>
+                                        </div>
+                                        <button class="br-button small secondary pub-toggle" data-target="#s3"
+                                            type="button">Mostrar mais</button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>2643</td>
+                                    <td><time datetime="2014-12-31">31/12/2014</time></td>
+                                    <td>—</td>
+                                    <td>733</td>
+                                    <td>
+                                        <div class="pub-complement" id="s4">
+                                            Transferência da petição 870220011711 homologada.
+                                            <div class="pub-fade" aria-hidden="true"></div>
+                                        </div>
+                                        <button class="br-button small secondary pub-toggle" data-target="#s4"
+                                            type="button">Mostrar mais</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <p class="text-muted mt-2 small">Dados atualizados em <time datetime="2025-09-23">23/09/2025</time>
+                        — Nº da
+                        Revista: 2855</p>
+                </div>
+            </div>
+
+            <footer class="mt-3 py-3 text-center text-muted border-top">© INPI • Protótipo de interface — somente para
+                validação de UX</footer>
+        </div>
+    </main>
+
+    <!-- DS GOV.BR (JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
+    <script>
+        (() => {
+            const DEFAULT_THRESHOLD = 320;
+
+            /* ===== DS + Ações do topo ===== */
+            function initDS() { if (window?.br?.initAll) window.br.initAll(); }
+            function bindTopActions() {
+                document.getElementById('share')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (navigator.share) navigator.share({ title: document.title, url: location.href });
+                    else alert('Seu navegador não suporta compartilhamento nativo.');
+                });
+                document.getElementById('verPDF')?.addEventListener('click', (e) => {
+                    e.preventDefault(); window.open('#', '_blank'); // TODO: URL real do dossiê
+                });
+                document.getElementById('baixarPDF')?.addEventListener('click', (e) => {
+                    e.preventDefault(); window.print(); // PDF da página
+                });
+                document.getElementById('baixarCertificado')?.addEventListener('click', (e) => {
+                    e.preventDefault(); window.open('#', '_blank'); // TODO: URL do certificado
+                });
+            }
+
+            /* ===== Voltar ao topo ===== */
+            function ensureBackToTop() {
+                // garante o sentinela #topo
+                if (!document.getElementById('topo')) {
+                    const anchor = document.createElement('div');
+                    anchor.id = 'topo';
+                    anchor.tabIndex = -1;
+                    anchor.setAttribute('aria-hidden', 'true');
+                    document.body.prepend(anchor);
+                }
+                // garante o botão
+                let btn = document.getElementById('backToTop');
+                if (!btn) {
+                    btn = document.createElement('a');
+                    btn.href = '#topo';
+                    btn.id = 'backToTop';
+                    btn.className = 'br-button circle large back-to-top';
+                    btn.setAttribute('aria-label', 'Voltar para o topo');
+                    btn.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>';
+                    document.body.appendChild(btn);
+                }
+                return btn;
+            }
+
+            function setupBackToTop() {
+                const btn = ensureBackToTop();
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const sentinel = document.getElementById('topo');
+
+                // mostra/esconde usando IntersectionObserver (mais estável)
+                if ('IntersectionObserver' in window && sentinel) {
+                    const io = new IntersectionObserver((entries) => {
+                        const vis = entries[0].isIntersecting;
+                        btn.classList.toggle('is-visible', !vis);
+                    }, { rootMargin: '-80px 0px 0px 0px' });
+                    io.observe(sentinel);
+                } else {
+                    const onScroll = () => btn.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.6);
+                    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+                }
+
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (prefersReduced) window.scrollTo(0, 0);
+                    else document.getElementById('topo')?.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+
+            /* ===== Prev/Próx (usa contexto salvo pela lista) ===== */
+            function setupSequentialNav() {
+                const entity = 'software';
+                // procura um KV pelo rótulo
+                const getKv = (regex) => {
+                    return [...document.querySelectorAll('.kv')].find(kv => regex.test((kv.querySelector('.k')?.textContent || '').trim()));
+                };
+                const recordId = (getKv(/N[ºo]\s*do\s*processo/i) || {}).querySelector?.('.v')?.textContent?.trim();
+                const btnPrev = document.getElementById('btnPrev');
+                const btnNext = document.getElementById('btnNext');
+                if (!btnPrev || !btnNext || !recordId) return;
+
+                let ctx = null;
+                try { ctx = JSON.parse(sessionStorage.getItem('pi:ctx') || 'null'); } catch { }
+
+                function buildUrl(ent, id, query) {
+                    const base = location.pathname;
+                    const p = new URLSearchParams(query || {});
+                    p.set('ent', ent); p.set('id', id);
+                    return `${base}?${p.toString()}`;
+                }
+                function wire(btn, targetId, rel) {
+                    if (!targetId) { btn.setAttribute('disabled', 'disabled'); btn.classList.add('disabled'); btn.removeAttribute('href'); return; }
+                    btn.removeAttribute('disabled');
+                    const url = buildUrl(entity, targetId, ctx?.query);
+                    btn.setAttribute('href', url); btn.setAttribute('rel', rel);
+                    btn.addEventListener('click', (e) => { e.preventDefault(); location.href = url; }, { once: true });
+                }
+
+                if (ctx && Array.isArray(ctx.ids)) {
+                    const i = ctx.ids.indexOf(recordId);
+                    if (i !== -1) {
+                        wire(btnPrev, ctx.ids[i - 1], 'prev');
+                        wire(btnNext, ctx.ids[i + 1], 'next');
+                    }
+                }
+            }
+
+            /* ===== Colapsáveis + Expandir/Recolher tudo ===== */
+            function setupCollapsibles() {
+                const entity = 'software';
+                const stateKey = `pi:collapse:${entity}`;
+                let state = {};
+                try { state = JSON.parse(sessionStorage.getItem(stateKey) || '{}'); } catch { }
+
+                const cards = [...document.querySelectorAll('main .br-card')];
+                cards.forEach((card, idx) => {
+                    const header = card.querySelector('.card-header'); const content = card.querySelector('.card-content');
+                    if (!header || !content) return; // primeiro card não tem header
+
+                    header.classList.add('d-flex', 'align-items-center');
+                    const h = header.querySelector('h2,h3,h4,h5,h6') || header.firstElementChild;
+                    const cid = content.id || `card-content-${idx}`; content.id = cid;
+
+                    const isOpen = state[cid] !== false; // padrão aberto
+                    card.classList.toggle('is-collapsed', !isOpen);
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'br-button circle small collapse-btn';
+                    btn.setAttribute('aria-controls', cid);
+                    btn.setAttribute('aria-expanded', String(isOpen));
+                    btn.innerHTML = `<i class="fa-solid ${isOpen ? 'fa-chevron-up' : 'fa-chevron-down'}" aria-hidden="true"></i><span class="sr-only">${isOpen ? 'Recolher' : 'Expandir'} seção ${(h?.textContent || '').trim()}</span>`;
+                    header.appendChild(btn);
+
+                    function toggle(force) {
+                        const openNow = btn.getAttribute('aria-expanded') === 'true';
+                        const next = (typeof force === 'boolean') ? force : !openNow;
+                        btn.setAttribute('aria-expanded', String(next));
+                        btn.querySelector('i').className = `fa-solid ${next ? 'fa-chevron-up' : 'fa-chevron-down'}`;
+                        card.classList.toggle('is-collapsed', !next);
+                        state[cid] = next; sessionStorage.setItem(stateKey, JSON.stringify(state));
+                    }
+                    btn.addEventListener('click', () => toggle());
+                    header.addEventListener('click', (e) => { if (e.target.closest('a,button')) return; toggle(); });
+                });
+
+                document.getElementById('expandAll')?.addEventListener('click', (e) => {
+                    e.preventDefault(); document.querySelectorAll('.collapse-btn[aria-expanded="false"]').forEach(b => b.click());
+                });
+                document.getElementById('collapseAll')?.addEventListener('click', (e) => {
+                    e.preventDefault(); document.querySelectorAll('.collapse-btn[aria-expanded="true"]').forEach(b => b.click());
+                });
+
+                // abrir a seção do alvo do hash (deep-link)
+                function openForHash() {
+                    if (!location.hash) return;
+                    const t = document.querySelector(location.hash);
+                    const card = t?.closest('.br-card');
+                    const btn = card?.querySelector('.collapse-btn');
+                    if (btn && btn.getAttribute('aria-expanded') === 'false') btn.click();
+                }
+                openForHash(); window.addEventListener('hashchange', openForHash);
+            }
+
+            /* ===== Publicações: “Mostrar mais/menos” (mantido) ===== */
+            const normLen = (el) => (el.textContent || '').replace(/\s+/g, ' ').trim().length;
+            const isOverflowing = (el) => (el.scrollHeight - el.clientHeight) > 1;
+            function hideBtn(btn) { if (!btn) return; btn.hidden = true; btn.setAttribute('aria-hidden', 'true'); btn.style.display = 'none'; btn.tabIndex = -1; }
+            function showBtn(btn) { if (!btn) return; btn.hidden = false; btn.removeAttribute('aria-hidden'); btn.style.display = ''; btn.tabIndex = 0; }
+            function evalOne(comp) {
+                const id = comp.id; if (!id) return;
+                const btn = document.querySelector(`.pub-toggle[data-target="#${id}"]`);
+                const fade = comp.querySelector('.pub-fade');
+                const th = Number(comp.getAttribute('data-threshold-chars')) || DEFAULT_THRESHOLD;
+                const len = normLen(comp); const ov = isOverflowing(comp); const need = (len > th) && ov;
+                if (!need) { comp.classList.add('expanded'); if (fade) fade.style.display = 'none'; hideBtn(btn); }
+                else { comp.classList.remove('expanded'); if (fade) fade.style.display = ''; if (btn) { showBtn(btn); btn.textContent = 'Mostrar mais'; } }
+            }
+            function setupPubToggles() { document.querySelectorAll('.pub-complement').forEach(evalOne); }
+            function delegatePubs() {
+                document.addEventListener('click', (ev) => {
+                    const btn = ev.target.closest('button.pub-toggle'); if (!btn) return;
+                    ev.preventDefault();
+                    const sel = btn.getAttribute('data-target'); const comp = sel && document.querySelector(sel); if (!comp) return;
+                    const fade = comp.querySelector('.pub-fade');
+                    const expanded = comp.classList.toggle('expanded');
+                    if (fade) fade.style.display = expanded ? 'none' : '';
+                    btn.textContent = expanded ? 'Mostrar menos' : 'Mostrar mais';
+                });
+                document.addEventListener('keydown', (ev) => {
+                    if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('button.pub-toggle')) { ev.preventDefault(); ev.target.click(); }
+                });
+            }
+            function installObservers() {
+                const card = document.querySelector('.br-card[aria-labelledby="sec-rpi"]');
+                const recalc = () => setupPubToggles();
+                if (card && 'ResizeObserver' in window) { new ResizeObserver(recalc).observe(card); }
+                else { let raf = null; window.addEventListener('resize', () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(recalc); }); }
+                if (document.fonts?.ready) { document.fonts.ready.then(recalc).catch(() => { }); }
+                const tbody = card?.querySelector('tbody');
+                if (tbody && 'MutationObserver' in window) { new MutationObserver(recalc).observe(tbody, { childList: true, subtree: true, characterData: true }); }
+            }
+
+            /* ===== Titulares anteriores (mantido) ===== */
+            function setupHoldersToggle() {
+                const toggle = document.getElementById('toggle-holders');
+                const list = document.getElementById('ex-holders');
+                toggle?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                    toggle.setAttribute('aria-expanded', String(!expanded));
+                    list.hidden = expanded;
+                    toggle.textContent = expanded ? 'Titulares anteriores' : 'Ocultar titulares anteriores';
+                });
+            }
+
+            /* ===== Tooltips de Despacho (mantido) ===== */
+            const DESP = { '709': 'Publicação do pedido / certificado', '730': 'Publicação de petição / comunicação', '742': 'Pagamento de GRU fora do prazo', '733': 'Transferência de petição homologada', '734': 'Transferência homologada (variante)', '111': 'Anulação de despacho anterior' };
+            const getDesp = (c) => DESP[c] || `Despacho ${c}`;
+            const TooltipEngine = (() => {
+                function tooltipifyCells(rootSelector, cellSelector, getDesc) {
+                    const root = typeof rootSelector === 'string' ? document.querySelector(rootSelector) : rootSelector; if (!root) return;
+                    root.querySelectorAll(cellSelector).forEach(td => {
+                        const code = (td.textContent || '').trim(); if (!code || code === '—') return;
+                        td.textContent = '';
+                        const span = document.createElement('span'); span.className = 'tt-inline'; span.tabIndex = 0; span.dataset.tooltip = getDesc(code); span.textContent = code;
+                        td.appendChild(span);
+                    });
+                }
+                return { tooltipifyCells };
+            })();
+            function applyTooltips() { TooltipEngine.tooltipifyCells('.br-card[aria-labelledby="sec-rpi"]', 'tbody tr td:nth-child(4)', getDesp); }
+
+            /* ===== Init ===== */
+            function init() {
+                initDS();
+                bindTopActions();
+                setupBackToTop();
+                setupSequentialNav();
+                setupCollapsibles();
+                setupPubToggles(); delegatePubs(); installObservers();
+                setupHoldersToggle();
+                applyTooltips();
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+            else init();
+        })();
+    </script>
+
+
+    <a href="#topo" class="br-button circle large back-to-top" id="backToTop" aria-label="Voltar para o topo">
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    </a>
+
+    </a>
+
+</body>
+
+</html>
