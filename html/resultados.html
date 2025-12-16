@@ -1,0 +1,1433 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patents</title>
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&amp;display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <link rel="stylesheet" crossorigin="" href="/assets/index-B7JLPoNZ.css">
+  <meta name="description" content="Encontre patentes registradas no INPI." data-react-helmet="true">
+  <meta id="dcngeagmmhegagicpcmpinaoklddcgon">
+  <style>
+    /* Barra de controles acima dos resultados */
+    .results-toolbar .open-modal-button,
+    .results-toolbar label[for="sort-select"] {
+      font-size: 0.875rem;
+      /* mesmo tamanho pros dois (≈14px) */
+      line-height: 1.5;
+    }
+
+    /* tira “folga” vertical que dá a sensação de 1px torto */
+    .results-toolbar .open-modal-button {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .results-toolbar label[for="sort-select"] {
+      margin-bottom: 0;
+      /* Se quiser que "Ordenar por:" fique azul como o link, descomenta a linha abaixo */
+      /* color: #1351b4; */
+    }
+
+    /* ... (seu CSS que já existe) ... */
+
+    /* Quando a classe filters-hidden estiver em .search-results, some com a sidebar */
+    .search-results.filters-hidden .sidebar {
+      display: none;
+    }
+
+    :root {
+      --homologation-banner-offset: 44px;
+      /* altura da barra */
+    }
+
+    /* Barra de homologação */
+    .homologation-banner {
+      position: sticky;
+      top: 0;
+      z-index: 10000;
+      background: var(--warning, #ffcd07);
+      color: #1b1b1b;
+      border-bottom: 1px solid rgba(0, 0, 0, .15);
+    }
+
+    .homologation-banner__inner {
+      min-height: var(--homologation-banner-offset);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .25rem 1rem;
+    }
+
+    .homologation-banner__text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: .875rem;
+    }
+
+    .homologation-banner__link {
+      font-size: .875rem;
+      font-weight: 600;
+      color: inherit;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    .homologation-banner__link:focus-visible {
+      outline: 3px solid #1351b4;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    /* Garante que o header sticky não “suba” por baixo da barra */
+    #header.br-header {
+      top: var(--homologation-banner-offset) !important;
+    }
+
+    /* Ajuste da logo do INPI (tamanho consistente no header) */
+    .inpi-logo {
+      max-height: 40px;
+      width: auto;
+      display: block;
+    }
+
+    /* Rodapé estilo gov.br/inpi */
+    .inpi-footer {
+      background: #071d41;
+      color: #fff;
+    }
+
+    .inpi-footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .inpi-footer a:hover,
+    .inpi-footer a:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Topo: marca gov.br grande */
+    .inpi-footer__main {
+      padding: 56px 0 44px;
+    }
+
+    .inpi-footer__govbr {
+      display: inline-block;
+      margin-bottom: 36px;
+    }
+
+    .inpi-footer__govbr img {
+      height: 54px;
+      width: auto;
+      display: block;
+    }
+
+    /* Colunas (grid) */
+    .inpi-footer__sitemap {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 40px;
+    }
+
+    @media (max-width: 1200px) {
+      .inpi-footer__sitemap {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .inpi-footer__main {
+        padding: 44px 0 36px;
+      }
+
+      .inpi-footer__sitemap {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    /* Títulos das colunas (mais “apagados”, como no gov.br) */
+    .inpi-footer__title {
+      margin: 0 0 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* Listas */
+    .inpi-footer__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .inpi-footer__list li {
+      margin: 10px 0;
+    }
+
+    .inpi-footer__list a {
+      font-size: 0.875rem;
+      line-height: 1.35;
+    }
+
+    /* Barra final */
+    .inpi-footer__bar {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 18px 0 22px;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .inpi-footer__bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .inpi-footer__org {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .inpi-footer__org img {
+      height: 20px;
+      width: auto;
+      display: block;
+    }
+
+    .inpi-footer__license a {
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* Redes sociais */
+    .inpi-footer__social {
+      margin-top: 44px;
+    }
+
+    .inpi-footer__social-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .inpi-footer__social-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .inpi-social-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .inpi-social-btn:hover,
+    .inpi-social-btn:focus-visible {
+      border-color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+    }
+
+    .inpi-social-btn:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.9);
+      outline-offset: 2px;
+    }
+
+    .paging-info__copy-btn {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #1351b4;
+      /* herda o azul gov.br */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 6px;
+      /* só pro foco ficar bonito */
+    }
+
+    .paging-info__copy-btn i {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    .paging-info__copy-btn:hover {
+      opacity: .85;
+      /* efeito sutil */
+    }
+
+    .paging-info__copy-btn:focus-visible {
+      outline: 3px solid #1351b4;
+      outline-offset: 2px;
+    }
+  </style>
+
+
+</head>
+
+<body>
+  <div id="root">
+    <nav class="br-skiplink" role="menubar"><a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir
+        para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true"
+          class="br-tag text ml-1">1</span></a><a class="br-item" href="#header-navigation" role="menuitem"
+        accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true"
+          class="br-tag text ml-1">2</span></a><a class="br-item" href="searchbox" role="menuitem" accesskey="3">Ir para
+        a busca <span aria-hidden="true">(3/4)</span> <span aria-hidden="true" class="br-tag text ml-1">3</span></a><a
+        class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span
+          aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a></nav>
+    <div class="homologation-banner" role="region" aria-label="Aviso: ambiente de homologação">
+      <div class="container-fluid homologation-banner__inner">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <span class="homologation-banner__text">
+          Ambiente de homologação — versão de avaliação.
+        </span>
+        <a class="homologation-banner__link" href="/comentarios.html">
+          Enviar comentário
+        </a>
+      </div>
+    </div>
+
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container-fluid">
+        <div class="header-top">
+          <div class="header-logo">
+            <img class="inpi-logo" alt="Logo do INPI" src="assets/logo-inpi.jpg">
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown"><button class="br-button circle small" type="button"
+                data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v"
+                  aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header">
+                  <div class="title">Acesso Rápido</div>
+                </div>
+              </div>
+            </div><span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown"><button class="br-button circle small" type="button"
+                data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th"
+                  aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header">
+                  <div class="title">Funcionalidades do Sistema</div>
+                </div>
+                <div class="br-item"><button class="br-button circle small" type="button"
+                    aria-label="Funcionalidade 1"><i class="fas fa-chart-bar" aria-hidden="true"></i><span
+                      class="text">Funcionalidade 1</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button"
+                    aria-label="Funcionalidade 2"><i class="fas fa-headset" aria-hidden="true"></i><span
+                      class="text">Funcionalidade 2</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button"
+                    aria-label="Funcionalidade 3"><i class="fas fa-comment" aria-hidden="true"></i><span
+                      class="text">Funcionalidade 3</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button"
+                    aria-label="Funcionalidade 4"><i class="fas fa-adjust" aria-hidden="true"></i><span
+                      class="text">Funcionalidade 4</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger"><button class="br-button circle" type="button" aria-label="Abrir Busca"
+                data-toggle="search" data-target=".header-search"><i class="fas fa-search"
+                  aria-hidden="true"></i></button></div>
+            <div class="dropdown"><button class="br-button circle small" type="button" aria-label="Funcionalidade 3"
+                title="Change language"><i class="fas fa-globe" aria-hidden="true"></i></button></div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in small" type="button" data-trigger="login"><i
+                    class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation"><button class="br-button small circle" type="button"
+                aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i
+                  class="fas fa-bars" aria-hidden="true"></i></button></div>
+            <div class="header-info">
+              <div class="header-title">Portal de Propriedade Industrial</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="br-menu " id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade
+                Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu"
+                data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu "><a href="#" class="menu-item " role="treeitem" tabindex="0"
+                aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span
+                  class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu "><a href="#" class="menu-item active" role="treeitem" tabindex="0"
+                aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-copyright"
+                    aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu "><a href="#" class="menu-item " role="treeitem" tabindex="0"
+                aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span
+                  class="content">Software</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list" role="list">
+                <li class="crumb home"><a class="br-button circle" href="/"><span class="sr-only">Página
+                      inicial</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Patentes</span>
+                </li>
+              </ol>
+            </nav>
+            <div class="mt-4" id="main-content">
+              <div class="br-radio" role="presentation" style="margin-bottom: 10px;"><input id="quick-search"
+                  type="radio" checked="" name="search-type"><label class="quick-search" for="quick-search">Busca
+                  rápida<button type="button" class="open-modal-button mb-2"><svg xmlns="http://www.w3.org/2000/svg"
+                      width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 16v-4"></path>
+                      <path d="M12 8h.01"></path>
+                    </svg></button></label><input id="advanced-search" type="radio" name="search-type"><label
+                  for="advanced-search">Busca avançada<button type="button" class="open-modal-button mb-2"><svg
+                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-info" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 16v-4"></path>
+                      <path d="M12 8h.01"></path>
+                    </svg></button></label></div>
+              <div class="search-box">
+                <form role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="downshift-0-label">
+                  <div class="sui-search-box">
+                    <div class="search-form">
+                      <div class="br-input"><input aria-autocomplete="list" aria-labelledby="downshift-0-label"
+                          autocomplete="off" id="downshift-0-input" data-transaction-name="search input"
+                          placeholder="Insira pelo menos 3 caracteres para realizar a busca"
+                          class="sui-search-box__text-input " value="motor"></div><button class="br-button primary"
+                        type="submit" title="Buscar">Buscar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="d-flex justify-content-between flex-wrap flex-align-items-center mb-3 results-toolbar">
+                <div class="br-switch ">
+                  <input id="toggle-filters" type="checkbox" checked="">
+                  <label for="toggle-filters">Exibir filtros</label>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-8">
+                  <!-- botão de personalização -->
+                  <button type="button" class="open-modal-button">
+                    <i class="far fa-eye"></i>Personalizar campos exibidos |
+                  </button>
+
+
+
+                  <!-- ícones de troca de visualização -->
+                  <div class="flex gap-1 switch-view">
+                    <button type="button" title="Mostrar em lista" class="active">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-list" aria-hidden="true">
+                        <path d="M3 12h.01"></path>
+                        <path d="M3 18h.01"></path>
+                        <path d="M3 6h.01"></path>
+                        <path d="M8 12h13"></path>
+                        <path d="M8 18h13"></path>
+                        <path d="M8 6h13"></path>
+                      </svg>
+                    </button>
+                    <button type="button" title="Mostrar em tabela" class="">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-table" aria-hidden="true">
+                        <path d="M12 3v18"></path>
+                        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                        <path d="M3 9h18"></path>
+                        <path d="M3 15h18"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+
+
+                  <!-- ordenar por -->
+                  <div class="d-flex flex-align-items-center gap-8">
+                    <select id="sort-select">
+                      <option value="|||">Ordenar por</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;title.keyword&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Título (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;title.keyword&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Título (Z-A)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;deposit_date&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Data depósito (antigas até novas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;deposit_date&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Data depósito (novas até antigas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;publication_date&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Data publicação (antigas até novas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;publication_date&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Data publicação (novas até antigas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;concession_date&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Data concessão (antigas até novas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;concession_date&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Data concessão (novas até antigas)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;applicants.name.keyword&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Aplicantes (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;applicants.name.keyword&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Aplicantes (Z-A)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;inventors.name.keyword&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Inventores (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;inventors.name.keyword&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Inventores (Z-A)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;representatives.name.keyword&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Procuradores (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;representatives.name.keyword&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Procuradores (Z-A)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;application_number&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Nº do Pedido (menor até maior)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;application_number&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Nº do Pedido (maior até menor)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;classification.ipc.text&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Classificação IPC (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;classification.ipc.text&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Classificação IPC (Z-A)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;status_text&quot;,&quot;direction&quot;:&quot;asc&quot;}]">
+                        Status (A-Z)</option>
+                      <option
+                        value="[{&quot;field&quot;:&quot;status_text&quot;,&quot;direction&quot;:&quot;desc&quot;}]">
+                        Status (Z-A)</option>
+                    </select>
+                  </div>
+
+
+
+
+
+                </div>
+              </div>
+
+              <button type="button" hidden="" class="sui-layout-sidebar-toggle">Filtros</button>
+              <div class="search-results">
+
+                <button type="button" hidden="" class="sui-layout-sidebar-toggle">Filtros</button>
+                <div class="search-results">
+                  <div class="sidebar "><button hidden="" type="button" class="sui-layout-sidebar-toggle">Fechar
+                      filtros</button>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Data deposito</legend>
+                      <div class="br-input"><label for="data-inicial">Desde</label><input class="sui-facet-input-date"
+                          id="data-inicial" type="date" value=""></div>
+                      <div class="br-input"><label for="data-final">Até</label><input class="sui-facet-input-date"
+                          id="data-final" type="date" value=""></div>
+                      <div class="button-group"><button class="br-button secondary" type="button">Buscar</button><button
+                          class="br-button tertiary" type="button">Clear</button></div>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Classificação IPC</legend>
+                      <div class="sui-multi-checkbox-facet"><label for="example_facet_Classificação IPCB60W 10/06"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Classificação IPC"
+                              id="example_facet_Classificação IPCB60W 10/06" class="sui-multi-checkbox-facet__checkbox"
+                              type="checkbox"><span class="sui-multi-checkbox-facet__input-text">B60W 10/06</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">213</span>
+                        </label><label for="example_facet_Classificação IPCB01D 53/94"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Classificação IPC"
+                              id="example_facet_Classificação IPCB01D 53/94" class="sui-multi-checkbox-facet__checkbox"
+                              type="checkbox"><span class="sui-multi-checkbox-facet__input-text">B01D 53/94</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">197</span>
+                        </label><label for="example_facet_Classificação IPCF01N 3/20"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Classificação IPC"
+                              id="example_facet_Classificação IPCF01N 3/20" class="sui-multi-checkbox-facet__checkbox"
+                              type="checkbox"><span class="sui-multi-checkbox-facet__input-text">F01N 3/20</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">179</span>
+                        </label><label for="example_facet_Classificação IPCF02D 41/00"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Classificação IPC"
+                              id="example_facet_Classificação IPCF02D 41/00" class="sui-multi-checkbox-facet__checkbox"
+                              type="checkbox"><span class="sui-multi-checkbox-facet__input-text">F02D 41/00</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">167</span>
+                        </label><label for="example_facet_Classificação IPCB60W 20/00"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Classificação IPC"
+                              id="example_facet_Classificação IPCB60W 20/00" class="sui-multi-checkbox-facet__checkbox"
+                              type="checkbox"><span class="sui-multi-checkbox-facet__input-text">B60W 20/00</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">138</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Nome do Depositante</legend>
+                      <div class="sui-multi-checkbox-facet"><label
+                          for="example_facet_Nome do DepositanteHONDA MOTOR CO., LTD."
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Depositante"
+                              id="example_facet_Nome do DepositanteHONDA MOTOR CO., LTD."
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">HONDA MOTOR CO., LTD.</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">648</span>
+                        </label><label for="example_facet_Nome do DepositanteSCANIA CV AB"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Depositante"
+                              id="example_facet_Nome do DepositanteSCANIA CV AB"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">SCANIA CV AB</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">217</span>
+                        </label><label for="example_facet_Nome do DepositanteNISSAN MOTOR CO., LTD."
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Depositante"
+                              id="example_facet_Nome do DepositanteNISSAN MOTOR CO., LTD."
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">NISSAN MOTOR CO., LTD.</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">215</span>
+                        </label><label for="example_facet_Nome do DepositanteHonda Motor Co., Ltd."
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Depositante"
+                              id="example_facet_Nome do DepositanteHonda Motor Co., Ltd."
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">Honda Motor Co., Ltd.</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">187</span>
+                        </label><label for="example_facet_Nome do DepositanteRobert Bosch GMBH"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Depositante"
+                              id="example_facet_Nome do DepositanteRobert Bosch GMBH"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">Robert Bosch GMBH</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">176</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Nome do Inventor</legend>
+                      <div class="sui-multi-checkbox-facet"><label
+                          for="example_facet_Nome do InventorJosé Carlos Veneziano"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Inventor"
+                              id="example_facet_Nome do InventorJosé Carlos Veneziano"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">José Carlos Veneziano</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">55</span>
+                        </label><label for="example_facet_Nome do InventorRinaldo Planca"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Inventor"
+                              id="example_facet_Nome do InventorRinaldo Planca"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">Rinaldo Planca</span>
+                          </div><span class="sui-multi-checkbox-facet__option-count">52</span>
+                        </label><label for="example_facet_Nome do InventorGuy Bernard Vauchel"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Inventor"
+                              id="example_facet_Nome do InventorGuy Bernard Vauchel"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">Guy Bernard Vauchel</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">39</span>
+                        </label><label for="example_facet_Nome do InventorDietmar Erich Bernhard Lilie"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Inventor"
+                              id="example_facet_Nome do InventorDietmar Erich Bernhard Lilie"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">Dietmar Erich Bernhard Lilie</span></div>
+                          <span class="sui-multi-checkbox-facet__option-count">27</span>
+                        </label><label for="example_facet_Nome do InventorJoão Batista Maglia"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Nome do Inventor"
+                              id="example_facet_Nome do InventorJoão Batista Maglia"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">João Batista Maglia</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">27</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Natureza</legend>
+                      <div class="sui-multi-checkbox-facet"><label for="example_facet_NaturezaPI"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Natureza" id="example_facet_NaturezaPI"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">PI</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">17,045</span>
+                        </label><label for="example_facet_NaturezaMU" class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Natureza" id="example_facet_NaturezaMU"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">MU</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">3,768</span>
+                        </label><label for="example_facet_Natureza11" class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Natureza" id="example_facet_Natureza11"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">11</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">3,656</span>
+                        </label><label for="example_facet_Natureza10" class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Natureza" id="example_facet_Natureza10"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">10</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,971</span>
+                        </label><label for="example_facet_Natureza20" class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Natureza" id="example_facet_Natureza20"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">20</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">479</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Deposit Year</legend>
+                      <div class="sui-multi-checkbox-facet"><label for="example_facet_Deposit Year2012"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Deposit Year" id="example_facet_Deposit Year2012"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2012</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,740</span>
+                        </label><label for="example_facet_Deposit Year2013"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Deposit Year" id="example_facet_Deposit Year2013"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2013</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,693</span>
+                        </label><label for="example_facet_Deposit Year2011"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Deposit Year" id="example_facet_Deposit Year2011"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2011</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,681</span>
+                        </label><label for="example_facet_Deposit Year2010"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Deposit Year" id="example_facet_Deposit Year2010"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2010</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,562</span>
+                        </label><label for="example_facet_Deposit Year2009"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Deposit Year" id="example_facet_Deposit Year2009"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2009</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,393</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet">
+                      <legend class="sui-facet__title">Publication Year</legend>
+                      <div class="sui-multi-checkbox-facet"><label for="example_facet_Publication Year2016"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Publication Year" id="example_facet_Publication Year2016"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2016</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">2,331</span>
+                        </label><label for="example_facet_Publication Year2017"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Publication Year" id="example_facet_Publication Year2017"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2017</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">2,175</span>
+                        </label><label for="example_facet_Publication Year2015"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Publication Year" id="example_facet_Publication Year2015"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2015</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,661</span>
+                        </label><label for="example_facet_Publication Year2000"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Publication Year" id="example_facet_Publication Year2000"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2000</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,317</span>
+                        </label><label for="example_facet_Publication Year2001"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - Publication Year" id="example_facet_Publication Year2001"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">2001</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">1,073</span>
+                        </label></div><button type="button" class="sui-facet-view-more" aria-label="Show more options">+
+                        More</button>
+                    </fieldset>
+                    <fieldset class="sui-facet country-code-facet">
+                      <legend class="sui-facet__title">País</legend>
+                      <div class="sui-multi-checkbox-facet"><label for="example_facet_PaísBR"
+                          class="sui-multi-checkbox-facet__option-label">
+                          <div class="sui-multi-checkbox-facet__option-input-wrapper"><input
+                              data-transaction-name="facet - País" id="example_facet_PaísBR"
+                              class="sui-multi-checkbox-facet__checkbox" type="checkbox"><span
+                              class="sui-multi-checkbox-facet__input-text">BR</span></div><span
+                            class="sui-multi-checkbox-facet__option-count">27,114</span>
+                        </label></div>
+                    </fieldset>
+                  </div>
+                  <div class="results ">
+                    <div class="results-header mb-2">
+                      <div class="paging-info paging-info-row">
+                        <span class="paging-info__count">
+                          Mostrando <strong>1 - 10</strong> de <strong>27.114</strong> para
+                        </span>
+
+                        <span class="paging-info__query" title="Consulta aplicada (exemplo)">
+                          <span class="paging-info__query-label">consulta:</span>
+
+                          <span class="paging-info__query-text" aria-label="Consulta aplicada (texto resumido)">
+                            name:"John A. Silva" AND (natureza:(PI OR 10)) AND depositante:("Honda Motor Co., Ltd." OR
+                            "Robert Bosch GmbH") AND ipc:(B60W* OR F02D* OR F01N*) AND pais:BR OR US OR DE...
+                          </span>
+
+                          <button type="button" class="paging-info__copy-btn" aria-label="Copiar consulta"
+                            title="Copiar consulta"
+                            data-copy='name:"John A. Silva" AND (natureza:(PI OR 10)) AND depositante:("Honda Motor Co., Ltd." OR "Robert Bosch GmbH") AND ipc:(B60W* OR F02D* OR F01N*) AND pais:(BR OR US OR DE) AND status:("Pedido Para Exame Técnico" OR "Pedido Publicado") AND deposit_date:[2009-01-01 TO 2016-12-31]'>
+                            <i class="far fa-copy" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+
+
+                    <ul class="sui-results-container">
+                      <!-- seus <li class="br-card"> ... permanecem iguais -->
+
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0901990"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0901990</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">29/06/2009</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">13/04/2010</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title"><em>MOTOR</em> GERADOR</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Honda Motor CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Tadafumi Hirose</span><span>Masanori
+                                    Shin</span><span>Makoto Uchimi</span><span>Takayuki Aoki</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI8706093"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI8706093</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">06/03/1987</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">09/02/1988</div>
+                              </div>
+                              <div class="br-tag">Pedido Arquivado </div>
+                            </div>
+                            <h3 class="result-title">CONJUNTO DE VÁLVULA DE GATILHO.</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Collins Motor Corporation Limited.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Ronald Edwin Valentine</span><span>Ronald Motor
+                                    Corporation Limited</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0403167"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0403167</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">06/08/2004</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">24/05/2005</div>
+                              </div>
+                              <div class="br-tag">Pedido Arquivado </div>
+                            </div>
+                            <h3 class="result-title"><em>MOTOR</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Honda Motor CO. LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Hiroyuki Kawakubo</span><span>Toru Gunji</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0901991"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0901991</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">29/06/2009</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">13/04/2010</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title"><em>MOTOR</em> GERADOR</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Honda Motor CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Tadafumi Hirose</span><span>JUNJI
+                                    HIRANUMA</span><span>HITOSHI YUKI</span><span>MASANORI SHIN</span><span>MASASHI
+                                    KAI</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0902038"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0902038</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">29/06/2009</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">13/04/2010</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title">GRUPO <em>MOTOR</em> GERADOR</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Honda Motor CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>RYOSUKE SHIBATA</span><span>JUNJI
+                                    HIRANUMA</span><span>MASANORI SHIN</span><span>HITOSHI YUKI</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI1101092"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI1101092</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">21/03/2011</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">25/09/2012</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title">CORPO DE <em>MOTOR</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>HONDA MOTOR CO., LTD</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Masafumi Taki</span><span>Hideyuki
+                                    Tawara</span><span>Masaji Narushima</span><span>Toru Nishi</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0920609"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0920609</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">08/09/2009</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">22/12/2015</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title">ESTRUTURA DE SUSPENSÃO DE <em>MOTOR</em> PARA UM VEÍCULO
+                              <em>MOTOR</em> DE DUAS RODAS
+                            </h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>HONDA MOTOR CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>TAKAYUKI SHIMADA</span><span>MASAAKI
+                                    YAMAGUCHI</span><span>TETSUHITO YOKOMORI</span><span>KOTARO FUJIYAMA</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color" href="/patentes/PI0915985"
+                          data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">PI0915985</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">PI</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">12/06/2009</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">24/09/2019</div>
+                              </div>
+                              <div class="br-tag">Pedido Para Exame Técnico </div>
+                            </div>
+                            <h3 class="result-title">CONJUNTO <em>MOTOR</em> TRANSMISSÃO</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>Honda Motor Co., Ltd.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>Shigemitsu Akutsu</span><span>Satoyoshi
+                                    Oya</span><span>Kota Kasaoka</span><span>Noriyuki Abe</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color"
+                          href="/patentes/102013025004" data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">102013025004</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">10</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">27/09/2013</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">01/09/2015</div>
+                              </div>
+                              <div class="br-tag">Pedido Publicado </div>
+                            </div>
+                            <h3 class="result-title"><em>MOTOR</em> DE COMBUSTÃO INTERNA</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>HONDA MOTOR CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>KATSUHIRO KUBO</span><span>KAZUYUKI
+                                    NAKAI</span><span>NORIKO IIZUKA</span><span>HIROTAKA KAWATSU</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                      <li class="br-card"><a title="Ver item completo" class="no-link-color"
+                          href="/patentes/102014006992" data-discover="true">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div title="Número INPI" class="result-number">102014006992</div>
+                              <div class="result-item">
+                                <div class="result-label">Natureza</div>
+                                <div class="result-value">10</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(22) Depósito</div>
+                                <div class="result-value">24/03/2014</div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(43) Publicação</div>
+                                <div class="result-value">20/10/2015</div>
+                              </div>
+                              <div class="br-tag">Pedido Publicado </div>
+                            </div>
+                            <h3 class="result-title"><em>MOTOR</em> DE COMBUSTÃO INTERNA</h3>
+                            <div class="result-meta">
+                              <div class="result-item">
+                                <div class="result-label">(71) Nome do Depositante</div>
+                                <div class="result-value"><span>HONDA MOTOR CO., LTD.</span></div>
+                              </div>
+                              <div class="result-item">
+                                <div class="result-label">(72) Nome do Inventor</div>
+                                <div class="result-value"><span>SATOSHI IIJIMA</span><span>KOTARO MIKI</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </a></li>
+                    </ul>
+                    <div class="results-footer"><button class="br-button secondary open-modal-button mb-2"
+                        type="button">Exportar resultados</button>
+                      <ul class="rc-pagination sui-paging">
+                        <li title="Previous Page" class="rc-pagination-prev rc-pagination-disabled"
+                          aria-disabled="true">
+                          <button type="button" aria-label="prev page" class="rc-pagination-item-link"
+                            disabled=""></button>
+                        </li>
+                        <li title="1" class="rc-pagination-item rc-pagination-item-1 rc-pagination-item-active"
+                          tabindex="0"><a rel="nofollow">1</a></li>
+                        <li title="2" class="rc-pagination-item rc-pagination-item-2" tabindex="0"><a
+                            rel="nofollow">2</a>
+                        </li>
+                        <li title="3" class="rc-pagination-item rc-pagination-item-3" tabindex="0"><a
+                            rel="nofollow">3</a>
+                        </li>
+                        <li title="4" class="rc-pagination-item rc-pagination-item-4" tabindex="0"><a
+                            rel="nofollow">4</a>
+                        </li>
+                        <li title="5"
+                          class="rc-pagination-item rc-pagination-item-5 rc-pagination-item-before-jump-next"
+                          tabindex="0"><a rel="nofollow">5</a></li>
+                        <li title="Next 5 Pages" tabindex="0" class="rc-pagination-jump-next"><button type="button"
+                            aria-label="next page" class="rc-pagination-item-link"></button></li>
+                        <li title="2712" class="rc-pagination-item rc-pagination-item-2712" tabindex="0"><a
+                            rel="nofollow">2712</a></li>
+                        <li title="Next Page" tabindex="0" class="rc-pagination-next" aria-disabled="false"><button
+                            type="button" aria-label="next page" class="rc-pagination-item-link"></button></li>
+                        <li class="rc-pagination-options"></li>
+                      </ul>
+                      <div class="d-flex align-items-center gap-8"><label for="results-per-page-select">Resultados
+                          por página:</label><select id="results-per-page-select">
+                          <option value="10">10</option>
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </main>
+      </div>
+    </div>
+    <footer id="footer" class="inpi-footer" role="contentinfo">
+      <div class="inpi-footer__main">
+        <div class="container-lg">
+
+          <!-- Marca gov.br (topo do rodapé) -->
+          <a class="inpi-footer__govbr" href="https://www.gov.br" target="_blank" rel="noopener noreferrer"
+            aria-label="Acessar o portal gov.br">
+            <img
+              src="https://www.gov.br/governodigital/pt-br/estrategias-e-governanca-digital/EGD2020/imagens/logo-white.png/@@images/image"
+              alt="gov.br" loading="lazy" decoding="async">
+          </a>
+
+          <!-- Colunas -->
+          <nav class="inpi-footer__sitemap" aria-label="Mapa do site">
+            <section class="inpi-footer__col" aria-label="Serviços">
+              <h2 class="inpi-footer__title">Serviços</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">Marcas</a></li>
+                <li><a href="#">Patentes</a></li>
+                <li><a href="#">Desenhos Industriais</a></li>
+                <li><a href="#">Indicações Geográficas</a></li>
+                <li><a href="#">Programas de Computador</a></li>
+                <li><a href="#">Topografias de Circuitos Integrados</a></li>
+                <li><a href="#">Contratos de Tecnologia e de Franquia</a></li>
+                <li><a href="#">Academia do INPI</a></li>
+              </ul>
+            </section>
+
+            <section class="inpi-footer__col" aria-label="Acesso à Informação">
+              <h2 class="inpi-footer__title">Acesso à Informação</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">Institucional</a></li>
+                <li><a href="#">Ações e Programas</a></li>
+                <li><a href="#">Participação Social</a></li>
+                <li><a href="#">Auditorias</a></li>
+                <li><a href="#">Convênios e Transferências</a></li>
+                <li><a href="#">Receitas e Despesas</a></li>
+                <li><a href="#">Licitações e Contratos</a></li>
+                <li><a href="#">Servidores</a></li>
+                <li><a href="#">Serviço de Informação ao Cidadão</a></li>
+                <li><a href="#">Dados Abertos</a></li>
+              </ul>
+            </section>
+
+            <section class="inpi-footer__col" aria-label="Canais de Atendimento">
+              <h2 class="inpi-footer__title">Canais de Atendimento</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">Pré-Atendimento</a></li>
+                <li><a href="#">Atendimento em Campo</a></li>
+                <li><a href="#">Atendimento na Solução de Problemas</a></li>
+                <li><a href="#">Atendimento em Novas Soluções</a></li>
+                <li><a href="#">Termo de Uso</a></li>
+                <li><a href="#">Política de Privacidade</a></li>
+                <li><a href="#">Endereços</a></li>
+              </ul>
+            </section>
+
+            <section class="inpi-footer__col" aria-label="Governança">
+              <h2 class="inpi-footer__title">Governança</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">Planejamento Estratégico</a></li>
+                <li><a href="#">Transparência e Prestação de Contas</a></li>
+                <li><a href="#">Tratamento de Dados Pessoais</a></li>
+                <li><a href="#">Agenda das Autoridades</a></li>
+                <li><a href="#">Ouvidoria</a></li>
+                <li><a href="#">Segurança da Informação</a></li>
+                <li><a href="#">Disponibilidade Técnica de Sistemas</a></li>
+              </ul>
+            </section>
+
+            <section class="inpi-footer__col" aria-label="Uso Estratégico da PI">
+              <h2 class="inpi-footer__title">Uso Estratégico da PI</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">INPI para empreender e inovar</a></li>
+                <li><a href="#">Observatório de Tecnologias Verdes</a></li>
+                <li><a href="#">Depósito Internacional de Marcas (Madri)</a></li>
+                <li><a href="#">Depósito Internacional de Patentes (PCT/CUP)</a></li>
+                <li><a href="#">Relações e Parcerias Nacionais</a></li>
+                <li><a href="#">Relações e Parcerias Internacionais</a></li>
+                <li><a href="#">Estudos e Informação Tecnológica</a></li>
+                <li><a href="#">Trâmites Prioritários de Patentes</a></li>
+              </ul>
+            </section>
+
+            <section class="inpi-footer__col" aria-label="Projetos Estratégicos">
+              <h2 class="inpi-footer__title">Projetos Estratégicos</h2>
+              <ul class="inpi-footer__list">
+                <li><a href="#">Pesquisa de Percepção da Qualidade do Exame</a></li>
+                <li><a href="#">Contato Direto com o Usuário</a></li>
+                <li><a href="#">Combate à Falsificação</a></li>
+                <li><a href="#">Memória da Propriedade Industrial</a></li>
+                <li><a href="#">Combate ao Backlog de Patentes</a></li>
+                <li><a href="#">Webinário Acordo de Haia</a></li>
+                <li><a href="#">Inova Simples</a></li>
+                <li><a href="#">Programa Agir INPI</a></li>
+                <li><a href="#">Programa Bem Aqui no INPI</a></li>
+              </ul>
+            </section>
+          </nav>
+
+          <div class="inpi-footer__social" aria-label="Redes sociais">
+            <div class="inpi-footer__social-title">Redes sociais</div>
+
+            <div class="inpi-footer__social-links">
+              <a class="inpi-social-btn" href="https://www.facebook.com/inpibr" target="_blank"
+                rel="noopener noreferrer" aria-label="INPI no Facebook">
+                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+              </a>
+
+              <a class="inpi-social-btn" href="https://www.instagram.com/inpibr/" target="_blank"
+                rel="noopener noreferrer" aria-label="INPI no Instagram">
+                <i class="fab fa-instagram" aria-hidden="true"></i>
+              </a>
+
+              <a class="inpi-social-btn" href="https://www.linkedin.com/company/inpi/" target="_blank"
+                rel="noopener noreferrer" aria-label="INPI no LinkedIn">
+                <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+              </a>
+
+              <a class="inpi-social-btn" href="https://www.youtube.com/user/INPIbr" target="_blank"
+                rel="noopener noreferrer" aria-label="INPI no YouTube">
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+              </a>
+
+              <a class="inpi-social-btn" href="https://twitter.com/inpibr" target="_blank" rel="noopener noreferrer"
+                aria-label="INPI no X (Twitter)">
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+
+              </a>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- Barra final (licença) -->
+      <div class="inpi-footer__bar">
+        <div class="container-lg inpi-footer__bar-inner">
+          <div class="inpi-footer__org">
+            <img
+              src="https://www.gov.br/inpi/en/content-center/press/marca-do-inpi/logo_inpi_branco_fundo_transparente.png/@@images/image"
+              alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <span>Instituto Nacional da Propriedade Industrial</span>
+          </div>
+
+          <div class="inpi-footer__license">
+            Todo o conteúdo deste site está publicado sob a licença
+            <a href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR" target="_blank"
+              rel="noopener noreferrer">
+              Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada
+            </a>.
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+
+  <div id="a11y-status-message" role="status" aria-live="polite" aria-relevant="additions text"
+    style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px;">
+  </div>
+  <script>
+    (function () {
+      var toggle = document.getElementById('toggle-filters');
+      var searchResults = document.querySelector('.search-results');
+
+      if (!toggle || !searchResults) return;
+
+      function updateFiltersVisibility() {
+        if (toggle.checked) {
+          searchResults.classList.remove('filters-hidden');
+        } else {
+          searchResults.classList.add('filters-hidden');
+        }
+      }
+
+      // Atualiza ao mudar o switch
+      toggle.addEventListener('change', updateFiltersVisibility);
+
+      // Garante o estado inicial de acordo com o "checked" no HTML
+      updateFiltersVisibility();
+    })();
+  </script>
+
+</body>
+
+</html>
