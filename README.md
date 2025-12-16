@@ -1,6 +1,7 @@
 # Protótipos
 
 
+- Resultados: [https://ibict-inpi.github.io/pi-interface/html/resultados.html](https://ibict-inpi.github.io/pi-interface/html/resultados.html)
 - Detalhe de Patentes: [https://ibict-inpi.github.io/pi-interface/html/patente-detalhe-v4.1.html](https://ibict-inpi.github.io/pi-interface/html/patente-detalhe-v4.1.html)
 - Detalhe de Marcas: [https://ibict-inpi.github.io/pi-interface/html/marca-detalhe-v3.1.html](https://ibict-inpi.github.io/pi-interface/html/marca-detalhe-v3.1.html)
 - Detalhe de Desenho Industrial: [https://ibict-inpi.github.io/pi-interface/html/desenho-industrial-detalhe-v3.1.html](https://ibict-inpi.github.io/pi-interface/html/desenho-industrial-detalhe-v3.1.html)
