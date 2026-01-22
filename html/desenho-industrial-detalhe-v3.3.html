@@ -4,29 +4,31 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Detalhe da Marca — Portal de Propriedade Industrial</title>
-    <meta name="description"
-        content="Visualização detalhada do processo de registro de marca no Portal de Propriedade Industrial.">
+    <title>Detalhe do Desenho Industrial — Portal de Propriedade Industrial</title>
+    <meta name="description" content="Visualização detalhada do registro de Desenho Industrial.">
 
-    <!-- DS Gov.br (Fonts + CSS via CDN) -->
+    <!-- DS GOV.BR (Fonts + Core) -->
     <link rel="stylesheet"
         href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.css">
 
-    <!-- Font Awesome (ícones) -->
+    <!-- Fontes/ícones auxiliares (mantidos) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Raleway (mantida para os títulos) -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;800&display=swap">
-
     <style>
-        /* === Ajustes mínimos (compatíveis com DS) ============================== */
+        /* ====== Base (igual ao arquivo de Patentes) ====== */
         .record-title h1 {
             margin: 0;
             font-family: Raleway, Rawline, Arial, sans-serif;
             font-weight: 800;
             letter-spacing: .01em
+        }
+
+        .br-tag {
+            white-space: nowrap;
+            background-color: red;
         }
 
         .status {
@@ -36,7 +38,6 @@
             font-weight: 700;
             color: #374151;
             font-size: .95rem;
-            cursor: pointer
         }
 
         .kv {
@@ -57,28 +58,15 @@
             color: #111827
         }
 
-        /* Moldura da mídia da marca: igual ao frame da patente */
-        .mark-media {
-            border: 1px solid #d0d7de;
-            border-radius: .75rem;
-            background:
-                linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px,
-                #f7f9fb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9ca3af;
-            font-size: .85rem;
+        .br-table table {
+            width: 100%
         }
 
-        .mark-media img {
-            display: block;
-            width: 100%;
-            height: auto;
-            object-fit: contain;
+        .record-title .br-tag {
+            margin-left: .5rem
         }
 
-        /* Skiplinks: visíveis só no foco */
+        /* Skiplinks */
         .skip-links {
             position: relative;
             z-index: 1000
@@ -101,12 +89,7 @@
             top: .5rem
         }
 
-        /* Respiro entre título e tag do nº do processo */
-        .record-title .br-tag {
-            margin-left: .5rem
-        }
-
-        /* Stepper/timeline custom (mantido) */
+        /* Stepper */
         .pi-timeline {
             margin-top: .75rem;
             border: 1px solid #e5e7eb;
@@ -193,9 +176,542 @@
             margin-top: .15rem
         }
 
-        /* Espaço entre botões do topo */
+        #status-acao-timeline {
+            cursor: pointer
+        }
+
+        /* Navegação topo */
         #navigation .br-button+.br-button {
             margin-left: .5rem
+        }
+
+        /* Grid biblio + carrossel (mantido) */
+        .biblio-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) clamp(260px, 28vw, 360px);
+            gap: 1rem;
+            align-items: start
+        }
+
+        .biblio-left {
+            display: grid;
+            gap: .75rem
+        }
+
+        .biblio-right {
+            position: relative;
+            /* mantém compatibilidade com o antigo carrossel */
+            display: grid;
+            /* passa a organizar os .kv em grid */
+            gap: .75rem;
+            /* mesmo espaçamento da coluna esquerda */
+            align-content: start;
+            /* garante que tudo “sente” no topo */
+        }
+
+
+        .media-carousel {
+            position: relative;
+            width: 100%
+        }
+
+        .media-frame {
+            aspect-ratio: 3/4;
+            width: 100%;
+            border: 1px solid #d0d7de;
+            border-radius: .75rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(0, 0, 0, .02) 25%, rgba(0, 0, 0, 0) 25%) 0 0/16px 16px, #f7f9fb;
+            display: grid;
+            place-items: center
+        }
+
+        .media-frame .mc-slide {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none
+        }
+
+        .media-frame .mc-slide.is-active {
+            display: block
+        }
+
+        .mc-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+            cursor: pointer;
+            display: grid;
+            place-items: center
+        }
+
+        .mc-btn.prev {
+            left: .5rem
+        }
+
+        .mc-btn.next {
+            right: .5rem
+        }
+
+        .mc-btn:focus-visible {
+            outline: 2px solid #0B5ED7;
+            outline-offset: 2px
+        }
+
+        /* Tooltip */
+        .tt {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-left: .375rem;
+            color: #6b7280;
+            cursor: help;
+            position: relative;
+            vertical-align: middle;
+            transform: translateY(-3px)
+        }
+
+        .tt:hover,
+        .tt:focus-visible {
+            color: #0B5ED7
+        }
+
+        .tt::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 10px);
+            transform: translateX(-50%);
+            min-width: 240px;
+            max-width: min(520px, 80vw);
+            background: #0b0d12;
+            color: #fff;
+            border-radius: .5rem;
+            padding: .625rem .75rem;
+            line-height: 1.35;
+            font-size: .875rem;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+            white-space: pre-line;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 10
+        }
+
+        .tt::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 100%;
+            transform: translate(-50%, 2px);
+            border: 8px solid transparent;
+            border-top-color: #0b0d12;
+            opacity: 0;
+            visibility: hidden
+        }
+
+        .tt:is(:hover, :focus-visible)::after,
+        .tt:is(:hover, :focus-visible)::before {
+            opacity: 1;
+            visibility: visible
+        }
+
+        /* Documentos para download */
+        .doc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: .75rem
+        }
+
+        .doc-item {
+            display: flex;
+            flex-direction: column
+        }
+
+        .br-button.secondary.doc-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            text-decoration: none
+        }
+
+        .doc-btn .btn-label {
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .doc-btn .btn-meta {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            font-size: .78rem;
+            color: #6b7280;
+            font-variant-numeric: tabular-nums
+        }
+
+        .doc-btn .btn-meta i {
+            opacity: .75
+        }
+
+        .br-button.secondary.doc-btn.doc-btn--stacked {
+            flex-direction: column;
+            align-items: flex-start
+        }
+
+        .br-button.secondary.doc-btn.doc-btn--stacked .btn-meta {
+            margin-top: .15rem
+        }
+
+        /* Tabelas simples */
+        .table-wrap {
+            overflow: auto
+        }
+
+        table.pi {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0
+        }
+
+        table.pi th,
+        table.pi td {
+            padding: .6rem .7rem;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top
+        }
+
+        table.pi th {
+            background: #f9fafb;
+            text-align: left;
+            font-weight: 700;
+            color: #374151
+        }
+
+        table.pi tr:hover td {
+            background: #fbfcff
+        }
+
+        /* Ajudante de acessibilidade */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Responsivo */
+        @media (max-width:992px) {
+            .biblio-grid {
+                grid-template-columns: 1fr
+            }
+
+            .biblio-right {
+                order: 2
+            }
+        }
+
+        @media (min-width:992px) {
+            .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
+                display: flex;
+                flex-direction: column;
+                justify-content: center
+            }
+
+            .record-title+.status {
+                margin-top: .4rem
+            }
+
+            #pi-stepper-panel {
+                margin-top: .75rem
+            }
+        }
+
+        /* Grid de miniaturas grandes (card de imagens) */
+        .di-thumbs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .di-thumb {
+            margin: 0;
+        }
+
+        .di-thumb img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            display: block;
+        }
+
+        .di-thumb figcaption {
+            text-align: center;
+            font-size: .875rem;
+            color: #6b7280;
+            margin-top: .25rem;
+        }
+
+        /* 50/50 no card de dados do Desenho Industrial */
+        .biblio-grid.biblio-grid--50 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            /* 50/50 */
+            gap: 1rem;
+            align-items: start;
+        }
+
+        /* Evita overflow/estouro de conteúdo dentro das colunas */
+        .biblio-grid.biblio-grid--50 .biblio-left,
+        .biblio-grid.biblio-grid--50 .biblio-right {
+            min-width: 0;
+        }
+
+        /* Pilha em 1 coluna no mobile */
+        @media (max-width: 767.98px) {
+            .biblio-grid.biblio-grid--50 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* links clicáveis nas thumbs */
+        .di-open {
+            display: block;
+            border-radius: .5rem;
+            outline: none;
+        }
+
+        .di-open:focus-visible img {
+            outline: 2px solid #0B5ED7;
+            outline-offset: 2px;
+        }
+
+        .di-open {
+            cursor: zoom-in;
+        }
+
+        /* Lightbox */
+        .lb {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            display: none;
+            /* toggla via aria-hidden */
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 2rem 1rem;
+        }
+
+        .lb[aria-hidden="false"] {
+            display: flex;
+        }
+
+        .lb-dialog {
+            position: relative;
+            max-width: 96vw;
+            max-height: 92vh;
+            display: grid;
+            grid-template-columns: auto;
+            /* imagem central */
+            align-items: center;
+            justify-items: center;
+            gap: .5rem;
+            outline: none;
+        }
+
+        .lb-figure {
+            margin: 0;
+        }
+
+        #lb-img {
+            display: block;
+            width: auto;
+            height: auto;
+            /* evita upscale */
+            max-width: 96vw;
+            max-height: 80vh;
+            /* responsivo */
+            border-radius: .5rem;
+            background: #fff;
+        }
+
+        .lb-caption {
+            color: #e5e7eb;
+            text-align: center;
+            font-size: .9rem;
+        }
+
+        .lb-close {
+            position: absolute;
+            top: .25rem;
+            right: .25rem;
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #111827;
+            display: grid;
+            place-items: center;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .25);
+        }
+
+        .lb-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .95);
+            color: #111827;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .25);
+        }
+
+        .lb-prev {
+            left: .25rem;
+        }
+
+        .lb-next {
+            right: .25rem;
+        }
+
+        .lb-nav:focus-visible,
+        .lb-close:focus-visible {
+            outline: 2px solid #0B5ED7;
+            outline-offset: 2px;
+        }
+
+        /* melhora toque em mobile */
+        @media (max-width: 576px) {
+
+            .lb-nav,
+            .lb-close {
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        .record-title h1 {
+            margin: 0;
+            font-family: 'Raleway', Rawline, Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: .01em;
+            font-variant-numeric: tabular-nums lining-nums;
+            /* padrão moderno */
+            font-feature-settings: "tnum" 1, "lnum" 1;
+            /* fallback p/ Safari/antigos */
+            font-kerning: normal;
+        }
+
+        /* === Toolbar + collapse (idêntico às outras páginas) === */
+        .detail-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            margin: .5rem 0 .75rem;
+            flex-wrap: wrap
+        }
+
+        .detail-toolbar .group-left,
+        .detail-toolbar .group-right {
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .detail-toolbar .br-button {
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            margin: 0
+        }
+
+        .detail-toolbar .br-button.circle.small {
+            width: 44px;
+            height: 44px
+        }
+
+        .detail-toolbar .hint-nav {
+            font-size: .875rem;
+            color: #6c757d
+        }
+
+        .detail-toolbar .text-divider {
+            opacity: .45;
+            margin: 0 .25rem
+        }
+
+        @media (max-width:768px) {
+            .detail-toolbar {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .detail-toolbar .group-left,
+            .detail-toolbar .group-right {
+                justify-content: space-between
+            }
+
+            .detail-toolbar .hint-nav {
+                display: none
+            }
+        }
+
+        /* Botão de colapso por card */
+        .br-card .card-header {
+            position: relative
+        }
+
+        .collapse-btn {
+            position: absolute;
+            right: .75rem;
+            top: .5rem
+        }
+
+        .br-card.is-collapsed .card-content {
+            display: none
+        }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 1040;
+            display: none
+        }
+
+        .back-to-top.is-visible {
+            display: inline-flex
         }
 
         /* Controles globais de colapsar/expandir (abaixo do 1º card) */
@@ -241,8 +757,8 @@
             justify-content: center;
             min-width: 130px;
             padding-top: 0;
+            /* mesmo “truque” das outras páginas para alinhar com os botões */
             transform: translateY(10px);
-            /* mesmo ajuste que funcionou na Patente */
         }
 
         .nav-seq-controls {
@@ -260,198 +776,10 @@
 
         .nav-seq-pages {
             font-size: .75rem;
-            color: #6c757d;
+            color: #6b7280;
             margin-top: .125rem;
             text-align: center;
             width: 100%;
-        }
-
-
-        /* CTA do rodapé (card "Atalhos"): respiro organizado */
-        .br-card[aria-label="Atalhos"] .card-content {
-            display: flex;
-            flex-wrap: wrap;
-            column-gap: .5rem;
-            row-gap: .5rem
-        }
-
-        .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
-            margin-left: .5rem
-        }
-
-        @media (max-width:576px) {
-            .br-card[aria-label="Atalhos"] .card-content .br-button+.br-button {
-                margin-left: 0
-            }
-        }
-
-        /* Centralização vertical do bloco título+status quando há mídia à direita */
-        @media (min-width:992px) {
-            .br-card .card-content>.row.g-3.align-items-center>.col-12.col-lg-8 {
-                display: flex;
-                flex-direction: column;
-                justify-content: center
-            }
-
-            .record-title+.status {
-                margin-top: .4rem
-            }
-
-            #pi-stepper-panel {
-                margin-top: .75rem
-            }
-        }
-
-        /* Tabela Classificação de Produtos / Serviços — SEM HOVER */
-        .tb-nice tbody tr:hover,
-        .tb-nice tbody tr:hover>*,
-        .tb-nice tbody td:hover,
-        .tb-nice tbody th:hover {
-            background-color: inherit !important;
-            box-shadow: none !important;
-        }
-
-        .tb-nice tbody tr {
-            cursor: default !important;
-        }
-
-        /* Remove qualquer hover apenas na tabela .no-hover */
-        .br-table .table.no-hover tbody tr:hover,
-        .br-table .table.no-hover tbody tr:hover>td,
-        .br-table .table.no-hover tbody tr:hover>th {
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-
-        /* Evita efeitos de transição que alguns temas aplicam no hover */
-        .br-table .table.no-hover tbody tr>td,
-        .br-table .table.no-hover tbody tr>th {
-            transition: none !important;
-            cursor: default !important;
-        }
-
-        .kv .old-owners {
-            margin-top: .35rem;
-            border-left: 2px solid #e5e7eb;
-            padding-left: .5rem;
-        }
-
-        .nowrap {
-            white-space: nowrap;
-        }
-
-        .old-owners-toggle {
-            font-weight: 400;
-            color: #1351b4;
-            text-decoration: underline;
-            background: transparent;
-            padding: 0;
-            border: 0;
-        }
-
-        .old-owners-toggle:hover,
-        .old-owners-toggle:focus {
-            color: #1351b4;
-            text-decoration: underline;
-            /* mantém aparência de link */
-            background: transparent;
-            box-shadow: none;
-        }
-
-        /* ——— Toolbar superior (navegação + expandir/recolher) ——— */
-        .detail-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: .5rem;
-            margin: .5rem 0 .75rem;
-            flex-wrap: wrap;
-        }
-
-        .detail-toolbar .group-left,
-        .detail-toolbar .group-right {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-        }
-
-        .detail-toolbar .br-button {
-            display: inline-flex;
-            align-items: center;
-            line-height: 1;
-            margin: 0;
-        }
-
-        .detail-toolbar .br-button.circle.small {
-            width: 44px;
-            height: 44px;
-        }
-
-        .detail-toolbar .hint-nav {
-            font-size: .875rem;
-            color: #6c757d;
-        }
-
-        .detail-toolbar .br-link {
-            display: inline-flex;
-            align-items: center;
-            gap: .25rem;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        .detail-toolbar .text-divider {
-            opacity: .45;
-            margin: 0 .25rem;
-        }
-
-        @media (max-width:768px) {
-            .detail-toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .detail-toolbar .group-left,
-            .detail-toolbar .group-right {
-                justify-content: space-between;
-            }
-
-            .detail-toolbar .hint-nav {
-                display: none;
-            }
-        }
-
-        /* ——— Colapsar cards (igual à Patente) ——— */
-        .br-card.is-collapsed .card-content {
-            display: none;
-        }
-
-        .br-card .card-header {
-            position: relative;
-        }
-
-        .collapse-btn {
-            position: absolute;
-            right: .75rem;
-            top: .5rem;
-        }
-
-        /* ——— Botão flutuante “Voltar ao topo” ——— */
-        .back-to-top {
-            position: fixed;
-            right: 1rem;
-            bottom: 1rem;
-            z-index: 1040;
-            display: none;
-        }
-
-        .back-to-top.is-visible {
-            display: inline-flex;
-        }
-
-        /* ——— Espaçamento entre os botões do topo (já existe, garantido aqui) ——— */
-        #navigation .br-button+.br-button {
-            margin-left: .5rem;
         }
 
         /* ... estilos existentes ... */
@@ -512,8 +840,6 @@
         .header-title {
             color: rgb(0, 51, 160) !important;
         }
-
-        /* ... estilos do header ... */
 
         /* Rodapé estilo gov.br/inpi */
         .inpi-footer {
@@ -598,82 +924,6 @@
             line-height: 1.35;
         }
 
-        /* Tooltips (bolha compartilhada) */
-        .tt-inline {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
-
-        .tt,
-        .tt-inline {
-            /* container base */
-        }
-
-        .tt {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-left: .375rem;
-            color: #6b7280;
-            cursor: help;
-            position: relative;
-            vertical-align: middle;
-            transform: translateY(-3px);
-        }
-
-        .tt:hover,
-        .tt:focus-visible {
-            color: #0B5ED7;
-        }
-
-        /* Bolha + seta */
-        .tt::after,
-        .tt-inline::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            left: 50%;
-            bottom: calc(100% + 10px);
-            transform: translateX(-50%);
-            min-width: 240px;
-            max-width: min(520px, 80vw);
-            background: #0b0d12;
-            color: #fff;
-            border-radius: .5rem;
-            padding: .625rem .75rem;
-            line-height: 1.35;
-            font-size: .875rem;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
-            white-space: pre-line;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .tt::before,
-        .tt-inline::before {
-            content: "";
-            position: absolute;
-            left: 50%;
-            bottom: 100%;
-            transform: translate(-50%, 2px);
-            border: 8px solid transparent;
-            border-top-color: #0b0d12;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .tt:is(:hover, :focus-visible)::after,
-        .tt-inline:is(:hover, :focus-visible)::after,
-        .tt:is(:hover, :focus-visible)::before,
-        .tt-inline:is(:hover, :focus-visible)::before {
-            opacity: 1;
-            visibility: visible;
-        }
-
         /* Barra final */
         .inpi-footer__bar {
             border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -749,27 +999,10 @@
             outline: 3px solid rgba(255, 255, 255, 0.9);
             outline-offset: 2px;
         }
-
-        /* Stepper trigger (tag clicável) */
-        #status-acao-timeline[role="button"] {
-            cursor: pointer;
-            user-select: none;
-            font-weight: 700;
-        }
-
-        /* A11y: foco visível ao navegar por teclado */
-        #status-acao-timeline[role="button"]:focus-visible {
-            outline: 2px solid var(--focus, #1351b4);
-            outline-offset: 3px;
-        }
-
-        #status-acao-timeline[role="button"]:hover {
-            filter: brightness(0.98);
-        }
     </style>
 </head>
 
-<body class="template-base">
+<body data-entity="desenho-industrial">
     <!-- Header Novo (baseado em resultados.html) -->
     <nav class="br-skiplink" role="menubar"><a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir
             para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true"
@@ -865,7 +1098,7 @@
         <div class="menu-container">
             <div class="menu-panel">
                 <div class="menu-header" data-visible="false">
-                    <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade
+                    <div class="menu-title"><img alt="Imagem ilustrativa" src="../img-template.png"><span>Propriedade
                             Industrial</span></div>
                     <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu"
                             data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
@@ -892,19 +1125,20 @@
         <!-- Linha 1: breadcrumb -->
         <nav class="br-breadcrumb mb-2" id="page-breadcrumb" aria-label="Breadcrumb">
             <ol class="crumb-list">
-                <li class="crumb"><a href="#">Consulta</a></li>
-                <li class="crumb"><a href="#">Marca</a></li>
-                <li class="crumb" aria-current="page">Detalhe</li>
+                <li class="crumb"><a href="#">Início »</a></li>
+                <li class="crumb"><a href="#">Desenho Industrial - Busca Avançada »</a></li>
+                <li class="crumb"><a href="#">Resultados »</a></li>
+                <li class="crumb" aria-current="page">BR302023003226-6</li>
             </ol>
         </nav>
 
         <!-- Linha 2: Voltar aos resultados (esq.) + ações (dir.) -->
         <div class="d-flex flex-wrap align-items-center justify-content-between">
             <!-- Voltar aos resultados -->
-            <button class="br-button secondary" type="button" onclick="history.back()">
+            <a href="#" class="br-button secondary">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 <span class="ml-1">Voltar aos resultados</span>
-            </button>
+            </a>
 
             <!-- Ações à direita -->
             <div class="nav-actions">
@@ -915,7 +1149,7 @@
                 </a>
 
                 <!-- Baixar PDF -->
-                <a class="br-button secondary" href="#" id="baixarPDF" title="Baixar PDF da página">
+                <a class="br-button secondary" href="#" id="baixarPDF">
                     <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
                     <span class="ml-1">Baixar PDF</span>
                 </a>
@@ -947,133 +1181,94 @@
 
 
     <main id="main-content" class="d-flex flex-fill">
+        <div id="topo" tabindex="-1" aria-hidden="true"></div>
+
         <div class="container-lg">
-            <!-- Toolbar do detalhe (navegação foi para a barra superior) -->
+            <!-- Toolbar do detalhe (navegação e expandir/recolher foram reposicionados) -->
             <div class="detail-toolbar lite" aria-label="Controles da página">
                 <div class="group-left"></div>
             </div>
 
 
-
-            <!-- Card: Cabeçalho do registro -->
+            <!-- CARD 1: Cabeçalho do registro (título/estado + tripla KV + stepper) -->
             <div class="br-card mt-3">
                 <div class="card-content">
-                    <!-- Título/status (esq.) + mídia (dir.) -->
                     <div class="row g-3 align-items-center">
                         <div class="col-12 col-lg-8">
                             <div class="record-title d-flex flex-wrap align-items-baseline">
-                                <h1>Marca • 933602448</h1>
+                                <h1>Desenho Industrial • BR302023003226-6</h1>
+                                <span class="br-tag">Registro de DI extinto</span>
                             </div>
-
-                            <!-- NOVO: box do Nº do Processo abaixo do título -->
-                            <div class="process-tag">
-                                <span class="br-tag" role="status" aria-label="Situação do processo">
-                                    <strong>Aguardando processamento da concessão do registro de marca</strong>
-                                </span>
-
-                                <span class="text-muted small ml-2" aria-label="Data da situação atual">
-                                    <i class="fa-regular fa-calendar mr-1" aria-hidden="true"></i> 05/03/2024
-                                </span>
-
-                                <!-- NOVO: CTA padrão (clicável) abaixo da tag -->
-                                <div class="mt-1">
-                                    <span id="status-acao-timeline" class="pi-stepper-trigger" role="button"
-                                        tabindex="0" aria-expanded="false" aria-controls="pi-stepper-panel">
-                                        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-                                        <span>Ver fluxo do processo</span>
-                                    </span>
-                                </div>
+                            <div class="status mt-2" id="status-acao-timeline" role="button" tabindex="0"
+                                aria-expanded="false" aria-controls="pi-stepper-panel">
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                <span>Ver fluxo do processo</span>
                             </div>
-
 
                         </div>
-                        <div class="col-12 col-lg-4">
-                            <div class="mark-media p-2" aria-label="Representação gráfica da marca">
-                                <img src="old/LogoMarcasServletController.jpg" alt="Logotipo apresentado no pedido"
-                                    loading="lazy" decoding="async" class="w-100" />
-                            </div>
-                        </div>
+                        <div class="col-12 col-lg-4"><!-- espaço reservado, sem mídia no topo --></div>
                     </div>
 
+                    <!-- Stepper (largura total do card) -->
                     <section id="pi-stepper-panel" class="pi-timeline" role="region" aria-labelledby="pi-timeline-title"
                         aria-hidden="true">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h2 id="pi-timeline-title" class="h6 m-0">Fluxo do registro de marca</h2>
+                            <h2 id="pi-timeline-title" class="h6 m-0">Fluxo do registro de desenho industrial</h2>
                             <span class="text-muted small">Etapas principais e estado atual</span>
                         </div>
-
                         <ol class="pi-stepper" role="list">
                             <div class="pi-progress" aria-hidden="true"></div>
-
                             <li class="pi-step pi-done" aria-label="Depósito do pedido">
                                 <span class="pi-dot" aria-hidden="true"><span class="pi-ico">1</span></span>
-                                <span class="pi-label">Depósito</span><span class="pi-meta">22/02/2024</span>
+                                <span class="pi-label">Depósito</span><span class="pi-meta">22/06/2023</span>
                             </li>
-
                             <li class="pi-step pi-done" aria-label="Exame formal">
                                 <span class="pi-dot" aria-hidden="true"><span class="pi-ico">2</span></span>
-                                <span class="pi-label">Exame formal</span><span class="pi-meta">26/02/2024</span>
+                                <span class="pi-label">Exame formal</span><span class="pi-meta">—</span>
                             </li>
-
                             <li class="pi-step pi-done" aria-label="Publicação na RPI">
                                 <span class="pi-dot" aria-hidden="true"><span class="pi-ico">3</span></span>
-                                <span class="pi-label">Publicação RPI</span><span class="pi-meta">05/03/2024</span>
+                                <span class="pi-label">Publicação RPI</span><span class="pi-meta">11/07/2023</span>
                             </li>
-
-                            <li class="pi-step pi-done" aria-label="Exame de mérito">
+                            <li class="pi-step pi-current" aria-current="step" aria-label="Exame de mérito">
                                 <span class="pi-dot" aria-hidden="true"><span class="pi-ico">4</span></span>
-                                <span class="pi-label">Exame de mérito</span><span class="pi-meta">20/06/2024</span>
+                                <span class="pi-label">Exame de mérito</span><span class="pi-meta">Em andamento</span>
                             </li>
-
-                            <li class="pi-step pi-current" aria-current="step" aria-label="Decisão / Concessão">
+                            <li class="pi-step" aria-label="Decisão / Concessão">
                                 <span class="pi-dot" aria-hidden="true"><span class="pi-ico">5</span></span>
-                                <span class="pi-label">Decisão / Concessão</span><span class="pi-meta">Em
-                                    processamento</span>
+                                <span class="pi-label">Decisão / Concessão</span><span class="pi-meta">—</span>
                             </li>
                         </ol>
                     </section>
 
 
-                    <!-- KV (3 colunas) -->
+                    <!-- KV tripla -->
                     <div class="row g-2 mt-3">
                         <div class="col-12 col-md">
                             <div class="kv">
-                                <div class="k">Elemento nominativo</div>
-                                <div class="v">CarMatch</div>
-                                <!-- Campo NOVO: Tradução -->
-                                <div class="v text-muted small mt-1"><i class="fa-solid fa-language mr-1"></i> Tradução:
-                                    <em>Encontro de carros</em>
-                                </div>
+                                <div class="k">(11) Número do registro</div>
+                                <div class="v">BR302023003226-6</div>
                             </div>
                         </div>
                         <div class="col-12 col-md">
                             <div class="kv">
-                                <div class="k">Apresentação</div>
-                                <div class="v">Mista</div>
+                                <div class="k">(22) Data do depósito</div>
+                                <div class="v">22/06/2023</div>
                             </div>
                         </div>
                         <div class="col-12 col-md">
                             <div class="kv">
-                                <div class="k">IRN</div>
-                                <div class="v">1694503A</div>
+                                <div class="k">Data da concessão</div>
+                                <div class="v">20/02/2024</div>
                             </div>
                         </div>
                         <div class="col-12 col-md">
                             <div class="kv">
-                                <div class="k">Natureza</div>
-                                <div class="v">Produtos e/ou Serviço</div>
+                                <div class="k">Data da vigência</div>
+                                <div class="v">20/02/2024</div>
                             </div>
                         </div>
-                        <!-- Campo Titular removido deste card conforme solicitação (Linha 17 Excel) -->
-                    </div>
-                    <div class="row g-2 mt-3">
-                        <div class="col-12">
-                            <div class="kv">
-                                <div class="k">Apostila</div>
-                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                    tempor incididunt ut </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -1091,299 +1286,287 @@
                 </a>
             </div>
 
-            <!-- Classificação de Produtos/Serviços -->
-            <div class="br-card mt-3" aria-labelledby="sec-ncl">
 
-                <!-- Classificação de Produtos/Serviços -->
-                <div class="br-card mt-3" aria-labelledby="sec-ncl">
-                    <div class="card-header">
-                        <h2 id="sec-ncl" class="h6 m-0">Classificação de Produtos / Serviços</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="br-table">
-                            <table class="table table-striped tb-nice no-hover">
-
-                                <thead>
-                                    <tr>
-                                        <th>Classe de Nice <i class="fa-regular fa-circle-question small ml-1"
-                                                title="Descrição da Classe de Nice ao passar o mouse"></i></th>
-                                        <th>Situação da Classe</th>
-                                        <th>Especificação</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="pair-start">
-                                        <!-- Tooltip com a descrição da classe (Linha 24 Excel) -->
-                                        <td rowspan="2">
-                                            <span class="tt-inline" tabindex="0"
-                                                data-tooltip="Descrição da classe de NICE"><strong>NCL(12)
-                                                    9</strong></span>
-                                        </td>
-                                        <td rowspan="2">Vide Situação do Processo</td>
-                                        <td lang="en">Electronic game programs; downloadable electronic game programs;
-                                            computer game software.</td>
-                                    </tr>
-                                    <tr class="pair-end">
-                                        <td lang="pt-BR">Programas de jogos eletrônicos; programas de jogos eletrônicos
-                                            para
-                                            download; software de jogos para computador.</td>
-                                    </tr>
-                                    <!-- Exemplo de Especificação APENAS em Inglês (Madri) -->
-                                    <tr class="pair-start">
-                                        <td rowspan="1">
-                                            <span class="tt-inline" tabindex="0"
-                                                data-tooltip="Descrição da classe de NICE"><strong>NCL(12)
-                                                    42</strong></span>
-                                        </td>
-                                        <td rowspan="1">Vide Situação do Processo</td>
-                                        <td lang="en">Software as a service (SaaS); Platform as a service (PaaS). <span
-                                                class="badge badge-light ml-2">Original em Inglês</span></td>
-                                    </tr>
-
-                                    <!-- Exemplo de Classe Nacional (Legado) 
-                                         Se fosse um registro antigo (ex: classes 25.10, 40 etc) 
-                                    -->
-                                    <!--
-                                    <tr>
-                                        <td><strong>NAC 25.10</strong></td>
-                                        <td>-</td>
-                                        <td>Vestuário em geral. (Classificação Nacional antiga)</td>
-                                    </tr>
-                                    -->
-                                </tbody>
-                            </table>
-                            <div class="br-table mt-3" role="region" aria-label="Identificação da Marca (Madri)">
-
+            <!-- CARD 2: Dados do registro + Representações -->
+            <div class="br-card mt-3" aria-labelledby="sec-biblio">
+                <div class="card-header">
+                    <h2 id="sec-biblio" class="h6 m-0">Dados do registro</h2>
+                </div>
+                <div class="card-content">
+                    <div class="biblio-grid biblio-grid--50">
+                        <!-- Esquerda -->
+                        <div class="biblio-left">
+                            <div class="kv">
+                                <div class="k">Indicação de produto (título)</div>
+                                <div>CONFIGURAÇÃO APLICADA A/EM PEÇAS PARA ADAPTAÇÃO DE IMPRESSORA 3D</div>
                             </div>
 
-                        </div>
+                            <div class="kv">
+                                <div class="k">Descrição</div>
+                                <div>—</div>
+                            </div>
 
-                    </div>
-                </div>
-
-                <!-- Classificação Internacional de Viena -->
-                <div class="br-card mt-3" aria-labelledby="sec-cfe">
-                    <div class="card-header">
-                        <h2 id="sec-cfe" class="h6 m-0">Classificação Internacional de Viena</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="br-table" role="region" aria-label="Classificação de Viena">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th style="width:80px">Edição</th>
-                                        <th style="width:120px">Código</th>
-                                        <th>Descrição</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>26.11.3</td>
-                                        <td>Mais de duas linhas ou de duas faixas</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>26.11.7</td>
-                                        <td>Linhas ou faixas verticais</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>27.5.17</td>
-                                        <td>Letras em caracteres cheios</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="br-card mt-3" aria-labelledby="sec-titular">
-                    <div class="card-header">
-                        <h2 id="sec-titular" class="h6 m-0">Titulares e Representante Legal</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="row g-2">
-                            <div class="col-12 col-md-6">
-                                <div class="kv">
-                                    <div class="k">Titular</div>
-                                    <div class="v">
-                                        CAR FINDER <span class="text-muted fw-normal">— desde 22/02/2024</span>
-                                        <!-- NOVO: País / UF / Cidade -->
-                                        <div class="small text-muted mt-1">
-                                            <i class="fa-solid fa-location-dot mr-1"></i> PT / Lisboa
-                                        </div>
-                                        <!-- NOVO: Natureza Jurídica e CPF/CNPJ (Linhas 45 e 46) -->
-                                        <div class="row g-2 mt-2">
-                                            <div class="col-12 col-sm-6">
-                                                <div class="kv p-2 mb-0 bg-white border-0 pl-0">
-                                                    <div class="k small">Natureza Jurídica</div>
-                                                    <div class="v small">Pessoa Jurídica</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-sm-6">
-                                                <div class="kv p-2 mb-0 bg-white border-0">
-                                                    <div class="k small">CPF / CNPJ</div>
-                                                    <div class="v small">00.000.000/0001-91</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Lista colapsável de titulares anteriores (NOVO LAYOUT) -->
-                                    <div class="mt-2">
-                                        <button type="button" class="br-button circle small secondary"
-                                            id="toggle-old-owners" aria-label="Ver histórico de titulares"
-                                            aria-expanded="false" aria-controls="old-owners"
-                                            style="width:32px;height:32px;">
-                                            <i class="fa-solid fa-clock-rotate-left"></i>
-                                        </button>
-                                        <span class="text-muted small ml-1">Ver histórico de titulares</span>
-                                    </div>
-
-                                    <div id="old-owners" class="old-owners mt-2" hidden>
-                                        <ul class="list-unstyled small m-0 pl-1 border-left ml-2">
-                                            <li class="mb-2 pl-2">
-                                                <strong>Virtual Drive Tecnologia Ltda.</strong>
-                                                <div class="text-muted" style="font-size:0.8em">
-                                                    Início: 15/08/2022 • Fim: 22/02/2024
-                                                </div>
-                                            </li>
-                                            <li class="pl-2">
-                                                <strong>Car Match Tecnologia EIRELI</strong>
-                                                <div class="text-muted" style="font-size:0.8em">
-                                                    Início: 03/05/2020 • Fim: 15/08/2022
-                                                </div>
-                                            </li>
-                                        </ul>
+                            <div class="kv">
+                                <div class="k">(51) Classificação Internacional de Locarno
+                                    <span class="tt" role="button" tabindex="0"
+                                        data-tooltip="Classificação específica para Desenho Industrial.">
+                                        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                        <span class="sr-only">Ajuda: Locarno</span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="table-wrap" aria-label="Classificação Locarno">
+                                        <table class="pi">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:90px">Edição</th>
+                                                    <th style="width:120px">Código</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>13</td>
+                                                    <td>15-09</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <div class="kv">
-                                    <div class="k">Procurador</div>
-                                    <div class="v">Otávio Jorge Assef</div>
-                                </div>
+
+                        <!-- Direita (Representações) -->
+                        <!-- Direita (Texto) -->
+                        <div class="biblio-right">
+                            <div class="kv">
+                                <div class="k">(72) Autor(es)</div>
+                                <div>WANIA APARECIDA CHRISTINELL / DANIEL CUNHA ELIAS / AIMORÉ DUTRA NETO</div>
+                            </div>
+
+                            <div class="kv">
+                                <div class="k">(73) Titular</div>
+                                <div>COMISSÃO NACIONAL DE ENERGIA NUCLEAR (BR/RJ) / UNIVERSIDADE FEDERAL DE MINAS GERAIS
+                                    (BR/MG)</div>
+                            </div>
+
+                            <div class="kv">
+                                <div class="k">(74) Representante legal</div>
+                                <div>—</div>
                             </div>
                         </div>
+
                     </div>
                 </div>
+            </div>
+            <!-- CARD 2: Representações (imagens) -->
+            <div class="br-card mt-3" aria-labelledby="sec-imagens">
+                <div class="card-header">
+                    <h2 id="sec-imagens" class="h6 m-0">Reproduções</h2>
+                </div>
+                <div class="card-content">
+                    <div class="di-thumbs" role="list" aria-label="Representações do desenho (miniaturas)">
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_001.jpg" class="di-open" data-index="0"
+                                aria-label="Abrir 1.1 Frente em tamanho maior">
+                                <img src="s001_001.jpg" alt="Vista 1.1 — Frente" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.1 Frente</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_002.jpg" class="di-open" data-index="1"
+                                aria-label="Abrir 1.2 Perspectiva direita em tamanho maior">
+                                <img src="s001_002.jpg" alt="Vista 1.2 — Perspectiva direita" loading="lazy"
+                                    decoding="async">
+                            </a>
+                            <figcaption>1.2 Perspectiva</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_003.jpg" class="di-open" data-index="2"
+                                aria-label="Abrir 1.3 Esquerda em tamanho maior">
+                                <img src="s001_003.jpg" alt="Vista 1.3 — Esquerda" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.3 Esquerda</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_004.jpg" class="di-open" data-index="3"
+                                aria-label="Abrir 1.4 Direita em tamanho maior">
+                                <img src="s001_004.jpg" alt="Vista 1.4 — Direita" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.4 Direita</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_005.jpg" class="di-open" data-index="4"
+                                aria-label="Abrir 1.5 Traseira em tamanho maior">
+                                <img src="s001_005.jpg" alt="Vista 1.5 — Traseira" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.5 Traseira</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_006.jpg" class="di-open" data-index="5"
+                                aria-label="Abrir 1.6 Superior em tamanho maior">
+                                <img src="s001_006.jpg" alt="Vista 1.6 — Superior" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.6 Superior</figcaption>
+                        </figure>
+                        <figure class="di-thumb" role="listitem">
+                            <a href="s001_007.jpg" class="di-open" data-index="6"
+                                aria-label="Abrir 1.7 Detalhe 1 em tamanho maior">
+                                <img src="s001_007.jpg" alt="Vista 1.7 — Detalhe 1" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>1.7 Detalhe</figcaption>
+                        </figure>
+                    </div>
 
+                </div>
+            </div>
 
-                <!-- CARD: (30) Prioridade Unionista -->
-                <div class="br-card mt-3" aria-labelledby="sec-prioridade">
-                    <div class="card-header">
-                        <h2 id="sec-prioridade" class="h6 m-0">
-                            (30) Prioridade Unionista
-                            <!-- (opcional) tooltip de ajuda como nos outros cards
+            <!-- CARD: (30) Prioridade Unionista -->
+            <div class="br-card mt-3" aria-labelledby="sec-prioridade">
+                <div class="card-header">
+                    <h2 id="sec-prioridade" class="h6 m-0">
+                        (30) Prioridade Unionista
+                        <!-- (opcional) tooltip de ajuda como nos outros cards
       <span class="tt" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0"
             data-tooltip="Prioridades reivindicadas conforme a Convenção de Paris.">
         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
         <span class="sr-only">Ajuda: Prioridade Unionista</span>
       </span>
       -->
-                        </h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="br-table" role="region" aria-label="Prioridade Unionista">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>(33) País</th>
-                                        <th>(31) Número</th>
-                                        <th>(32) Data</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Exemplos ilustrativos; substitua pelos dados reais -->
-                                    <tr>
-                                        <td>KR</td>
-                                        <td>10-2011-0048939</td>
-                                        <td><time datetime="2011-05-23">23/05/2011</time></td>
-                                    </tr>
-                                    <!-- mais linhas, se houver -->
-                                </tbody>
-                            </table>
-                        </div>
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="br-table" role="region" aria-label="Prioridade Unionista">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>(33) País</th>
+                                    <th>(31) Número</th>
+                                    <th>(32) Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Exemplos ilustrativos; substitua pelos dados reais -->
+                                <tr>
+                                    <td>KR</td>
+                                    <td>10-2011-0048939</td>
+                                    <td><time datetime="2011-05-23">23/05/2011</time></td>
+                                </tr>
+                                <!-- mais linhas, se houver -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
+            <!-- CARD 3: Datas -->
+            <div class="br-card mt-3" aria-labelledby="sec-datas">
+                <div class="card-header">
+                    <h2 id="sec-datas" class="h6 m-0">Datas</h2>
+                </div>
+                <div class="card-content">
+                    <div class="row g-2">
 
-                <!-- Datas -->
-                <div class="br-card mt-3" aria-labelledby="sec-datas">
-                    <div class="card-header">
-                        <h2 id="sec-datas" class="h6 m-0">Datas</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="row g-2">
-                            <div class="col-12 col-md">
-                                <div class="kv">
-                                    <div class="k">Data de Depósito</div>
-                                    <div class="v">22/02/2024</div>
-                                </div>
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(45) Data de recepção</div>
+                                <div class="v">20/02/2024</div>
                             </div>
-                            <div class="col-12 col-md">
-                                <div class="kv">
-                                    <div class="k">Data de Concessão</div>
-                                    <div class="v">-</div>
-                                </div>
+                        </div>
+
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">Data da extinção</div>
+                                <div class="v">22/06/2033</div>
                             </div>
-                            <div class="col-12 col-md">
-                                <div class="kv">
-                                    <div class="k">Data de Vigência</div>
-                                    <div class="v">22/02/2024</div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md">
-                                <div class="kv">
-                                    <div class="k">Data recebimento INPI</div>
-                                    <div class="v">22/02/2024</div>
-                                </div>
-                            </div>
-                            <!-- Campo NOVO: Data Inicio Titular Atual -->
-                            <div class="col-12 col-md">
-                                <div class="kv">
-                                    <div class="k">Data Início Titular</div>
-                                    <div class="v">22/02/2024</div>
-                                </div>
+                        </div>
+
+                        <div class="col-12 col-md">
+                            <div class="kv">
+                                <div class="k">(17) Duração prevista do registro/renovação</div>
+                                <div class="v">22/06/2033</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Publicações (RPI) -->
-            <div class="br-card mt-3" aria-labelledby="sec-publicacoes">
+
+
+            <!-- CARD 5: Publicações -->
+            <div class="br-card mt-3" aria-labelledby="sec-pubs">
                 <div class="card-header">
-                    <h2 id="sec-publicacoes" class="h6 m-0">Publicações</h2>
+                    <h2 id="sec-pubs" class="h6 m-0">Publicações</h2>
                 </div>
                 <div class="card-content">
-                    <div class="br-table" role="region" aria-label="Publicações na RPI">
-                        <table>
+                    <div class="table-wrap">
+                        <table class="pi">
                             <thead>
                                 <tr>
                                     <th style="width:80px">RPI</th>
                                     <th style="width:120px">Data RPI</th>
-                                    <th style="width:240px">Despacho</th>
-                                    <th>Complemento</th>
+                                    <th>Despacho</th>
+
+                                    <th>Complemento do despacho</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>2774</td>
-                                    <td>05/03/2024</td>
-                                    <td>Publicação de pedido de registro</td>
-                                    <td>Exame formal concluído</td>
+                                    <td>2772</td>
+                                    <td>20/02/2024</td>
+                                    <td>Concessão de registro</td>
+
+                                    <td><strong>Detalhes do despacho:</strong> Título adequado de ofício com base no
+                                        item 5.3.1.1 do
+                                        Manual de Desenhos Industriais.</td>
+                                </tr>
+                                <tr>
+                                    <td>2741</td>
+                                    <td>18/07/2023</td>
+                                    <td>Exigência - Art. 106 § 3º da LPI.</td>
+
+                                    <td>
+                                        <strong>Detalhes do despacho:</strong> Exigência formulada com fulcro no Manual
+                                        de Desenhos
+                                        Industriais - 1ª revisão (doravante Manual), acessível em
+                                        manual.inpi.gov.br/projects/manual-de-desenho-industrial/wiki.<br>
+                                        [1] Conforme item 5.6.1 do Manual, as figuras devem ter contraste, nitidez e
+                                        resolução gráfica
+                                        suficientes para a plena compreensão do desenho requerido. As figuras
+                                        apresentadas estão com
+                                        qualidade gráfica insatisfatória, linhas tremidas, imprecisas, especialmente as
+                                        linhas curvas.
+                                        Apresente as figuras com qualidade adequada, utilizando apenas linhas contínuas,
+                                        com traços
+                                        precisos.<br>
+                                        [2] Foi apresentada procuração do segundo depositante (CNEN) para o primeiro
+                                        depositante (UFMG), mas
+                                        não foi cadastrado procurador no sistema. Esclareça se o primeiro depositante é,
+                                        de fato,
+                                        depositante, ou se é procurador. Sendo depositante, descadastre a procuração.
+                                        Sendo procurador, os
+                                        dados cadastrais deverão ser corrigidos no sistema antes da emissão da GRU de
+                                        cumprimento de
+                                        exigência (105) e deve ser solicitada, nos esclarecimentos do cumprimento de
+                                        exigência, a exclusão
+                                        do 1º depositante.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2740</td>
+                                    <td>11/07/2023</td>
+                                    <td>Notificação de Depósito.</td>
+
+                                    <td><strong>Detalhes do despacho:</strong> Notificação de depósito (Protocolo:
+                                        8702300537545 • UF: WB
+                                        • Data: 22/06/2023 • Hora: 15:14).</td>
                                 </tr>
                             </tbody>
                         </table>
+
                     </div>
-                    <p class="text-muted mt-2 small">Dados atualizados até <strong>12/08/2025</strong> • Nº da
-                        Revista:
-                        <strong>2849</strong>
-                    </p>
                 </div>
             </div>
+
 
             <footer id="footer" class="inpi-footer" role="contentinfo">
                 <div class="inpi-footer__main">
@@ -1533,13 +1716,28 @@
             </footer>
         </div>
     </main>
+    <!-- Lightbox de imagens (vanilla) -->
+    <div id="lb" class="lb" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lb-caption">
+        <div class="lb-dialog" tabindex="-1">
+            <button type="button" class="lb-close" aria-label="Fechar (Esc)">&times;</button>
+            <button type="button" class="lb-nav lb-prev" aria-label="Imagem anterior"><i
+                    class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+            <figure class="lb-figure">
+                <img id="lb-img" alt="" />
+                <figcaption id="lb-caption" class="lb-caption"></figcaption>
+            </figure>
+            <button type="button" class="lb-nav lb-next" aria-label="Próxima imagem"><i
+                    class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        </div>
+    </div>
 
-    <!-- DS Gov.br (JS) -->
+
+    <!-- DS GOV.BR (JS) -->
     <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            /* Inicialização DS */
             if (window?.br?.initAll) window.br.initAll();
+
 
             /* Toggle da timeline (click/teclado) */
             const trigger = document.getElementById('status-acao-timeline');
@@ -1566,57 +1764,155 @@
                 if (progress) progress.style.width = pct + '%';
             });
 
-            /* Ações simples (copiar/compartilhar/ver PDF) */
-            document.getElementById('copyLink')?.addEventListener('click', async () => {
+
+            // Ações simples
+            document.getElementById('copyLink')?.addEventListener('click', async (e) => {
+                e.preventDefault();
                 try { await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
                 catch { alert('Não foi possível copiar.'); }
             });
-            document.getElementById('share')?.addEventListener('click', e => {
+            document.getElementById('share')?.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (navigator.share) navigator.share({ title: document.title, url: location.href });
                 else alert('Seu navegador não suporta compartilhamento nativo.');
             });
-            document.getElementById('verPDF')?.addEventListener('click', e => {
+            document.getElementById('verPDF')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.open('#', '_blank'); /* troque pela URL real do PDF */
+                window.open('#', '_blank'); // trocar pela URL real do PDF
             });
+
+            // Carrossel
+            (function () {
+                const root = document.getElementById('biblio-carousel');
+                if (!root) return;
+                const prev = root.querySelector('.prev');
+                const next = root.querySelector('.next');
+                const slides = [...root.querySelectorAll('.mc-slide')].filter(el => (el.getAttribute('src') || '').trim() !== '');
+                let i = 0;
+                function update(idx) {
+                    if (!slides.length) return;
+                    i = (idx + slides.length) % slides.length;
+                    slides.forEach((el, j) => el.classList.toggle('is-active', j === i));
+                    const hide = slides.length < 2; prev.hidden = hide; next.hidden = hide;
+                }
+                prev?.addEventListener('click', () => update(i - 1));
+                next?.addEventListener('click', () => update(i + 1));
+                root.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') update(i - 1);
+                    if (e.key === 'ArrowRight') update(i + 1);
+                });
+                update(0);
+            })();
         });
+        /* Lightbox de miniaturas (.di-open) */
+        (function () {
+            const items = [...document.querySelectorAll('.di-thumbs .di-open')];
+            if (!items.length) return;
 
-        /* Toggle "Titulares anteriores" (link inline) */
-        const toggleOldOwners = document.getElementById('toggle-old-owners');
-        const oldOwnersPanel = document.getElementById('old-owners');
-        if (toggleOldOwners && oldOwnersPanel) {
-            const toggle = (e) => {
-                e.preventDefault();
-                const expanded = toggleOldOwners.getAttribute('aria-expanded') === 'true';
-                toggleOldOwners.setAttribute('aria-expanded', String(!expanded));
-                oldOwnersPanel.hidden = expanded;
-            };
-            toggleOldOwners.addEventListener('click', toggle);
-            toggleOldOwners.addEventListener('keydown', e => {
-                if (e.key === ' ' || e.key === 'Enter') { toggle(e); }
+            const lb = document.getElementById('lb');
+            const dlg = lb.querySelector('.lb-dialog');
+            const img = document.getElementById('lb-img');
+            const cap = document.getElementById('lb-caption');
+            const btnClose = lb.querySelector('.lb-close');
+            const btnPrev = lb.querySelector('.lb-prev');
+            const btnNext = lb.querySelector('.lb-next');
+
+            let i = 0;
+            let lastFocused = null;
+
+            function captionFor(anchor) {
+                // pega do figcaption irmão
+                const fig = anchor.closest('figure');
+                const fc = fig?.querySelector('figcaption');
+                return fc?.textContent?.trim() || '';
+            }
+
+            function open(idx, focusTarget) {
+                i = (idx + items.length) % items.length;
+                lastFocused = focusTarget || items[i];
+                const a = items[i];
+                img.src = a.getAttribute('href');
+                img.alt = a.querySelector('img')?.alt || '';
+                cap.textContent = captionFor(a);
+                lb.setAttribute('aria-hidden', 'false');
+                // esconder setas se só há 1
+                const single = items.length < 2;
+                btnPrev.hidden = single; btnNext.hidden = single;
+                // foco inicial
+                setTimeout(() => btnClose.focus(), 0);
+                // pré-carrega vizinhos
+                const prev = new Image(); prev.src = items[(i - 1 + items.length) % items.length].getAttribute('href');
+                const next = new Image(); next.src = items[(i + 1) % items.length].getAttribute('href');
+                trapStart();
+            }
+
+            function close() {
+                lb.setAttribute('aria-hidden', 'true');
+                img.removeAttribute('src');
+                trapStop();
+                // volta foco
+                if (lastFocused) lastFocused.focus();
+            }
+
+            function show(delta) {
+                i = (i + delta + items.length) % items.length;
+                const a = items[i];
+                img.src = a.getAttribute('href');
+                img.alt = a.querySelector('img')?.alt || '';
+                cap.textContent = captionFor(a);
+            }
+
+            // eventos em thumbs
+            items.forEach((a, idx) => {
+                a.addEventListener('click', (e) => { e.preventDefault(); open(idx, a); });
             });
-        }
+
+            // controles
+            btnClose.addEventListener('click', close);
+            btnPrev.addEventListener('click', () => show(-1));
+            btnNext.addEventListener('click', () => show(1));
+
+            // fecha clicando fora
+            lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+
+            // teclado
+            function onKey(e) {
+                if (lb.getAttribute('aria-hidden') === 'true') return;
+                if (e.key === 'Escape') close();
+                else if (e.key === 'ArrowLeft') show(-1);
+                else if (e.key === 'ArrowRight') show(1);
+            }
+            document.addEventListener('keydown', onKey);
+
+            // trap de foco simples dentro do dialog
+            let trapHandler = null;
+            function trapStart() {
+                trapHandler = (e) => {
+                    if (e.key !== 'Tab') return;
+                    const focusables = [...lb.querySelectorAll('button')]
+                        .filter(el => !el.hidden && !el.disabled);
+                    if (!focusables.length) return;
+                    const first = focusables[0], last = focusables[focusables.length - 1];
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                };
+                lb.addEventListener('keydown', trapHandler);
+            }
+            function trapStop() {
+                if (trapHandler) lb.removeEventListener('keydown', trapHandler);
+            }
+        })();
+
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 0) DS
-            if (window?.br?.initAll) window.br.initAll();
-
-            // 1) Ações simples (compartilhar, ver PDF, baixar PDF da página)
-            document.getElementById('share')?.addEventListener('click', e => {
+            // 6.1 Baixar PDF da página (abre diálogo de impressão → “Salvar como PDF”)
+            document.getElementById('baixarPDF')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (navigator.share) navigator.share({ title: document.title, url: location.href });
-                else alert('Seu navegador não suporta compartilhamento nativo.');
-            });
-            document.getElementById('verPDF')?.addEventListener('click', e => {
-                e.preventDefault();
-                window.open('#', '_blank'); // TROCAR pela URL real do dossiê
-            });
-            document.getElementById('baixarPDF')?.addEventListener('click', e => {
-                e.preventDefault();
-                window.print(); // usa a caixa de diálogo nativa (Salvar como PDF)
+                window.print();
             });
 
-            // 2) Voltar ao topo
+            // 6.2 Voltar ao topo
             (function setupBackToTop() {
                 const btn = document.getElementById('backToTop');
                 if (!btn) return;
@@ -1632,28 +1928,25 @@
                 });
             })();
 
-            // 3) Navegação Anterior/Próximo (mesma lógica da Patente)
+            // 6.3 Navegar anterior/próximo (idêntico; usa contexto salvo de resultados se existir)
             (function setupSequentialNav() {
-                const entity = 'marca';
+                const entity = document.body.dataset.entity || 'desenho-industrial';
 
                 function getCurrentRecordId() {
                     const fromData = (document.body.dataset.recordId || '').trim();
                     if (fromData) return fromData;
-
-                    // H1: "Marca • 933602448"
-                    const h1 = document.querySelector('.record-title h1');
-                    const m = h1?.textContent?.match(/Marca\s*•\s*([^\s]+)/i);
-                    if (m) return m[1];
-
-                    // Algum KV rotulado como Nº do Processo
-                    const k = [...document.querySelectorAll('.kv .k')].find(el => /N[ºo]\s*do\s*Processo/i.test(el.textContent));
-                    if (k) return k.parentElement.querySelector('.v')?.textContent?.trim() || null;
-
-                    // Tabela de identificação (Madri)
-                    const cell = document.querySelector('.tb-identificacao tbody tr td:first-child');
-                    if (cell) return cell.textContent.trim();
-
-                    return null;
+                    // tenta pelo rótulo do KV
+                    const k = [...document.querySelectorAll('.kv .k')]
+                        .find(el => /(Número do registro|N[ºo]\s*do\s*Pedido)/i.test(el.textContent || ''));
+                    const byKv = k ? k.parentElement.querySelector('.v')?.textContent?.trim() : '';
+                    if (byKv) return byKv;
+                    // tenta pelo breadcrumb (última “crumb”)
+                    const bc = document.querySelector('.br-breadcrumb .crumb[aria-current="page"]')?.textContent?.trim();
+                    if (bc) return bc;
+                    // tenta pelo H1 (parte após o ponto médio “•”)
+                    const h1 = (document.querySelector('.record-title h1')?.textContent || '');
+                    const part = h1.includes('•') ? h1.split('•').pop().trim() : h1.trim();
+                    return part || null;
                 }
 
                 const recordId = getCurrentRecordId();
@@ -1665,7 +1958,7 @@
                 try { ctx = JSON.parse(sessionStorage.getItem('pi:ctx') || 'null'); } catch { }
 
                 function buildRecordUrl(entity, id, query) {
-                    const base = location.pathname; // mantém rota
+                    const base = location.pathname;
                     const params = new URLSearchParams(query || {});
                     params.set('ent', entity);
                     params.set('id', id);
@@ -1694,9 +1987,9 @@
                 }
             })();
 
-            // 4) Colapsar cards + Expandir/Recolher tudo (idêntico)
+            // 6.4 Colapsar blocos + Expandir/Recolher tudo
             (function setupCollapsibles() {
-                const entity = 'marca';
+                const entity = document.body.dataset.entity || 'desenho-industrial';
                 const stateKey = `pi:collapse:${entity}`;
                 let state = {};
                 try { state = JSON.parse(sessionStorage.getItem(stateKey) || '{}'); } catch { }
@@ -1709,6 +2002,7 @@
 
                     header.classList.add('d-flex', 'align-items-center');
                     const h = header.querySelector('h2,h3,h4,h5,h6') || header.firstElementChild;
+
                     const cid = content.id || `card-content-${idx}`;
                     content.id = cid;
 
@@ -1732,9 +2026,11 @@
                         state[cid] = next;
                         sessionStorage.setItem(stateKey, JSON.stringify(state));
                     }
-
                     btn.addEventListener('click', () => toggle());
-                    header.addEventListener('click', (e) => { if (!e.target.closest('a,button')) toggle(); });
+                    header.addEventListener('click', (e) => {
+                        if (e.target.closest('a,button')) return;
+                        toggle();
+                    });
                 });
 
                 document.getElementById('expandAll')?.addEventListener('click', (e) => {
@@ -1746,7 +2042,7 @@
                     document.querySelectorAll('.collapse-btn[aria-expanded="true"]').forEach(b => b.click());
                 });
 
-                // abrir seção do hash, se houver
+                // Deep-link abre a seção alvo
                 function openForHash() {
                     if (!location.hash) return;
                     const target = document.querySelector(location.hash);
@@ -1760,10 +2056,10 @@
         });
     </script>
 
-
     <a href="#topo" class="br-button circle large back-to-top" id="backToTop" aria-label="Voltar para o topo">
         <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
     </a>
+
 
 </body>
 
