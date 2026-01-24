@@ -497,6 +497,43 @@
             border-radius: 2px;
         }
 
+        :root {
+            --homologation-banner-offset: 0px;
+            /* será calculado via JS */
+        }
+
+        /* Só a barra amarela fixa */
+        .homologation-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+        }
+
+        /* Empurra o conteúdo pra não ficar embaixo da barra */
+        body {
+            padding-top: var(--homologation-banner-offset);
+        }
+
+        /* Garante que o header NÃO fique fixo, mesmo se algo do DS tentar */
+        #header.br-header {
+            position: static !important;
+            top: auto !important;
+        }
+
+
+        /* Empurra a página para baixo (senão a barra cobre o header) */
+        body {
+            padding-top: var(--homologation-banner-offset);
+        }
+
+        /* Garante que o header sticky/fixo fique abaixo da barra */
+        #header.br-header {
+            top: var(--homologation-banner-offset) !important;
+        }
+
+
         /* Garante que o header sticky não “suba” por baixo da barra */
         #header.br-header {
             top: var(--homologation-banner-offset) !important;
@@ -1537,6 +1574,21 @@
     <!-- DS Gov.br (JS) -->
     <script src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.6.2/dist/core.min.js" defer></script>
     <script>
+        (function setupHomologationBannerOffset() {
+            const banner = document.querySelector('.homologation-banner');
+            if (!banner) return;
+
+            const apply = () => {
+                document.documentElement.style.setProperty(
+                    '--homologation-banner-offset',
+                    `${banner.offsetHeight || 0}px`
+                );
+            };
+
+            apply();
+            window.addEventListener('resize', apply, { passive: true });
+        })();
+
         document.addEventListener('DOMContentLoaded', () => {
             /* Inicialização DS */
             if (window?.br?.initAll) window.br.initAll();
@@ -1758,6 +1810,20 @@
                 window.addEventListener('hashchange', openForHash);
             })();
         });
+        /* Ajusta altura real da barra fixa (evita sobreposição) */
+        (function setupHomologationBannerOffset() {
+            const banner = document.querySelector('.homologation-banner');
+            if (!banner) return;
+
+            const apply = () => {
+                const h = banner.offsetHeight || 0;
+                document.documentElement.style.setProperty('--homologation-banner-offset', `${h}px`);
+            };
+
+            apply();
+            window.addEventListener('resize', apply, { passive: true });
+        })();
+
     </script>
 
 
