@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROTÓTIPO: Busca por Desenhos Industriais (Grid Híbrido)</title>
+  <meta name="description" content="Encontre desenhos industriais registrados no INPI.">
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- App CSS (cópia local da homologação) -->
+  <link rel="stylesheet" href="app.css">
+
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* ============================================================
+       MODO GRID — GALERIA DE DESENHOS INDUSTRIAIS
+       Variáveis herdadas do DS Gov.br via app.css
+    ============================================================ */
+
+    /* --- container de resultados quando no modo grid --- */
+    .results.view-grid .sui-results-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 4px;
+    }
+
+    /* --- oculta / exibe contêineres conforme modo --- */
+    .results.view-grid  .sui-results-container { display: grid; }
+    .results.view-grid  #grid-container        { display: none !important; }
+    .results.view-list  .sui-results-container { display: flex; flex-direction: column; gap: 1rem; }
+    .results.view-list  #grid-container        { display: none !important; }
+    .results.view-photo .sui-results-container { display: none !important; }
+    .results.view-photo #grid-container        { display: grid !important; }
+
+    /* --- grid galeria --- */
+    #grid-container {
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 4px;
+    }
+
+    /* --- item do grid --- */
+    .gi-item {
+      position: relative;
+      border: 1px solid var(--border-color, #dee2e6);
+      border-radius: var(--surface-rounder-sm, 4px);
+      background: var(--background, #fff);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      outline: none;
+    }
+    .gi-item:hover,
+    .gi-item:focus-visible {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+      border-color: var(--interactive, #1351b4);
+      z-index: 2;
+    }
+    .gi-item:focus-visible {
+      outline: 3px solid var(--focus-color, #c49c00);
+      outline-offset: 2px;
+    }
+
+    /* --- área da imagem --- */
+    .gi-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--gray-5, #f0f0f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .gi-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .gi-img-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: var(--gray-30, #adadad);
+      font-size: 2.5rem;
+      gap: 4px;
+      background: linear-gradient(135deg, var(--gray-5, #f0f0f0) 0%, var(--gray-3, #f6f6f6) 100%);
+    }
+    .gi-img-placeholder span {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--gray-40, #888);
+      text-transform: uppercase;
+    }
+
+    /* --- identificador sempre visível --- */
+    .gi-id {
+      padding: 6px 8px 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--interactive, #1351b4);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: 1px solid var(--border-color, #dee2e6);
+      background: var(--background, #fff);
+    }
+
+    /* --- OVERLAY desktop (hover/focus) --- */
+    .gi-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(19, 81, 180, 0.93);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.3) transparent;
+      z-index: 5;
+    }
+    .gi-overlay::-webkit-scrollbar {
+      width: 4px;
+    }
+    .gi-overlay::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+    }
+    .gi-item:hover   .gi-overlay,
+    .gi-item:focus-visible .gi-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Quando acionado por tap (aria-expanded) no mobile */
+    .gi-item[aria-expanded="true"] .gi-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .gi-overlay-id {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+    }
+    .gi-overlay-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.35;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .gi-overlay-row {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .gi-overlay-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.75;
+    }
+    .gi-overlay-value {
+      font-size: 0.72rem;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .gi-overlay-link {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 3px;
+      padding: 3px 7px;
+      align-self: flex-start;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .gi-overlay-link:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* botão tap (mobile) — canto inferior direito do placeholder */
+    .gi-tap-btn {
+      display: none; /* visível só no mobile via media query */
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(19,81,180,0.85);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      line-height: 1;
+    }
+
+    /* --- estados do botão switch-view --- */
+    .switch-view button {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--surface-rounder-sm, 4px);
+      color: var(--color-secondary-06, #888);
+      transition: color 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .switch-view button.active {
+      color: var(--interactive, #1351b4);
+      background: rgba(19,81,180,0.08);
+      border-color: var(--interactive, #1351b4);
+    }
+    .switch-view button:hover:not(.active) {
+      color: var(--interactive, #1351b4);
+      background: rgba(19,81,180,0.05);
+    }
+    .switch-view button:focus-visible {
+      outline: 3px solid var(--focus-color, #c49c00);
+      outline-offset: 2px;
+    }
+
+    /* --- Responsividade do grid --- */
+    @media (max-width: 1200px) {
+      #grid-container,
+      .results.view-grid .sui-results-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      #grid-container,
+      .results.view-grid .sui-results-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      /* No mobile: botão de tap visível, overlay sempre oculto até expandir */
+      .gi-tap-btn { display: flex; }
+      /* Quando não expandido, overlay fica oculto mesmo com focus */
+      .gi-item:not([aria-expanded="true"]):focus-visible .gi-overlay {
+        opacity: 0;
+        pointer-events: none;
+      }
+      /* Hover não é confiável em touch — desabilitar */
+      .gi-item:hover .gi-overlay {
+        opacity: 0;
+        pointer-events: none;
+      }
+      /* Apenas aria-expanded controla no mobile */
+      .gi-item[aria-expanded="true"] .gi-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+    @media (max-width: 480px) {
+      #grid-container,
+      .results.view-grid .sui-results-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+    }
+    /* ============================================================
+       REGRAS DO PROTÓTIPO HÍBRIDO (NAV + HOVER)
+    ============================================================ */
+
+    /* Botões de Navegação (Setas) */
+    .gi-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color, #dee2e6);
+      color: var(--interactive, #1351b4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s, color 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .gi-nav-btn:hover {
+      background: var(--interactive, #1351b4);
+      color: #fff;
+      border-color: var(--interactive, #1351b4);
+    }
+    .gi-item:hover .gi-nav-btn {
+      opacity: 0.7;
+    }
+    .gi-nav-btn:hover {
+      opacity: 1 !important;
+    }
+    .gi-nav-prev { left: 8px; }
+    .gi-nav-next { right: 8px; }
+
+    /* Contador de Imagens */
+    .gi-image-counter {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 2px 6px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      border-radius: 10px;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .gi-item:hover .gi-image-counter {
+      opacity: 1;
+    }
+
+    /* PRIORIDADE DE HOVER: Esconde overlay se o mouse estiver nas setas */
+    .gi-item.is-navigating .gi-overlay {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    
+    /* Efeito visual nas setas quando ativas */
+    .gi-nav-btn:focus-visible {
+      outline: 2px solid var(--focus-color, #c49c00);
+      outline-offset: 2px;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="searchbox" role="menuitem" accesskey="3">Ir para a busca <span aria-hidden="true">(3/4)</span> <span aria-hidden="true" class="br-tag text ml-1">3</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies" title="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste" title="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-registered" aria-hidden="true"></i></span><span class="content">Marcas</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span class="content">Programa de computador</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-pencil-ruler" aria-hidden="true"></i></span><span class="content">Desenhos Industriais</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-file-contract" aria-hidden="true"></i></span><span class="content">Contratos</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="/">Busca</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Busca por Desenhos Industriais</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4" id="main-content">
+              <div class="search-page-theme search-page-theme--industrial-design">
+
+                <!-- PAGE HEADER -->
+                <div class="search-page-header">
+                  <span class="search-page-header__icon" aria-hidden="true"><i class="fas fa-pencil-ruler"></i></span>
+                  <h1 class="search-page-header__title">Busca por Desenhos Industriais</h1>
+                </div>
+
+                <!-- TIPO DE BUSCA -->
+                <div class="br-radio" role="presentation" style="margin-bottom: 10px;">
+                  <input id="quick-search" type="radio" checked="" name="search-type">
+                  <label class="quick-search" for="quick-search">Busca rápida
+                    <button type="button" class="open-modal-button mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    </button>
+                  </label>
+                  <input id="advanced-search" type="radio" name="search-type">
+                  <label for="advanced-search">Busca avançada
+                    <button type="button" class="open-modal-button mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    </button>
+                  </label>
+                </div>
+
+                <!-- CAIXA DE BUSCA -->
+                <div class="search-box">
+                  <form role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="downshift-0-label">
+                    <div class="sui-search-box">
+                      <div class="search-form">
+                        <div class="br-input">
+                          <input aria-autocomplete="list" aria-labelledby="downshift-0-label" autocomplete="off" id="downshift-0-input" data-transaction-name="search input" placeholder="Insira pelo menos 2 caracteres para realizar a busca" class="sui-search-box__text-input focus" value="metal">
+                        </div>
+                        <button class="br-button primary" type="submit" title="Buscar">Buscar</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- CONTROLES DE EXIBIÇÃO -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap row-gap-1">
+                  <div class="d-flex align-items-center flex-wrap row-gap-1">
+                    <div class="br-switch">
+                      <input id="toggle-filters" type="checkbox" checked="">
+                      <label for="toggle-filters">Exibir filtros</label>
+                    </div>
+                    <div aria-hidden="true" style="border-left: 1px solid rgb(222, 226, 230); height: 24px; margin: 0px 8px 0px 16px;"></div>
+                    <button type="button" class="open-modal-button mb-2">
+                      <i class="far fa-eye"></i>Personalizar exibição
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center flex-wrap row-gap-1">
+                    <button type="button" title="Copy API query" style="background: transparent; border: none; cursor: pointer; color: var(--interactive); font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; padding: 4px 10px 8px; transition: color 0.2s;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>API
+                    </button>
+                    <button type="button" style="background: transparent; border: none; cursor: pointer; color: var(--interactive); font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; padding: 4px 10px 8px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>Exportar
+                    </button>
+                    <div aria-hidden="true" style="border-left: 1px solid rgb(222, 226, 230); height: 24px; margin: 0px 12px 0px 2px;"></div>
+                    <!-- SWITCH VIEW -->
+                    <div class="flex gap-1 switch-view" style="margin-right: 8px;" role="group" aria-label="Modo de visualização">
+                      <button id="btn-view-list" type="button" title="Mostrar em lista" class="active" aria-pressed="true" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list" aria-hidden="true"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg>
+                      </button>
+                      <button id="btn-view-table" type="button" title="Mostrar em tabela" class="" aria-pressed="false" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table" aria-hidden="true"><path d="M12 3v18"></path><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path></svg>
+                      </button>
+                      <button id="btn-view-photo" type="button" title="Mostrar em galeria" class="" aria-pressed="false" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                      </button>
+                    </div>
+                    <!-- ORDENAÇÃO -->
+                    <div style="min-width: 200px;">
+                      <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                        <label for="sort-select">Ordenar por:</label>
+                        <select id="sort-select">
+                          <option value="|||">Relevância</option>
+                          <option value='[{"field":"title.keyword","direction":"asc"}]'>Título (A-Z)</option>
+                          <option value='[{"field":"title.keyword","direction":"desc"}]'>Título (Z-A)</option>
+                          <option value='[{"field":"deposit_date","direction":"asc"}]'>Data depósito (antigas até novas)</option>
+                          <option value='[{"field":"deposit_date","direction":"desc"}]'>Data depósito (novas até antigas)</option>
+                          <option value='[{"field":"holders.name.keyword","direction":"asc"}]'>Titulares (A-Z)</option>
+                          <option value='[{"field":"holders.name.keyword","direction":"desc"}]'>Titulares (Z-A)</option>
+                          <option value='[{"field":"inventors.name.keyword","direction":"asc"}]'>Inventores (A-Z)</option>
+                          <option value='[{"field":"inventors.name.keyword","direction":"desc"}]'>Inventores (Z-A)</option>
+                          <option value='[{"field":"status","direction":"asc"}]'>Status (A-Z)</option>
+                          <option value='[{"field":"status","direction":"desc"}]'>Status (Z-A)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" hidden="" class="sui-layout-sidebar-toggle">Filtros</button>
+
+                <!-- ÁREA DE RESULTADOS (sidebar + cards) -->
+                <div class="search-results">
+
+                  <!-- SIDEBAR DE FILTROS -->
+                  <div class="sidebar">
+                    <button hidden="" type="button" class="sui-layout-sidebar-toggle">Fechar filtros</button>
+
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; user-select: none;">
+                        Data de depósito
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Ano depósito
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Titular
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Inventor
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Status
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Tipo pedido
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        Situação
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                    <div class="sui-facet mb-4">
+                      <div class="sui-facet__title h6 mb-2" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        País
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true" style="transition: transform 0.2s; transform: rotate(0deg);"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ÁREA DOS RESULTADOS -->
+                  <div class="results">
+                    <div class="results-header mb-2">
+                      <div class="paging-info d-flex align-items-center flex-wrap">
+                        <span class="me-2">Mostrando <strong>1 - 10</strong> de um total de <strong>115</strong> resultados para a busca:
+                          <span style="display: inline; word-break: break-word;">metal
+                            <button type="button" title="Copy search term" class="d-inline-flex align-items-center justify-content-center" style="background: none; border: none; cursor: pointer; color: rgb(108, 117, 125); padding: 0px 4px; transition: color 0.2s; vertical-align: middle;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                            </button>
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2"></div>
+
+                    <!-- LISTA DE RESULTADOS -->
+                    <ul class="sui-results-container">
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/DI5502019">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">DI5502019</div>
+                                <div class="br-tag">972</div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">17/10/1995</div></div>
+                            </div>
+                            <h3 class="result-title">Anel em <em>metal</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>Italma SA. Indústria do Mobiliário</span><span>Sergio Carlos Vieira de Aquino</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>Sergio Carlos Vieira de Aquino</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/MI4500711">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">MI4500711</div>
+                                <div class="br-tag">875</div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>MI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">04/09/1985</div></div>
+                            </div>
+                            <h3 class="result-title">SEÇÃO DE <em>METAL</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>Dinko Klaric</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>Dinko Klaric</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302024006649">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302024006649</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>30</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">04/12/2024</div></div>
+                            </div>
+                            <h3 class="result-title">Lâminas de <em>metal</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>METALURGICA ESTRELA DE ACO LTDA</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>FABIANO PERES CRUVINEL</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302013003396">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302013003396</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">12/07/2013</div></div>
+                            </div>
+                            <h3 class="result-title">FOGAREIRO PORTÁTIL DE <em>METAL</em></h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>ONADIR ONOFRE BOGO</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>ONADIR ONOFRE BOGO</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/DI7102729">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">DI7102729</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">27/05/2011</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>Hansgrohe AG</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>Philippe Starck</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302013004392">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302013004392</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">03/09/2013</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>HANSGROHE SE</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>TOM SCHÖNHERR</span><span>ANDREAS DIEFENBACH</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302013004388">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302013004388</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">03/09/2013</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>HANSGROHE SE</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>TOM SCHÖNHERR</span><span>ANDREAS DIEFENBACH</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302013004385">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302013004385</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">03/09/2013</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>HANSGROHE SE</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>TOM SCHÖNHERR</span><span>ANDREAS DIEFENBACH</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302015001036">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302015001036</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">05/03/2015</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>DOCOL METAIS SANITÁRIOS LTDA.</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>INGO DOUBRAWA</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                      <li class="br-card">
+                        <a title="Ver item completo" class="no-link-color" href="https://pi-homol.ibict.br/desenhos-industriais/302015001106">
+                          <div class="card-content">
+                            <div class="result-header">
+                              <div>
+                                <div title="Número INPI" class="result-number">302015001106</div>
+                                <div class="br-tag"></div>
+                              </div>
+                              <div class="result-item"><div class="label">Natureza</div><div class="result-value"><span>DI</span></div></div>
+                              <div class="result-item"><div class="label">Data de depósito</div><div class="result-value">10/03/2015</div></div>
+                            </div>
+                            <h3 class="result-title">CONFIGURAÇÃO APLICADA EM <em>METAL</em> SANITÁRIO</h3>
+                            <div class="result-meta">
+                              <div class="result-item"><div class="label">Titular</div><div class="result-value"><span>DOCOL METAIS SANITÁRIOS LTDA</span></div></div>
+                              <div class="result-item"><div class="label">Inventor</div><div class="result-value"><span>INGO DOUBRAWA</span></div></div>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+
+                    </ul>
+
+                    <!-- GRADE DE RESULTADOS (modo galeria) -->
+                    <ul id="grid-container" aria-label="Resultados em grade" role="list">
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="DI5502019 — Anel em metal" aria-expanded="false" data-images='["img-mock/cadeira1.jpg", "img-mock/cadeira2.jpg", "img-mock/cadeira3.jpg"]'>
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/DI5502019" tabindex="-1" aria-hidden="true" class="no-link-color gi-main-link" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <img src="img-mock/cadeira1.jpg" alt="DI5502019">
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de DI5502019" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">DI5502019</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">Anel em <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">metal</em></span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">Italma SA. Indústria do Mobiliário</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <div class="gi-overlay-link-wrap"><span class="gi-overlay-link">Ver completo &#8594;</span></div>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">DI5502019</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="MI4500711 — SEÇÃO DE METAL" aria-expanded="false" data-images='["img-mock/lumi2.jpg", "img-mock/lumi3.jpg", "img-mock/eletronico1.jpg"]'>
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/MI4500711" tabindex="-1" aria-hidden="true" class="no-link-color gi-main-link" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <img src="img-mock/lumi2.jpg" alt="MI4500711">
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de MI4500711" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">MI4500711</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">SEÇÃO DE <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em></span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">Dinko Klaric</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <div class="gi-overlay-link-wrap"><span class="gi-overlay-link">Ver completo &#8594;</span></div>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">MI4500711</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302024006649 — Lâminas de metal" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302024006649" tabindex="-1" aria-hidden="true" class="no-link-color gi-main-link" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302024006649</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302024006649" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302024006649</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">Lâminas de <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">metal</em></span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">METALURGICA ESTRELA DE ACO LTDA</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <div class="gi-overlay-link-wrap"><span class="gi-overlay-link">Ver completo &#8594;</span></div>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302024006649</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302013003396 — FOGAREIRO PORTÁTIL DE METAL" aria-expanded="false" data-images='["img-mock/eletronico1.jpg", "img-mock/eletronico2.jpg"]'>
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302013003396" tabindex="-1" aria-hidden="true" class="no-link-color gi-main-link" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302013003396</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302013003396" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302013003396</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">FOGAREIRO PORTÁTIL DE <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em></span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">ONADIR ONOFRE BOGO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <div class="gi-overlay-link-wrap"><span class="gi-overlay-link">Ver completo &#8594;</span></div>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302013003396</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="DI7102729 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/DI7102729" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>DI7102729</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de DI7102729" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">DI7102729</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">Hansgrohe AG</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/DI7102729">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">DI7102729</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302013004392 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302013004392" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302013004392</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302013004392" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302013004392</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">HANSGROHE SE</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/302013004392">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302013004392</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302013004388 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302013004388" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302013004388</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302013004388" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302013004388</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">HANSGROHE SE</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/302013004388">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302013004388</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302013004385 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302013004385" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302013004385</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302013004385" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302013004385</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">HANSGROHE SE</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/302013004385">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302013004385</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302015001036 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302015001036" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302015001036</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302015001036" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302015001036</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">DOCOL METAIS SANITÁRIOS LTDA.</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/302015001036">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302015001036</div>
+                      </li>
+
+                      <li class="gi-item" role="listitem" tabindex="0" aria-label="302015001106 — CONFIGURAÇÃO APLICADA EM METAL SANITÁRIO" aria-expanded="false">
+                        <a href="https://pi-homol.ibict.br/desenhos-industriais/302015001106" tabindex="-1" aria-hidden="true" class="no-link-color" style="display:contents;">
+                          <div class="gi-img-wrap">
+                            <div class="gi-img-placeholder" aria-hidden="true">
+                              <i class="fas fa-pencil-ruler"></i>
+                              <span>302015001106</span>
+                            </div>
+                            <button class="gi-tap-btn" aria-label="Ver detalhes de 302015001106" tabindex="0">&#x2139;</button>
+                            <div class="gi-overlay" aria-hidden="true">
+                              <div class="gi-overlay-id">302015001106</div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Nome</span><span class="gi-overlay-value">CONFIGURAÇÃO APLICADA EM <em style="background:#ffd89e;padding:0 2px;border-radius:2px;font-style:normal;">METAL</em> SANITÁRIO</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Titular</span><span class="gi-overlay-value">DOCOL METAIS SANITÁRIOS LTDA</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Classificação</span><span class="gi-overlay-value">11-01</span></div>
+                              <div class="gi-overlay-row"><span class="gi-overlay-label">Situação</span><span class="gi-overlay-value">Em Vigor</span></div>
+                              <a class="gi-overlay-link" href="https://pi-homol.ibict.br/desenhos-industriais/302015001106">Ver completo &#8594;</a>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="gi-id" aria-hidden="true">302015001106</div>
+                      </li>
+
+                    </ul>
+
+                    <!-- RODAPÉ DOS RESULTADOS -->
+                    <div class="results-footer">
+                      <button class="br-button secondary" type="button">
+                        <span class="d-flex align-items-center gap-05">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>
+                          Voltar para o topo
+                        </span>
+                      </button>
+                      <ul class="rc-pagination sui-paging">
+                        <li title="Previous Page" class="rc-pagination-prev rc-pagination-disabled" aria-disabled="true"><button type="button" aria-label="prev page" class="rc-pagination-item-link" disabled=""></button></li>
+                        <li title="1" class="rc-pagination-item rc-pagination-item-1 rc-pagination-item-active" tabindex="0"><a rel="nofollow">1</a></li>
+                        <li title="2" class="rc-pagination-item rc-pagination-item-2" tabindex="0"><a rel="nofollow">2</a></li>
+                        <li title="3" class="rc-pagination-item rc-pagination-item-3" tabindex="0"><a rel="nofollow">3</a></li>
+                        <li title="4" class="rc-pagination-item rc-pagination-item-4" tabindex="0"><a rel="nofollow">4</a></li>
+                        <li title="5" class="rc-pagination-item rc-pagination-item-5 rc-pagination-item-before-jump-next" tabindex="0"><a rel="nofollow">5</a></li>
+                        <li title="Next 5 Pages" tabindex="0" class="rc-pagination-jump-next"><button type="button" aria-label="next page" class="rc-pagination-item-link"></button></li>
+                        <li title="12" class="rc-pagination-item rc-pagination-item-12" tabindex="0"><a rel="nofollow">12</a></li>
+                        <li title="Next Page" tabindex="0" class="rc-pagination-next" aria-disabled="false"><button type="button" aria-label="next page" class="rc-pagination-item-link"></button></li>
+                        <li class="rc-pagination-options"></li>
+                      </ul>
+                      <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                        <label for="results-per-page-select">Resultados por página:</label>
+                        <select id="results-per-page-select">
+                          <option value="10">10</option>
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                    </div>
+
+                  </div><!-- /results -->
+                </div><!-- /search-results -->
+
+              </div><!-- /search-page-theme -->
+            </div><!-- /mt-4 -->
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="/patentes"><div class="content">Patentes</div></a>
+              <a class="br-item" href="/desenhos-industriais"><div class="content">Desenhos Industriais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/indicacoes-geograficas"><div class="content">Indicações Geográficas</div></a>
+              <a class="br-item" href="/programas-de-computador"><div class="content">Programas de Computador</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/topografias-de-circuitos-integrados"><div class="content">Topografias de Circuitos Integrados</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/contratos-de-tecnologia-e-de-franquia"><div class="content">Contratos de Tecnologia e de Franquia</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/a-academia"><div class="content">Academia do INPI</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/acoes-e-programas"><div class="content">Ações e Programas</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/participacao-social"><div class="content">Participação Social</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/auditorias"><div class="content">Auditorias</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/receitas-e-despesas"><div class="content">Receitas e Despesas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/planejamento-estrategico"><div class="content">Planejamento Estratégico</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/transparencia-e-prestacao-de-contas"><div class="content">Transparência e Prestação de Contas</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/tratamento-de-dados-pessoais"><div class="content">Tratamento de Dados Pessoais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <a class="br-item" href="https://disponibilidade.inpi.gov.br/"><div class="content">Disponibilidade Técnica de Sistemas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="d-none d-sm-block">
+          <div class="row align-items-end justify-content-between py-5">
+            <div class="col">
+              <div class="social-network">
+                <div class="social-network-title">Redes Sociais</div>
+                <div class="d-flex">
+                  <a class="br-button circle" target="_blank" href="https://www.facebook.com/inpibrasil" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.instagram.com/inpibrasil" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.linkedin.com/company/inpibrasil" rel="noopener"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.youtube.com/@institutonacionaldaproprie2128" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /root -->
+
+  <!-- App JS from homologação -->
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var btnList  = document.getElementById('btn-view-list');
+    var btnTable = document.getElementById('btn-view-table');
+    var btnPhoto = document.getElementById('btn-view-photo');
+    var resultsDiv = document.querySelector('.results');
+
+    if (!btnList || !btnTable || !btnPhoto || !resultsDiv) return;
+
+    /* ---------- trocar modo ---------- */
+    function setView(mode) {
+      resultsDiv.classList.remove('view-list', 'view-table', 'view-photo');
+      resultsDiv.classList.add('view-' + mode);
+
+      [btnList, btnTable, btnPhoto].forEach(function (b) {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+
+      var active = mode === 'list' ? btnList : mode === 'table' ? btnTable : btnPhoto;
+      active.classList.add('active');
+      active.setAttribute('aria-pressed', 'true');
+    }
+
+    /* defaut: lista */
+    setView('list');
+
+    btnList.addEventListener('click',  function () { setView('list');  });
+    btnTable.addEventListener('click', function () { setView('table'); });
+    btnPhoto.addEventListener('click', function () { setView('photo'); });
+
+    /* ---------- GRID: interação tap / teclado ---------- */
+    var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    document.querySelectorAll('.gi-item').forEach(function (item) {
+
+      /* Botão de tap interno (mobile) */
+      var tapBtn = item.querySelector('.gi-tap-btn');
+      if (tapBtn) {
+        tapBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var expanded = item.getAttribute('aria-expanded') === 'true';
+          /* fechar todos os outros */
+          document.querySelectorAll('.gi-item[aria-expanded="true"]').forEach(function (o) {
+            if (o !== item) o.setAttribute('aria-expanded', 'false');
+          });
+          item.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        });
+      }
+
+      /* Enter/Space para navegar ao link (teclado) no desktop */
+      item.addEventListener('keydown', function (e) {
+        var link = item.querySelector('a');
+        if ((e.key === 'Enter' || e.key === ' ') && link) {
+          if (isTouchDevice) {
+            /* no mobile, Enter/Space abre overlay */
+            e.preventDefault();
+            var expanded = item.getAttribute('aria-expanded') === 'true';
+            document.querySelectorAll('.gi-item[aria-expanded="true"]').forEach(function (o) {
+              if (o !== item) o.setAttribute('aria-expanded', 'false');
+            });
+            item.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          } else {
+            /* desktop: navega ao detalhe */
+            link.click();
+          }
+        }
+        /* Escape fecha overlay */
+        if (e.key === 'Escape') {
+          item.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      /* Fechar overlay ao clicar fora */
+      document.addEventListener('click', function (e) {
+        if (!item.contains(e.target)) {
+          item.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+  }());
+  </script>
+
+  <!-- SCRIPTS DO PROTÓTIPO HÍBRIDO -->
+  <script>
+    (function() {
+      const gridContainer = document.getElementById('grid-container');
+      
+      // Inicializa os cards com múltiplas imagens
+      function initHybridCards() {
+        // Evita duplicar elementos usando uma flag
+        const items = document.querySelectorAll('.gi-item[data-images]:not(.is-initialized)');
+        
+        items.forEach(item => {
+          item.classList.add('is-initialized'); // Marca como inicializado
+          const images = JSON.parse(item.getAttribute('data-images'));
+          const imgWrap = item.querySelector('.gi-img-wrap');
+          const mainImg = imgWrap.querySelector('img') || null;
+          
+          if (!images || images.length <= 1) return;
+
+          // Cria e injeta o contador
+          const counter = document.createElement('div');
+          counter.className = 'gi-image-counter';
+          counter.innerText = `1 / ${images.length}`;
+          imgWrap.appendChild(counter);
+
+          // Cria e injeta as setas
+          const prevBtn = document.createElement('button');
+          prevBtn.className = 'gi-nav-btn gi-nav-prev';
+          prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+          prevBtn.setAttribute('aria-label', 'Imagem anterior');
+          
+          const nextBtn = document.createElement('button');
+          nextBtn.className = 'gi-nav-btn gi-nav-next';
+          nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+          nextBtn.setAttribute('aria-label', 'Próxima imagem');
+
+          imgWrap.appendChild(prevBtn);
+          imgWrap.appendChild(nextBtn);
+
+          let currentIndex = 0;
+
+          // Função para atualizar imagem e contador
+          function updateCard(index) {
+            currentIndex = index;
+            if (mainImg) {
+              mainImg.src = images[currentIndex];
+            } else {
+              // Busca o placeholder atual
+              const placeholder = imgWrap.querySelector('.gi-img-placeholder');
+              if (placeholder) {
+                const newImg = document.createElement('img');
+                newImg.src = images[currentIndex];
+                placeholder.replaceWith(newImg);
+                // Atualiza a referência para futuros cliques
+                const mainImg = newImg;
+              }
+            }
+            counter.innerText = `${currentIndex + 1} / ${images.length}`;
+          }
+
+          // Eventos das Setas
+          [prevBtn, nextBtn].forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation(); // Impede abrir detalhe
+              
+              if (btn === prevBtn) {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+              } else {
+                currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+              }
+              updateCard(currentIndex);
+            });
+
+            // Gerenciamento de Prioridade de Hover (Esconde Overlay)
+            btn.addEventListener('mouseenter', () => item.classList.add('is-navigating'));
+            btn.addEventListener('mouseleave', () => item.classList.remove('is-navigating'));
+          });
+        });
+      }
+
+      // Executa inicialização
+      initHybridCards();
+
+      // Observador simples para o caso de troca de visualização (Grid/Lista)
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+            initHybridCards();
+          }
+        });
+      });
+
+      if (gridContainer) {
+        observer.observe(gridContainer, { attributes: true });
+      }
+    })();
+  </script>
+</body>
+</html>
