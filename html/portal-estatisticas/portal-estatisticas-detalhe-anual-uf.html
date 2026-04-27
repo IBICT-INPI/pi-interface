@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depósitos por UF — Portal de Estatísticas / INPI</title>
+  <meta name="description" content="Série histórica anual de depósitos de ativos de PI por Unidade da Federação. Mapa, ranking e comparativo histórico. INPI.">
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="app.css">
+
+  <!-- Vega -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* ============================================================
+       TELA DETALHADA — ANUAL (DEPÓSITOS POR UF)
+    ============================================================ */
+
+    .pe-back-link {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      font-size: 0.82rem; font-weight: 600; color: #0d6a52;
+      text-decoration: none; margin-bottom: 1rem;
+    }
+    .pe-back-link:hover { text-decoration: underline; }
+
+    /* --- Vega-Lite Tooltip --- */
+    #vg-tooltip-element {
+      font-family: 'Rawline', 'Raleway', sans-serif;
+      font-size: 0.78rem;
+      color: #333;
+      background-color: #fff;
+      border: 1px solid #d4d4d4;
+      border-radius: 4px;
+      padding: 0.5rem 0.65rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      max-width: 260px;
+      pointer-events: none;
+      z-index: 10000;
+    }
+    #vg-tooltip-element td.key {
+      font-weight: 700;
+      color: #555;
+      padding-right: 0.5rem;
+      white-space: nowrap;
+    }
+    #vg-tooltip-element td.value {
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+    #vg-tooltip-element table {
+      border-spacing: 0;
+    }
+    #vg-tooltip-element tr td {
+      padding: 2px 4px;
+    }
+    #vg-tooltip-element.hidden {
+      display: none;
+    }
+
+    .pe-badge-period {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 10px;
+      border-radius: 20px; background: rgba(13,106,82,0.1); color: #0d6a52; margin-bottom: 0.5rem;
+    }
+    .pe-detalhe-header { margin-bottom: 1.5rem; }
+    .pe-detalhe-header h1 {
+      font-size: 1.4rem; font-weight: 700; color: #0d6a52;
+      margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .pe-detalhe-header p {
+      font-size: 0.875rem; color: var(--color-secondary-07, #555); line-height: 1.6; margin: 0;
+    }
+
+    /* --- Filtros --- */
+    .pe-filters-bar {
+      background: var(--gray-2, #f8f9fa); border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem;
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+    }
+    .pe-filter-group { display: flex; flex-direction: column; gap: 0.25rem; min-width: 150px; }
+    .pe-filter-group label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #444;
+    }
+    .pe-filter-group select, .pe-filter-group input {
+      font-size: 0.875rem; border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 4px; padding: 0.4rem 0.625rem;
+      background: var(--background, #fff); color: var(--color-primary-pastel-01, #071d41);
+    }
+    .pe-filter-group select[multiple] { height: 80px; }
+    .pe-filter-group select:focus { outline: 3px solid var(--focus-color, #c49c00); outline-offset: 1px; }
+    .pe-filter-actions { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .pe-btn-apply {
+      padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 700;
+      background: #0d6a52; color: #fff; border: none; border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; gap: 0.375rem; transition: background 0.15s;
+    }
+    .pe-btn-apply:hover { background: #095741; }
+    .pe-btn-apply:focus-visible { outline: 3px solid var(--focus-color, #c49c00); outline-offset: 2px; }
+    .pe-btn-clear {
+      padding: 0.45rem 0.875rem; font-size: 0.875rem; font-weight: 600;
+      background: transparent; color: #0d6a52;
+      border: 1px solid #0d6a52; border-radius: 4px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .pe-btn-clear:hover { background: rgba(13,106,82,0.06); }
+
+    /* --- Exportação --- */
+    .pe-export-bar {
+      display: flex; align-items: center; gap: 0.75rem; padding: 1rem;
+      background: var(--gray-2, #f8f9fa); border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 6px; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .pe-export-bar__label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #444; flex-shrink: 0; }
+    .pe-btn-export {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      font-size: 0.82rem; font-weight: 700; padding: 0.4rem 1rem;
+      border-radius: 4px; cursor: pointer; transition: background 0.15s; text-decoration: none;
+    }
+    .pe-btn-export--csv { background: rgba(13,106,82,0.08); color: #0d6a52; border: 1px solid #0d6a52; }
+    .pe-btn-export--csv:hover { background: rgba(13,106,82,0.16); }
+    .pe-btn-export--json { background: rgba(19,81,180,0.08); color: var(--interactive,#1351b4); border: 1px solid var(--interactive,#1351b4); }
+    .pe-btn-export--json:hover { background: rgba(19,81,180,0.15); }
+    .pe-btn-export:focus-visible { outline: 3px solid var(--focus-color, #c49c00); outline-offset: 2px; }
+
+    /* --- Seção do mapa + ranking --- */
+    .pe-section-title {
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #0d6a52; margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color, #dee2e6);
+    }
+    .pe-mapa-ranking-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) { .pe-mapa-ranking-row { grid-template-columns: 1fr; } }
+
+    /* --- Mapa placeholder --- */
+    .pe-mapa-card {
+      background: var(--background, #fff); border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 6px; overflow: hidden;
+    }
+    .pe-mapa-card__header {
+      padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-color, #dee2e6);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pe-mapa-card__title { font-size: 0.875rem; font-weight: 700; color: #0c4a36; }
+    .pe-mapa-card__meta { font-size: 0.72rem; color: var(--color-secondary-06, #7a7a7a); }
+    .pe-mapa-card__body { padding: 1rem; }
+    .pe-mapa-placeholder {
+      width: 100%; min-height: 320px; background: linear-gradient(135deg, #eef2f9 0%, #e4ecf7 100%);
+      border-radius: 4px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; position: relative; overflow: hidden;
+      border: 1px solid rgba(19,81,180,0.1);
+    }
+    .pe-mapa-placeholder__label {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--interactive, #1351b4); margin-top: 0.75rem; opacity: 0.7;
+    }
+    /* Mapa SVG esquemático simplificado do Brasil */
+    .pe-mapa-br-svg {
+      width: 200px; opacity: 0.55; filter: drop-shadow(0 2px 4px rgba(19,81,180,0.15));
+    }
+
+    /* Estados destacados no mapa (legenda de cores) */
+    .pe-mapa-legenda {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+      margin-top: 0.75rem;
+    }
+    .pe-mapa-legenda__item {
+      display: flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--color-secondary-07, #555);
+    }
+    .pe-mapa-legenda__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* --- Ranking de UFs --- */
+    .pe-ranking-card {
+      background: var(--background, #fff); border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .pe-ranking-card__header { padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-color, #dee2e6); }
+    .pe-ranking-card__title { font-size: 0.875rem; font-weight: 700; color: #0c4a36; }
+    .pe-ranking-card__meta { font-size: 0.72rem; color: var(--color-secondary-06, #7a7a7a); margin-top: 2px; }
+    .pe-ranking-list { list-style: none; margin: 0; padding: 0; flex: 1; }
+    .pe-ranking-list li {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.625rem 1rem; border-bottom: 1px solid var(--border-color, #dee2e6);
+      font-size: 0.85rem;
+    }
+    .pe-ranking-list li:last-child { border-bottom: none; }
+    .pe-ranking-list li:hover { background: rgba(13,106,82,0.04); }
+    .pe-ranking-pos {
+      width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800; flex-shrink: 0;
+    }
+    .pe-ranking-pos--1 { background: #ffd700; color: #5a4000; }
+    .pe-ranking-pos--2 { background: #c0c0c0; color: #3a3a3a; }
+    .pe-ranking-pos--3 { background: #cd7f32; color: #fff; }
+    .pe-ranking-pos--n { background: var(--gray-10, #e0e0e0); color: var(--color-secondary-07, #555); }
+    .pe-ranking-uf { font-weight: 700; color: #0c4a36; min-width: 30px; }
+    .pe-ranking-nome { color: #444; font-size: 0.8rem; flex: 1; }
+    .pe-ranking-val { font-weight: 700; font-variant-numeric: tabular-nums; color: #0d6a52; white-space: nowrap; }
+    .pe-ranking-pct { font-size: 0.72rem; color: var(--color-secondary-06, #7a7a7a); white-space: nowrap; min-width: 40px; text-align: right; }
+
+    /* --- Bloco de comparação histórica --- */
+    .pe-historico-card {
+      background: var(--background, #fff); border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 6px; overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .pe-historico-card__header {
+      padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border-color, #dee2e6);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .pe-historico-card__title { font-size: 0.9rem; font-weight: 700; color: #0c4a36; }
+    .pe-historico-card__meta { font-size: 0.75rem; color: var(--color-secondary-06, #7a7a7a); }
+    .pe-historico-card__body { padding: 0.75rem 1rem; }
+    #chart-uf-historico { width: 100%; height: 280px; }
+    .pe-historico-hint {
+      font-size: 0.78rem; color: var(--color-secondary-06, #7a7a7a);
+      display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 1rem;
+      border-top: 1px solid var(--border-color, #dee2e6);
+      background: var(--gray-2, #f8f9fa);
+    }
+
+    /* --- Tabela UFs --- */
+    .pe-table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+    .pe-data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .pe-data-table th {
+      text-align: left; padding: 0.625rem 0.875rem; font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em; color: #333;
+      border-bottom: 2px solid var(--border-color, #dee2e6); background: var(--gray-2, #f8f9fa); white-space: nowrap;
+    }
+    .pe-data-table td {
+      padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--border-color, #dee2e6);
+      color: #1a1a2e;
+    }
+    .pe-data-table tr:last-child td { border-bottom: none; }
+    .pe-data-table tr:hover td { background: rgba(13,106,82,0.03); }
+    .pe-data-table .pe-num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .pe-pct-bar { display: flex; align-items: center; gap: 0.5rem; }
+    .pe-pct-bar__track { flex: 1; height: 6px; background: var(--gray-10, #e0e0e0); border-radius: 6px; }
+    .pe-pct-bar__fill { height: 100%; border-radius: 6px; background: #0d6a52; }
+    .pe-pct-bar__label { font-size: 0.72rem; white-space: nowrap; color: #333; font-weight: 600; }
+
+    .pe-footnote {
+      font-size: 0.78rem; color: #555;
+      border-top: 1px solid var(--border-color, #dee2e6); padding-top: 1rem; margin-top: 1rem;
+    }
+
+    /* --- Bloco de análises relacionadas (verde) --- */
+    .pe-related-section { margin-top: 2rem; margin-bottom: 1.5rem; }
+    .pe-related-title {
+      font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #0d6a52; margin-bottom: 0.75rem; padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border-color, #dee2e6);
+      display: flex; align-items: center; gap: 0.375rem;
+    }
+    .pe-related-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.875rem;
+    }
+    @media (max-width: 992px) { .pe-related-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .pe-related-grid { grid-template-columns: 1fr; } }
+    .pe-related-card {
+      display: flex; align-items: center; gap: 0.75rem;
+      border: 1px solid var(--border-color, #dee2e6); border-radius: 6px;
+      padding: 0.875rem 1rem; background: var(--background, #fff);
+      text-decoration: none; color: inherit;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .pe-related-card:hover {
+      box-shadow: 0 2px 10px rgba(13,106,82,0.1);
+      border-color: #0d6a52;
+      text-decoration: none; color: inherit;
+    }
+    .pe-related-card:focus-visible {
+      outline: 3px solid var(--focus-color, #c49c00); outline-offset: 2px;
+    }
+    .pe-related-card__icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(13,106,82,0.08); color: #0d6a52;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .pe-related-card__text { flex: 1; }
+    .pe-related-card__label {
+      font-size: 0.8rem; font-weight: 700; color: #0c4a36;
+      line-height: 1.3; margin-bottom: 2px;
+    }
+    .pe-related-card__hint {
+      font-size: 0.7rem; color: var(--color-secondary-06, #7a7a7a);
+    }
+    .pe-related-card__arrow {
+      font-size: 0.78rem; color: #0d6a52; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-home.html">Portal de Estatísticas</a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-panorama-anual.html">Dados Consolidados Anuais</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Depósitos por UF</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4">
+              <!-- =============================================
+                   MIOLO — Detalhe Anual: Depósitos por UF
+              ============================================= -->
+              <div class="search-page-theme search-page-theme--estatisticas">
+
+                <!-- VOLTAR -->
+                <a href="portal-estatisticas-panorama-anual.html" class="pe-back-link">
+                  <i class="fas fa-arrow-left" aria-hidden="true"></i> Dados Consolidados Anuais — Panorama
+                </a>
+
+                <!-- CABEÇALHO -->
+                <div class="pe-detalhe-header">
+                  <div class="pe-badge-period">Anual · Dados Consolidados</div>
+                  <h1>
+                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                    Depósitos de ativos de PI por UF
+                  </h1>
+                  <p>
+                    Visualize a série histórica anual dos depósitos de ativos de Propriedade Industrial realizados por residentes,
+                    segregados por Unidade da Federação. Direcione investimentos e ações de fomento regionalizadas.
+                    Compare estados, analise tendências regionais e acompanhe a participação percentual
+                    de cada UF no total nacional ao longo dos anos.
+                  </p>
+                </div>
+
+                <!-- FILTROS -->
+                <form class="pe-filters-bar" role="search" aria-label="Filtros da análise">
+                  <div class="pe-filter-group">
+                    <label for="filtro-ano-ini">Período — Início</label>
+                    <select id="filtro-ano-ini" name="ano-inicio">
+                      <option>2019</option><option>2020</option><option>2021</option>
+                      <option>2022</option><option selected>2023</option>
+                    </select>
+                  </div>
+                  <div class="pe-filter-group">
+                    <label for="filtro-ano-fim">Período — Fim</label>
+                    <select id="filtro-ano-fim" name="ano-fim">
+                      <option>2020</option><option>2021</option><option>2022</option>
+                      <option>2023</option><option selected>2024</option>
+                    </select>
+                  </div>
+                  <div class="pe-filter-group">
+                    <label for="filtro-ativo-uf">Tipo de ativo</label>
+                    <select id="filtro-ativo-uf" name="ativo">
+                      <option value="">Todos os ativos</option>
+                      <option>Patentes (PI + MU)</option>
+                      <option>Marcas</option>
+                      <option>Desenhos Industriais</option>
+                      <option>Programas de Computador</option>
+                    </select>
+                  </div>
+                  <div class="pe-filter-group">
+                    <label for="filtro-ufs">UFs (comparação histórica)</label>
+                    <select id="filtro-ufs" name="ufs" multiple aria-describedby="hint-uf-multi">
+                      <option selected>SP</option><option selected>RJ</option><option selected>MG</option>
+                      <option>RS</option><option>PR</option><option>SC</option>
+                      <option>BA</option><option>CE</option><option>PE</option>
+                      <option>GO</option><option>DF</option>
+                    </select>
+                    <span id="hint-uf-multi" style="font-size:0.68rem; color:var(--color-secondary-06,#7a7a7a);">Ctrl+clique para múltiplas</span>
+                  </div>
+                  <div class="pe-filter-actions">
+                    <button type="submit" class="pe-btn-apply" id="btn-aplicar-filtros-uf">
+                      <i class="fas fa-filter" aria-hidden="true"></i> Aplicar
+                    </button>
+                    <button type="reset" class="pe-btn-clear">Limpar</button>
+                  </div>
+                </form>
+
+                <!-- EXPORTAÇÃO -->
+                <div class="pe-export-bar" role="toolbar" aria-label="Exportar dados">
+                  <span class="pe-export-bar__label"><i class="fas fa-download" aria-hidden="true"></i> Exportar:</span>
+                  <a href="#" class="pe-btn-export pe-btn-export--csv" id="btn-export-csv-uf" download aria-label="Exportar dados em CSV">
+                    <i class="fas fa-file-csv" aria-hidden="true"></i> CSV
+                  </a>
+                  <a href="#" class="pe-btn-export pe-btn-export--json" id="btn-export-json-uf" download aria-label="Exportar dados em JSON">
+                    <i class="fas fa-code" aria-hidden="true"></i> JSON
+                  </a>
+                  <span style="font-size:0.75rem; color:var(--color-secondary-06,#7a7a7a); margin-left:0.5rem;">
+                    Período: 2023–2024 · Todos os ativos · Residentes
+                  </span>
+                </div>
+
+                <!-- BLOCO 1: MAPA + RANKING -->
+                <div class="pe-section-title"><i class="fas fa-map" aria-hidden="true"></i> Distribuição territorial — 2024</div>
+                <div class="pe-mapa-ranking-row">
+
+                  <!-- MAPA PLACEHOLDER -->
+                  <div class="pe-mapa-card">
+                    <div class="pe-mapa-card__header">
+                      <span class="pe-mapa-card__title">Mapa de calor — depósitos por UF</span>
+                      <span class="pe-mapa-card__meta">Ano: 2024 · Residentes</span>
+                    </div>
+                    <div class="pe-mapa-card__body">
+                      <div class="pe-mapa-placeholder" role="img" aria-label="Mapa coroplético do Brasil mostrando a distribuição de depósitos por Unidade da Federação em 2024. São Paulo lidera com 34,7% do total nacional.">
+                        <!-- SVG esquemático simplificado do Brasil -->
+                        <svg class="pe-mapa-br-svg" viewBox="0 0 340 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <!-- Silhueta simplificada do Brasil por macroregiões -->
+                          <!-- Norte -->
+                          <path d="M60 40 L180 20 L240 50 L260 100 L230 130 L180 120 L130 140 L80 130 L50 100 Z" fill="#b7d4c8" stroke="#fff" stroke-width="2"/>
+                          <!-- Nordeste -->
+                          <path d="M180 20 L280 30 L310 80 L300 130 L260 150 L230 130 L260 100 L240 50 Z" fill="#7fb8a4" stroke="#fff" stroke-width="2"/>
+                          <!-- Centro-Oeste -->
+                          <path d="M80 130 L130 140 L180 120 L230 130 L220 200 L180 220 L130 230 L90 210 L70 180 Z" fill="#4e9a82" stroke="#fff" stroke-width="2"/>
+                          <!-- Sudeste -->
+                          <path d="M180 220 L220 200 L260 150 L300 130 L310 190 L280 240 L240 260 L200 260 L180 240 Z" fill="#0d6a52" stroke="#fff" stroke-width="2"/>
+                          <!-- Sul -->
+                          <path d="M130 230 L180 240 L200 260 L180 310 L150 330 L110 310 L100 270 Z" fill="#3a8a6e" stroke="#fff" stroke-width="2"/>
+                          <!-- Labels macrorregionais -->
+                          <text x="140" y="82" font-size="10" fill="#0d6a52" font-weight="700" text-anchor="middle">Norte</text>
+                          <text x="258" y="90" font-size="9" fill="#0d6a52" font-weight="700" text-anchor="middle">NE</text>
+                          <text x="155" y="183" font-size="9" fill="#fff" font-weight="700" text-anchor="middle">C-Oeste</text>
+                          <text x="248" y="205" font-size="9" fill="#fff" font-weight="700" text-anchor="middle">Sudeste</text>
+                          <text x="150" y="283" font-size="9" fill="#fff" font-weight="700" text-anchor="middle">Sul</text>
+                        </svg>
+                        <div class="pe-mapa-placeholder__label">Mapa coroplético — placeholder de visualização</div>
+                        <div class="pe-mapa-legenda" role="list" aria-label="Legenda do mapa">
+                          <div class="pe-mapa-legenda__item" role="listitem"><div class="pe-mapa-legenda__dot" style="background:#0d6a52;"></div> &gt;30%</div>
+                          <div class="pe-mapa-legenda__item" role="listitem"><div class="pe-mapa-legenda__dot" style="background:#3a8a6e;"></div> 15–30%</div>
+                          <div class="pe-mapa-legenda__item" role="listitem"><div class="pe-mapa-legenda__dot" style="background:#4e9a82;"></div> 5–15%</div>
+                          <div class="pe-mapa-legenda__item" role="listitem"><div class="pe-mapa-legenda__dot" style="background:#b7d4c8;"></div> &lt;5%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RANKING DE UFs -->
+                  <div class="pe-ranking-card">
+                    <div class="pe-ranking-card__header">
+                      <div class="pe-ranking-card__title"><i class="fas fa-trophy" aria-hidden="true"></i> Ranking de UFs — depósitos em 2024</div>
+                      <div class="pe-ranking-card__meta">Participação percentual no total nacional · Residentes</div>
+                    </div>
+                    <ol class="pe-ranking-list" aria-label="Ranking dos estados por depósitos em 2024">
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--1" aria-label="1º lugar">1</span>
+                        <span class="pe-ranking-uf">SP</span>
+                        <span class="pe-ranking-nome">São Paulo</span>
+                        <span class="pe-ranking-val">74.100</span>
+                        <span class="pe-ranking-pct">34,7%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--2" aria-label="2º lugar">2</span>
+                        <span class="pe-ranking-uf">RJ</span>
+                        <span class="pe-ranking-nome">Rio de Janeiro</span>
+                        <span class="pe-ranking-val">24.840</span>
+                        <span class="pe-ranking-pct">11,6%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--3" aria-label="3º lugar">3</span>
+                        <span class="pe-ranking-uf">MG</span>
+                        <span class="pe-ranking-nome">Minas Gerais</span>
+                        <span class="pe-ranking-val">21.384</span>
+                        <span class="pe-ranking-pct">10,0%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--n" aria-label="4º lugar">4</span>
+                        <span class="pe-ranking-uf">RS</span>
+                        <span class="pe-ranking-nome">Rio Grande do Sul</span>
+                        <span class="pe-ranking-val">17.107</span>
+                        <span class="pe-ranking-pct">8,0%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--n" aria-label="5º lugar">5</span>
+                        <span class="pe-ranking-uf">PR</span>
+                        <span class="pe-ranking-nome">Paraná</span>
+                        <span class="pe-ranking-val">15.969</span>
+                        <span class="pe-ranking-pct">7,5%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--n" aria-label="6º lugar">6</span>
+                        <span class="pe-ranking-uf">SC</span>
+                        <span class="pe-ranking-nome">Santa Catarina</span>
+                        <span class="pe-ranking-val">11.618</span>
+                        <span class="pe-ranking-pct">5,4%</span>
+                      </li>
+                      <li>
+                        <span class="pe-ranking-pos pe-ranking-pos--n" aria-label="7º lugar">7</span>
+                        <span class="pe-ranking-uf">BA</span>
+                        <span class="pe-ranking-nome">Bahia</span>
+                        <span class="pe-ranking-val">6.415</span>
+                        <span class="pe-ranking-pct">3,0%</span>
+                      </li>
+                      <li style="background:var(--gray-2,#f8f9fa); font-size:0.78rem; color:var(--color-secondary-06,#7a7a7a); justify-content:center; padding:0.5rem;">
+                        + demais UFs (20 estados) — 19,8% restantes
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+
+                <!-- BLOCO 2: COMPARAÇÃO HISTÓRICA -->
+                <div class="pe-section-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Comparação histórica por UF — 2020 a 2024</div>
+                <div class="pe-historico-card">
+                  <div class="pe-historico-card__header">
+                    <span class="pe-historico-card__title">Série histórica anual de depósitos — UFs selecionadas</span>
+                    <span class="pe-historico-card__meta">SP · RJ · MG · período: 2020–2024 · Todos os ativos</span>
+                  </div>
+                  <div class="pe-historico-card__body">
+                    <div id="chart-uf-historico" role="img" aria-label="Gráfico de linhas comparando a evolução anual de depósitos de PI nas UFs SP, RJ e MG de 2020 a 2024"></div>
+                  </div>
+                  <div class="pe-historico-hint" role="note">
+                    <i class="fas fa-mouse-pointer" aria-hidden="true"></i>
+                    Para alterar as UFs comparadas, selecione os estados no filtro acima e clique em <strong>Aplicar</strong>.
+                  </div>
+                </div>
+
+                <!-- BLOCO 3: TABELA COMPLETA -->
+                <div class="pe-section-title"><i class="fas fa-table" aria-hidden="true"></i> Tabela consolidada — depósitos por UF (2023 e 2024)</div>
+                <div class="pe-table-wrap">
+                  <table class="pe-data-table" aria-label="Tabela de depósitos por UF nos anos 2023 e 2024">
+                    <thead>
+                      <tr>
+                        <th scope="col">UF</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col" class="pe-num">2023</th>
+                        <th scope="col" class="pe-num">2024</th>
+                        <th scope="col" class="pe-num">Var. %</th>
+                        <th scope="col">Part. 2024</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>SP</strong></td><td>São Paulo</td><td class="pe-num">69.820</td><td class="pe-num">74.100</td>
+                        <td class="pe-num" style="color:#0d6a52;">+6,1%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:100%"></div></div><span class="pe-pct-bar__label">34,7%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>RJ</strong></td><td>Rio de Janeiro</td><td class="pe-num">23.400</td><td class="pe-num">24.840</td>
+                        <td class="pe-num" style="color:#0d6a52;">+6,2%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:34%"></div></div><span class="pe-pct-bar__label">11,6%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>MG</strong></td><td>Minas Gerais</td><td class="pe-num">20.100</td><td class="pe-num">21.384</td>
+                        <td class="pe-num" style="color:#0d6a52;">+6,4%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:29%"></div></div><span class="pe-pct-bar__label">10,0%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>RS</strong></td><td>Rio Grande do Sul</td><td class="pe-num">16.200</td><td class="pe-num">17.107</td>
+                        <td class="pe-num" style="color:#0d6a52;">+5,6%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:23%"></div></div><span class="pe-pct-bar__label">8,0%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>PR</strong></td><td>Paraná</td><td class="pe-num">14.920</td><td class="pe-num">15.969</td>
+                        <td class="pe-num" style="color:#0d6a52;">+7,0%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:22%"></div></div><span class="pe-pct-bar__label">7,5%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>SC</strong></td><td>Santa Catarina</td><td class="pe-num">10.800</td><td class="pe-num">11.618</td>
+                        <td class="pe-num" style="color:#0d6a52;">+7,6%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:16%"></div></div><span class="pe-pct-bar__label">5,4%</span></div></td>
+                      </tr>
+                      <tr>
+                        <td><strong>BA</strong></td><td>Bahia</td><td class="pe-num">5.980</td><td class="pe-num">6.415</td>
+                        <td class="pe-num" style="color:#0d6a52;">+7,3%</td>
+                        <td><div class="pe-pct-bar"><div class="pe-pct-bar__track"><div class="pe-pct-bar__fill" style="width:9%"></div></div><span class="pe-pct-bar__label">3,0%</span></div></td>
+                      </tr>
+                      <tr style="font-size:0.78rem; color:var(--color-secondary-06,#7a7a7a);">
+                        <td colspan="6" style="padding: 0.5rem 0.875rem;">... demais 20 UFs ...</td>
+                      </tr>
+                      <tr style="background:var(--gray-2,#f8f9fa);">
+                        <td colspan="2"><strong>Total nacional</strong></td>
+                        <td class="pe-num"><strong>200.200</strong></td>
+                        <td class="pe-num"><strong>213.840</strong></td>
+                        <td class="pe-num" style="color:#0d6a52;"><strong>+6,8%</strong></td>
+                        <td><strong>100%</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- ANÁLISES ANUAIS RELACIONADAS -->
+                <div class="pe-related-section">
+                  <div class="pe-related-title">
+                    <i class="fas fa-link" aria-hidden="true"></i> Análises anuais relacionadas
+                  </div>
+                  <div class="pe-related-grid">
+
+                    <!-- Depósitos -->
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Depósitos por país">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-globe"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Depósitos por país</div>
+                        <div class="pe-related-card__hint">Ranking histórico dos principais países</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Depósitos por município">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-city"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Depósitos por município</div>
+                        <div class="pe-related-card__hint">Polos de inovação em nível municipal</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Depósitos por natureza jurídica">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-users"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Depósitos por natureza jurídica</div>
+                        <div class="pe-related-card__hint">PF, Empresa, Universidade/ICT</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+
+                    <!-- Concessões -->
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Concessões por país">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-globe"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Concessões por país</div>
+                        <div class="pe-related-card__hint">Taxa de concessão e ranking por país</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Concessões por UF">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-map-marked-alt"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Concessões por UF</div>
+                        <div class="pe-related-card__hint">Ranking e taxa de concessão por estado</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Concessões por município">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-city"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Concessões por município</div>
+                        <div class="pe-related-card__hint">Municípios com maior volume de concessão</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+                    <a href="#" class="pe-related-card" aria-label="Ver análise: Concessões por natureza jurídica">
+                      <div class="pe-related-card__icon" aria-hidden="true"><i class="fas fa-users"></i></div>
+                      <div class="pe-related-card__text">
+                        <div class="pe-related-card__label">Concessões por natureza jurídica</div>
+                        <div class="pe-related-card__hint">Segmentos com maior sucesso na PI</div>
+                      </div>
+                      <div class="pe-related-card__arrow" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                    </a>
+
+                  </div>
+                </div>
+
+                <!-- NOTA -->
+                <p class="pe-footnote">
+                  <i class="fas fa-info-circle" aria-hidden="true"></i>
+                  <strong>Fonte:</strong> INPI — Anuário Estatístico de Propriedade Industrial 2024.
+                  Considera apenas depositantes residentes. UF do titular conforme endereço cadastrado no INPI.
+                  Dados consolidados referentes ao ano-calendário 2024. CGEI/INPI.
+                </p>
+
+              </div><!-- /search-page-theme -->
+            </div>
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="/patentes"><div class="content">Patentes</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+  </div><!-- /root -->
+
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <script>
+  // Gráfico de comparação histórica por UF
+  const specUfHistorico = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": "container", "height": 260,
+    "data": { "values": [
+      {"ano": "2020", "uf": "SP", "depositos": 62000},
+      {"ano": "2021", "uf": "SP", "depositos": 64800},
+      {"ano": "2022", "uf": "SP", "depositos": 67100},
+      {"ano": "2023", "uf": "SP", "depositos": 69820},
+      {"ano": "2024", "uf": "SP", "depositos": 74100},
+      {"ano": "2020", "uf": "RJ", "depositos": 20100},
+      {"ano": "2021", "uf": "RJ", "depositos": 21200},
+      {"ano": "2022", "uf": "RJ", "depositos": 22400},
+      {"ano": "2023", "uf": "RJ", "depositos": 23400},
+      {"ano": "2024", "uf": "RJ", "depositos": 24840},
+      {"ano": "2020", "uf": "MG", "depositos": 17400},
+      {"ano": "2021", "uf": "MG", "depositos": 18200},
+      {"ano": "2022", "uf": "MG", "depositos": 19100},
+      {"ano": "2023", "uf": "MG", "depositos": 20100},
+      {"ano": "2024", "uf": "MG", "depositos": 21384}
+    ]},
+    "mark": { "type": "line", "point": { "filled": true, "size": 60 }, "strokeWidth": 2.5 },
+    "encoding": {
+      "x": { "field": "ano", "type": "ordinal", "axis": { "title": "Ano", "labelFontSize": 12 } },
+      "y": { "field": "depositos", "type": "quantitative", "axis": { "title": "Depósitos", "labelFontSize": 11 }, "scale": { "zero": false } },
+      "color": {
+        "field": "uf", "type": "nominal",
+        "scale": { "domain": ["SP", "RJ", "MG"], "range": ["#0d6a52", "#1351b4", "#c45a12"] },
+        "legend": { "title": "UF", "orient": "top-right" }
+      },
+      "tooltip": [
+        { "field": "ano", "title": "Ano" },
+        { "field": "uf", "title": "UF" },
+        { "field": "depositos", "title": "Depósitos", "format": "," }
+      ]
+    },
+    "config": { "view": { "stroke": null }, "background": "transparent" }
+  };
+  vegaEmbed('#chart-uf-historico', specUfHistorico, { actions: false, renderer: 'svg' });
+  </script>
+</body>
+</html>
