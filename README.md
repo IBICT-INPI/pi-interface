@@ -2,11 +2,11 @@
 
 ## Portal de Estatísticas
 
-- Home: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home.html)
-- Panorama Mensal: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-mensal.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-mensal.html)
-- Panorama Anual: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-anual.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-anual.html)
-- Detalhe Mensal (Decisões): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-mensal-decisoes.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-mensal-decisoes.html)
-- Detalhe Anual (UF): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-anual-uf.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-anual-uf.html)
+- Home: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-home.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-home.html)
+- Panorama Mensal: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-panorama-mensal.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-panorama-mensal.html)
+- Panorama Anual: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-panorama-anual.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-panorama-anual.html)
+- Detalhe Mensal (Decisões): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-detalhe-mensal-decisoes.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-detalhe-mensal-decisoes.html)
+- Detalhe Anual (UF): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-detalhe-anual-uf.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas-v2/portal-estatisticas-detalhe-anual-uf.html)
 
 ## Busca e Detalhes de Ativos
 

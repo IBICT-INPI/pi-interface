@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Estatísticas — ServiçosPI / INPI</title>
+  <meta name="description" content="Acesse dados e indicadores sobre propriedade industrial no Brasil. Estatísticas mensais e anuais consolidadas do INPI. Explorador de indicadores interativo.">
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- App CSS (cópia local da homologação) -->
+  <link rel="stylesheet" href="app.css">
+
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* ============================================================
+       PORTAL DE ESTATÍSTICAS — HOME — Navegação analítica
+    ============================================================ */
+
+    .pe-intro {
+      margin-bottom: 2rem;
+    }
+    .pe-intro h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #071d41;
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pe-intro h1 i { color: #1351b4; font-size: 1.3rem; }
+    .pe-intro p {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.65;
+      margin: 0;
+      max-width: 720px;
+    }
+
+    /* Seção de grupo */
+    .pe-group {
+      margin-bottom: 2rem;
+    }
+    .pe-group-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #7a7a7a;
+      margin: 0 0 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pe-group-title span.pe-tag {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1px 7px;
+      border-radius: 20px;
+      background: #dbe8fb;
+      color: #1351b4;
+    }
+    .pe-group-title span.pe-tag--green {
+      background: rgba(13,106,82,0.12);
+      color: #0d6a52;
+    }
+
+    /* Lista de itens navegáveis */
+    .pe-nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .pe-nav-list li {
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .pe-nav-list li:last-child { border-bottom: none; }
+
+    .pe-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 0.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.12s;
+      border-radius: 4px;
+    }
+    .pe-nav-item:hover {
+      background: #f5f8ff;
+      text-decoration: none;
+      color: inherit;
+    }
+    .pe-nav-item:focus-visible {
+      outline: 3px solid #c49c00;
+      outline-offset: 2px;
+    }
+
+    .pe-nav-item__icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      background: #eef2fb;
+      color: #1351b4;
+    }
+    .pe-nav-item__icon--green {
+      background: rgba(13,106,82,0.1);
+      color: #0d6a52;
+    }
+    .pe-nav-item__icon--purple {
+      background: rgba(80,40,160,0.09);
+      color: #5028a0;
+    }
+
+    .pe-nav-item__text {
+      flex: 1;
+      min-width: 0;
+    }
+    .pe-nav-item__label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #071d41;
+      display: block;
+      line-height: 1.3;
+    }
+    .pe-nav-item:hover .pe-nav-item__label {
+      color: #1351b4;
+    }
+    .pe-nav-item__desc {
+      font-size: 0.78rem;
+      color: #7a7a7a;
+      display: block;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .pe-nav-item__arrow {
+      color: #adb5bd;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      transition: color 0.12s, transform 0.12s;
+    }
+    .pe-nav-item:hover .pe-nav-item__arrow {
+      color: #1351b4;
+      transform: translateX(3px);
+    }
+    /* Item DESABILITADO — mesmo layout do habilitado, mas opaco */
+    .pe-nav-item--disabled {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 0.5rem;
+      border-radius: 4px;
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Ícone cinza para itens desabilitados */
+    .pe-nav-item__icon--gray {
+      background: #f0f0f0;
+      color: #aaa;
+    }
+
+    /* Badge de status */
+    .pe-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pe-status-badge--available {
+      background: #d4edda;
+      color: #155724;
+    }
+    .pe-status-badge--soon {
+      background: #f0f0f0;
+      color: #888;
+    }
+
+    /* Legenda */
+    .pe-legend {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0.65rem 1rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+      font-size: 0.8rem;
+      color: #555;
+      flex-wrap: wrap;
+    }
+    .pe-legend__item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Nota de rodapé */
+    .pe-footnote {
+      font-size: 0.78rem;
+      color: #888;
+      line-height: 1.55;
+      border-top: 1px solid #dee2e6;
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ============================================================
+       PORTAL DE ESTATÍSTICAS — HOME
+       Estilos escopados ao miolo, sem sobrescrever globais
+    ============================================================ */
+
+    .pe-home-intro {
+      margin-bottom: 2rem;
+    }
+
+    .pe-home-intro h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-primary-default, #1351b4);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+
+    .pe-home-intro h1 i {
+      font-size: 1.5rem;
+      opacity: 0.85;
+    }
+
+    .pe-home-intro p {
+      font-size: 1rem;
+      color: var(--color-secondary-07, #555);
+      line-height: 1.65;
+      margin-bottom: 0;
+    }
+
+    .pe-badge-period {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: var(--color-primary-lighten-05, #dbe8fb);
+      color: var(--color-primary-default, #1351b4);
+      margin-bottom: 0.75rem;
+    }
+
+    /* --- Tiles principais --- */
+    .pe-tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .pe-tiles-grid { grid-template-columns: 1fr; }
+    }
+
+    .pe-tile {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-color, #dee2e6);
+      border-radius: 8px;
+      background: var(--background, #fff);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.15s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .pe-tile:hover,
+    .pe-tile:focus-visible {
+      box-shadow: 0 6px 24px rgba(19, 81, 180, 0.14);
+      transform: translateY(-3px);
+      border-color: var(--interactive, #1351b4);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .pe-tile:focus-visible {
+      outline: 3px solid var(--focus-color, #c49c00);
+      outline-offset: 2px;
+    }
+
+    .pe-tile__header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border-color, #dee2e6);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .pe-tile__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .pe-tile--mensal .pe-tile__icon {
+      background: rgba(19, 81, 180, 0.1);
+      color: var(--interactive, #1351b4);
+    }
+
+    .pe-tile--anual .pe-tile__icon {
+      background: rgba(13, 106, 82, 0.1);
+      color: #0d6a52;
+    }
+
+    .pe-tile--mensal .pe-tile__header-text h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0c44ac;
+      margin: 0 0 0.25rem;
+      line-height: 1.3;
+    }
+
+    .pe-tile--anual .pe-tile__header-text h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0a7b5a;
+      margin: 0 0 0.25rem;
+      line-height: 1.3;
+    }
+
+    .pe-tile__header-text .pe-subtitle {
+      font-size: 0.82rem;
+      color: var(--color-secondary-06, #7a7a7a);
+      font-weight: 500;
+    }
+
+    .pe-tile__body {
+      padding: 1rem 1.5rem;
+      flex: 1;
+    }
+
+    .pe-tile__body p {
+      font-size: 0.9rem;
+      color: var(--color-secondary-07, #555);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .pe-tile__footer {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gray-2, #f8f9fa);
+      border-top: 1px solid var(--border-color, #dee2e6);
+    }
+
+    .pe-tile__footer .pe-periodicidade {
+      font-size: 0.78rem;
+      color: var(--color-secondary-06, #7a7a7a);
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .pe-tile__footer .pe-cta {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--interactive, #1351b4);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .pe-tile--anual .pe-tile__footer .pe-cta {
+      color: #0d6a52;
+    }
+
+    /* --- Explorador de Indicadores card --- */
+    .pe-explorador-section {
+      margin-top: 2rem;
+    }
+
+    .pe-explorador-card {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+
+    .pe-explorador-card:hover {
+      box-shadow: 0 6px 24px rgba(19, 81, 180, 0.12);
+    }
+
+    .pe-explorador-card__inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem 1.75rem;
+    }
+
+    @media (max-width: 640px) {
+      .pe-explorador-card__inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+
+    .pe-explorador-card__icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(19, 81, 180, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: #1351b4;
+      flex-shrink: 0;
+    }
+
+    .pe-explorador-card__body {
+      flex: 1;
+    }
+
+    .pe-explorador-card__body h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #071d41;
+      margin: 0 0 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pe-explorador-card__body h2 .pe-badge-new {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 1px 7px;
+      border-radius: 20px;
+      background: #1351b4;
+      color: #fff;
+      vertical-align: middle;
+    }
+
+    .pe-explorador-card__body p {
+      font-size: 0.88rem;
+      color: #555;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .pe-explorador-card__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #1351b4;
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 0.55rem 1.25rem;
+      border-radius: 4px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .pe-explorador-card__cta:hover,
+    .pe-explorador-card__cta:focus-visible {
+      background: #0c3a8f;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .pe-explorador-card__cta:focus-visible {
+      outline: 3px solid #c49c00;
+      outline-offset: 2px;
+    }
+
+    /* --- Aviso informativo --- */
+    .pe-info-box {
+      margin-top: 2.5rem;
+      background: var(--gray-2, #f8f9fa);
+      border-left: 4px solid var(--interactive, #1351b4);
+      border-radius: 0 4px 4px 0;
+      padding: 1rem 1.25rem;
+      font-size: 0.875rem;
+      color: var(--color-secondary-07, #555);
+      line-height: 1.6;
+    }
+
+    .pe-info-box strong {
+      color: var(--color-primary-default, #1351b4);
+    }
+
+    /* --- Seção "Como navegar" --- */
+    .pe-about {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color, #dee2e6);
+    }
+
+    .pe-about h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-primary-default, #1351b4);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pe-about-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .pe-about-grid { grid-template-columns: 1fr; }
+    }
+
+    .pe-about-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .pe-about-item i {
+      color: var(--interactive, #1351b4);
+      font-size: 1.1rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .pe-about-item p {
+      font-size: 0.85rem;
+      color: var(--color-secondary-07, #555);
+      line-height: 1.55;
+      margin: 0;
+      border-top: 1px solid #dee2e6;
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* --- Cards de Categoria (Mensal / Anual) --- */
+    .pe-category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 640px) { .pe-category-grid { grid-template-columns: 1fr; } }
+
+    .pe-category-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background: #fff;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.15s, border-color 0.15s, transform 0.12s;
+    }
+    .pe-category-card:hover {
+      box-shadow: 0 4px 16px rgba(19,81,180,0.1);
+      border-color: #1351b4;
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: inherit;
+    }
+    .pe-category-card:focus-visible {
+      outline: 3px solid #c49c00;
+      outline-offset: 2px;
+    }
+
+    .pe-category-card__icon {
+      width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .pe-category-card__icon--blue { background: rgba(19,81,180,0.1); color: #1351b4; }
+    .pe-category-card__icon--green { background: rgba(13,106,82,0.1); color: #0d6a52; }
+
+    .pe-category-card__body { flex: 1; min-width: 0; }
+    .pe-category-card__tag {
+      display: inline-block; font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 1px 7px; border-radius: 20px; margin-bottom: 0.3rem;
+      background: #dbe8fb; color: #1351b4;
+    }
+    .pe-category-card__tag--green { background: rgba(13,106,82,0.12); color: #0d6a52; }
+    .pe-category-card__title {
+      font-size: 0.95rem; font-weight: 700; color: #071d41; margin-bottom: 0.35rem; line-height: 1.2;
+    }
+    .pe-category-card:hover .pe-category-card__title { color: #1351b4; }
+    .pe-category-card__desc {
+      font-size: 0.78rem; color: #666; line-height: 1.45; margin-bottom: 0.5rem;
+    }
+    .pe-category-card__meta {
+      display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+      font-size: 0.75rem;
+    }
+    .pe-category-card__meta-sep { color: #ccc; }
+    .pe-category-card__count-soon { color: #888; font-size: 0.75rem; }
+
+    .pe-category-card__arrow {
+      font-size: 0.8rem; color: #adb5bd; flex-shrink: 0; transition: color 0.12s, transform 0.12s;
+    }
+    .pe-category-card:hover .pe-category-card__arrow { color: #1351b4; transform: translateX(3px); }
+
+  </style>
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER (idêntico à base) -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies" title="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste" title="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL (idêntico à base) -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-registered" aria-hidden="true"></i></span><span class="content">Marcas</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span class="content">Programa de computador</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-pencil-ruler" aria-hidden="true"></i></span><span class="content">Desenhos Industriais</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-file-contract" aria-hidden="true"></i></span><span class="content">Contratos</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Portal de Estatísticas</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4">
+
+              <!-- CABEÇALHO: título + fonte, igual ao WIPO -->
+              <h1 style="font-size:1.5rem;font-weight:700;color:#071d41;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.5rem;">
+                <i class="fas fa-chart-bar" style="color:#1351b4;font-size:1.25rem;" aria-hidden="true"></i>
+                Portal de Estatísticas — INPI
+              </h1>
+              <div style="background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:0.5rem 0.875rem;font-size:0.8rem;color:#555;margin-bottom:1.5rem;">
+                Fonte: INPI/CGEI — BADEPI v11.0 · Estatísticas Mensais Jan/2026. Última atualização: 03/02/2026.
+              </div>
+
+              <!-- LEGENDA -->
+              <div class="pe-legend" role="note" aria-label="Legenda dos indicadores">
+                <strong style="font-size:0.8rem;color:#444;">Legenda:</strong>
+                <span class="pe-legend__item">
+                  <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> Disponível</span>
+                  <span>Tela construída — clique para acessar</span>
+                </span>
+                <span class="pe-legend__item">
+                  <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                  <span>Indicador previsto — em desenvolvimento</span>
+                </span>
+              </div>
+
+              <!-- ===================================================
+                   GRUPO 1 — EXPLORADOR DE DADOS (Self-Service BI)
+              ==================================================== -->
+              <div class="pe-group">
+                <div class="pe-group-title">
+                  <i class="fas fa-sliders-h" aria-hidden="true"></i>
+                  Explorador de Dados
+                  <span class="pe-tag" style="background:#e8e0f8;color:#5028a0;">Self-Service BI</span>
+                </div>
+                <ul class="pe-nav-list" role="list">
+
+                  <!-- ✅ HABILITADO -->
+                  <li>
+                    <a href="portal-estatisticas-explorador.html" class="pe-nav-item" id="nav-explorador">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--purple" aria-hidden="true"><i class="fas fa-sliders-h"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Explorador de Indicadores</span>
+                        <span class="pe-nav-item__desc">Monte sua consulta: selecione ativo, indicador, período e filtros — visualize em tabela ou gráfico e exporte em CSV</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> Disponível</span>
+                      <i class="fas fa-chevron-right pe-nav-item__arrow" aria-hidden="true"></i>
+                    </a>
+                  </li>
+
+                  <!-- 🔜 EM BREVE -->
+                  <li>
+                    <div class="pe-nav-item--disabled" aria-disabled="true">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--gray" aria-hidden="true"><i class="fas fa-bookmark"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Consultas Salvas</span>
+                        <span class="pe-nav-item__desc">Salve e recupere pesquisas personalizadas para reutilização — equivalente ao "Save search to file" do WIPO</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                    </div>
+                  </li>
+
+                </ul>
+              </div>
+
+              <!-- ===================================================
+                   CARDS DE CATEGORIA
+              ==================================================== -->
+              <div class="pe-category-grid">
+
+                <!-- CARD: Dados Preliminares Mensais -->
+                <a href="portal-estatisticas-dados-mensais.html" class="pe-category-card" id="card-dados-mensais">
+                  <div class="pe-category-card__icon pe-category-card__icon--blue">
+                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                  </div>
+                  <div class="pe-category-card__body">
+                    <div class="pe-category-card__tag">Mensal · Janeiro/2026</div>
+                    <div class="pe-category-card__title">Dados Preliminares Mensais</div>
+                    <div class="pe-category-card__desc">
+                      Total de Depósitos, Decisões de Patentes, Contratos de Tecnologia, Marcas, Desenhos Industriais, IG e TCI — dados mensais sujeitos a revisão
+                    </div>
+                    <div class="pe-category-card__meta">
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> 3 indicadores disponíveis</span>
+                      <span class="pe-category-card__meta-sep">·</span>
+                      <span class="pe-category-card__count-soon">4 em breve</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right pe-category-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <!-- CARD: Dados Consolidados Anuais -->
+                <a href="portal-estatisticas-dados-anuais.html" class="pe-category-card" id="card-dados-anuais">
+                  <div class="pe-category-card__icon pe-category-card__icon--green">
+                    <i class="fas fa-calendar-check" aria-hidden="true"></i>
+                  </div>
+                  <div class="pe-category-card__body">
+                    <div class="pe-category-card__tag pe-category-card__tag--green">Anual · 2000–2024 · BADEPI v11.0</div>
+                    <div class="pe-category-card__title">Dados Consolidados Anuais</div>
+                    <div class="pe-category-card__desc">
+                      Patentes (PI, MU, CA) por tipo, origem, UF, município, natureza jurídica, IPC e via de entrada — série histórica completa. Inclui Marcas, DI, Programas de Computador e IG
+                    </div>
+                    <div class="pe-category-card__meta">
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> 4 indicadores disponíveis</span>
+                      <span class="pe-category-card__meta-sep">·</span>
+                      <span class="pe-category-card__count-soon">14 em breve</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right pe-category-card__arrow" aria-hidden="true"></i>
+                </a>
+
+              </div>
+
+
+
+              <!-- NOTA DE RODAPÉ -->
+              <div class="pe-footnote" role="note">
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                <strong>Fonte dos dados:</strong> INPI/CGEI — BADEPI v11.0 (dados anuais 2000–2024) e Estatísticas Mensais (extração 03/02/2026, sujeitos a revisão).
+                Os indicadores marcados como <em>Disponível</em> correspondem às telas construídas nesta versão de protótipo.
+              </div>
+
+            </div>
+
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER (idêntico à base) -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="/patentes"><div class="content">Patentes</div></a>
+              <a class="br-item" href="/desenhos-industriais"><div class="content">Desenhos Industriais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/indicacoes-geograficas"><div class="content">Indicações Geográficas</div></a>
+              <a class="br-item" href="/programas-de-computador"><div class="content">Programas de Computador</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/acoes-e-programas"><div class="content">Ações e Programas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/planejamento-estrategico"><div class="content">Planejamento Estratégico</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="d-none d-sm-block">
+          <div class="row align-items-end justify-content-between py-5">
+            <div class="col">
+              <div class="social-network">
+                <div class="social-network-title">Redes Sociais</div>
+                <div class="d-flex">
+                  <a class="br-button circle" target="_blank" href="https://www.facebook.com/inpibrasil" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.instagram.com/inpibrasil" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.linkedin.com/company/inpibrasil" rel="noopener"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.youtube.com/@institutonacionaldaproprie2128" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /root -->
+
+  <!-- App JS from homologação -->
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+</body>
+</html>

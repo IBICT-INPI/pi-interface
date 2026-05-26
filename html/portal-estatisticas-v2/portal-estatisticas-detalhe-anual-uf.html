@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depósitos de PI por Estado (UF) — Portal de Estatísticas / INPI</title>
+  <meta name="description" content="Série histórica anual de depósitos de Patentes por Unidade da Federação. Visualize em tabela, gráfico de barras ou linhas. INPI / CGEI.">
+
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="app.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* ===========================================
+       WIPO-STYLE — Depósitos de PI por UF
+    =========================================== */
+    .wdc-page { font-family: 'Rawline', 'Raleway', sans-serif; }
+
+    /* Cabeçalho do indicador */
+    .wdc-header { margin-bottom: 1rem; }
+    .wdc-header h1 {
+      font-size: 1.6rem; font-weight: 700; color: #071d41;
+      margin: 0 0 0.75rem; line-height: 1.2;
+    }
+    .wdc-source-bar {
+      background: #f5f5f5; border: 1px solid #ddd;
+      padding: 0.5rem 0.875rem; font-size: 0.82rem; color: #444;
+      margin-bottom: 0.5rem; border-radius: 3px;
+    }
+    .wdc-indicator-bar {
+      border: 1px solid #ddd; padding: 0.5rem 0.875rem;
+      font-size: 0.85rem; color: #333; border-radius: 3px; margin-bottom: 1.25rem;
+    }
+    .wdc-indicator-bar strong { color: #1351b4; }
+
+    /* Barra de alternância de visualização */
+    .wdc-view-bar {
+      display: flex; align-items: center; gap: 0;
+      border-bottom: 1px solid #dee2e6; margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .wdc-view-btn {
+      background: none; border: none; padding: 0.625rem 1rem;
+      font-size: 0.875rem; color: #555; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color 0.12s, border-color 0.12s;
+      font-family: inherit; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.375rem;
+    }
+    .wdc-view-btn:hover { color: #1351b4; }
+    .wdc-view-btn.active { color: #1351b4; border-bottom-color: #1351b4; font-weight: 700; }
+    .wdc-view-sep { color: #ccc; font-size: 0.85rem; padding: 0 0.1rem; align-self: center; line-height: 1; user-select: none; }
+    .wdc-view-btn--download {
+      margin-left: auto; color: #1351b4; border: 1px solid #1351b4; border-radius: 3px;
+      margin-bottom: 4px; padding: 0.375rem 0.875rem; font-size: 0.82rem;
+    }
+    .wdc-view-btn--download:hover { background: #eef2fb; }
+
+    /* Layout: filtros + resultados */
+    .wdc-results-layout {
+      display: grid; grid-template-columns: 240px 1fr; gap: 1.25rem; align-items: start;
+    }
+    @media (max-width: 768px) { .wdc-results-layout { grid-template-columns: 1fr; } }
+
+    /* Painel de filtros */
+    .wdc-filters { background: #f5f5f5; border: 1px solid #ddd; border-radius: 3px; font-size: 0.85rem; }
+    .wdc-filters__header {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.875rem;
+      font-size: 0.85rem; font-weight: 600; color: #444;
+      border-bottom: 1px solid #ddd; background: #e8e8e8; border-radius: 3px 3px 0 0;
+    }
+    .wdc-filter-group { border-bottom: 1px solid #ddd; }
+    .wdc-filter-group:last-child { border-bottom: none; }
+    .wdc-filter-group__toggle {
+      display: flex; align-items: center; gap: 0.375rem; width: 100%;
+      background: none; border: none; padding: 0.625rem 0.875rem;
+      font-size: 0.82rem; font-weight: 700; color: #333;
+      cursor: pointer; text-align: left; font-family: inherit;
+    }
+    .wdc-filter-group__toggle i.fa-chevron-down { font-size: 0.65rem; color: #888; margin-left: auto; transition: transform 0.15s; }
+    .wdc-filter-group__toggle.closed i.fa-chevron-down { transform: rotate(-90deg); }
+    .wdc-filter-group__body { padding: 0.375rem 0.875rem 0.75rem; }
+    .wdc-check { display: flex; align-items: center; gap: 0.375rem; font-size: 0.82rem; color: #333; padding: 2px 0; cursor: pointer; }
+    .wdc-check input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: #1351b4; }
+    .wdc-check--indented { padding-left: 1.25rem; }
+    .wdc-show-all { background: none; border: none; color: #1351b4; font-size: 0.78rem; cursor: pointer; padding: 0.25rem 0; display: flex; align-items: center; gap: 0.25rem; font-family: inherit; }
+    .wdc-show-all:hover { text-decoration: underline; }
+
+    /* Área de resultados */
+    .wdc-result-area { min-width: 0; }
+
+    /* Paginação */
+    .wdc-pagination { display: flex; align-items: center; gap: 0.25rem; font-size: 0.82rem; color: #333; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .wdc-pagination__info { margin-right: 0.5rem; color: #555; }
+    .wdc-page-btn { background: none; border: 1px solid #ccc; border-radius: 2px; padding: 2px 7px; cursor: pointer; font-size: 0.8rem; color: #333; transition: background 0.1s; }
+    .wdc-page-btn:hover { background: #eee; }
+    .wdc-page-btn.active { background: #1351b4; color: #fff; border-color: #1351b4; font-weight: 700; }
+    .wdc-page-btn:disabled { opacity: 0.35; cursor: default; }
+    .wdc-per-page { font-size: 0.8rem; border: 1px solid #ccc; border-radius: 2px; padding: 2px 5px; background: #fff; color: #333; cursor: pointer; }
+
+    /* Tabela */
+    .wdc-table-wrap { overflow-x: auto; border: 1px solid #ddd; border-radius: 3px; }
+    .wdc-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .wdc-table thead { background: #f5f5f5; }
+    .wdc-table th { text-align: left; padding: 0.5rem 0.75rem; font-weight: 700; font-size: 0.78rem; color: #333; border-right: 1px solid #ddd; border-bottom: 1px solid #bbb; white-space: nowrap; }
+    .wdc-table th.num { text-align: right; white-space: nowrap; min-width: 60px; }
+    .wdc-table th .sort-icon { font-size: 0.6rem; color: #aaa; margin-left: 3px; }
+    .wdc-table td { padding: 0.45rem 0.75rem; border-right: 1px solid #eee; border-bottom: 1px solid #eee; color: #1a1a2e; }
+    .wdc-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 60px; }
+    .wdc-table tr:hover td { background: rgba(19,81,180,0.04); }
+    .wdc-table tr.total-row td { background: #f0f4ff; font-weight: 700; }
+    .wdc-table tr:last-child td { border-bottom: none; }
+    .wdc-table td:last-child, .wdc-table th:last-child { border-right: none; }
+    .row-num { color: #999; font-size: 0.75rem; text-align: right; width: 28px; }
+
+    /* Área de gráfico */
+    .wdc-chart-area { border: 1px solid #ddd; border-radius: 3px; background: #fff; padding: 1rem; min-height: 420px; }
+    #chart-wdc { width: 100%; height: 420px; }
+
+    /* Esconder/mostrar views */
+    .wdc-view { display: none; }
+    .wdc-view.active { display: block; }
+
+    /* Nota de rodapé */
+    .wdc-footnote { font-size: 0.75rem; color: #777; margin-top: 1rem; border-top: 1px solid #dee2e6; padding-top: 0.75rem; line-height: 1.55; }
+
+    /* Tooltip vega */
+    #vg-tooltip-element { font-family: 'Rawline','Raleway',sans-serif; font-size: 0.78rem; color: #333; background-color: #fff; border: 1px solid #d4d4d4; border-radius: 4px; padding: 0.5rem 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); max-width: 260px; pointer-events: none; z-index: 10000; }
+    #vg-tooltip-element td.key { font-weight: 700; color: #555; padding-right: 0.5rem; white-space: nowrap; }
+    #vg-tooltip-element table { border-spacing: 0; }
+    #vg-tooltip-element tr td { padding: 2px 4px; }
+    #vg-tooltip-element.hidden { display: none; }
+
+    .pe-back-link { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.82rem; font-weight: 600; color: #1351b4; text-decoration: none; margin-bottom: 1.25rem; }
+    .pe-back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger"><button class="br-button circle" type="button" aria-label="Abrir Busca"><i class="fas fa-search" aria-hidden="true"></i></button></div>
+            <div class="dropdown"><div class="d-flex flex-align-items-center gap-8 flex-wrap"><select id="select-language" title="Alterar idioma"><option value="pt-BR">Português</option><option value="en-US">English</option></select></div></div>
+            <div class="header-login"><div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div><div class="header-avatar"></div></div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation"><button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button></div>
+            <div class="header-info"><div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-home.html">Portal de Estatísticas</a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-panorama-anual.html">Dados Anuais</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Depósitos por UF</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4 wdc-page">
+
+              <a href="portal-estatisticas-panorama-anual.html" class="pe-back-link">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Dados Consolidados Anuais
+              </a>
+
+              <!-- CABEÇALHO DO INDICADOR (estilo WIPO) -->
+              <div class="wdc-header">
+                <h1>Portal de Estatísticas — INPI</h1>
+                <div class="wdc-source-bar">
+                  Fonte: Instituto Nacional da Propriedade Industrial (INPI) / CGEI — BADEPI v11.0. Última atualização: dez/2024.
+                </div>
+                <div class="wdc-indicator-bar">
+                  Indicador: <strong>Patentes — Depósitos por Estado (UF) dos Depositantes Residentes</strong>
+                  &nbsp;·&nbsp; Tabela 4 (PI, MU e CA) · Série 2000–2024
+                </div>
+              </div>
+
+              <!-- BARRA DE ALTERNÂNCIA DE VISUALIZAÇÃO (estilo WIPO) -->
+              <nav class="wdc-view-bar" role="tablist" aria-label="Modo de visualização">
+                <button class="wdc-view-btn active" id="btn-view-table" role="tab" aria-selected="true" aria-controls="view-table" onclick="switchView('table')">Tabela</button>
+                <span class="wdc-view-sep" aria-hidden="true">|</span>
+                <button class="wdc-view-btn" id="btn-view-line" role="tab" aria-selected="false" aria-controls="view-chart" onclick="switchView('line')">Gráfico de linhas</button>
+                <span class="wdc-view-sep" aria-hidden="true">|</span>
+                <button class="wdc-view-btn" id="btn-view-bar" role="tab" aria-selected="false" aria-controls="view-chart" onclick="switchView('bar')">Gráfico de barras</button>
+                <span class="wdc-view-sep" aria-hidden="true">|</span>
+                <button class="wdc-view-btn" id="btn-view-stacked" role="tab" aria-selected="false" aria-controls="view-chart" onclick="switchView('stacked')">Empilhado</button>
+                <button class="wdc-view-btn wdc-view-btn--download" id="btn-download-csv" onclick="downloadCSV()">
+                  <i class="fas fa-download" aria-hidden="true"></i> Download CSV
+                </button>
+              </nav>
+
+              <!-- LAYOUT: FILTROS + RESULTADOS -->
+              <div class="wdc-results-layout">
+
+                <!-- PAINEL DE FILTROS -->
+                <aside class="wdc-filters" aria-label="Filtros da análise">
+                  <div class="wdc-filters__header">
+                    <i class="fas fa-filter" aria-hidden="true"></i> Filtros
+                  </div>
+
+                  <div class="wdc-filter-group">
+                    <button class="wdc-filter-group__toggle" onclick="toggleFilterGroup(this)" aria-expanded="true">
+                      <i class="fas fa-chevron-down" aria-hidden="true"></i> Tipo
+                    </button>
+                    <div class="wdc-filter-group__body">
+                      <label class="wdc-check"><input type="checkbox" id="tipo-todos" checked onchange="onFilterChange()"> Todos</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="tipo-pi" checked onchange="onFilterChange()"> Patente de Invenção (PI)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="tipo-mu" onchange="onFilterChange()"> Modelo de Utilidade (MU)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="tipo-ca" onchange="onFilterChange()"> Certificado de Adição (CA)</label>
+                    </div>
+                  </div>
+
+                  <div class="wdc-filter-group">
+                    <button class="wdc-filter-group__toggle" onclick="toggleFilterGroup(this)" aria-expanded="true">
+                      <i class="fas fa-chevron-down" aria-hidden="true"></i> Estado (UF)
+                    </button>
+                    <div class="wdc-filter-group__body">
+                      <label class="wdc-check"><input type="checkbox" id="uf-todas" checked onchange="onFilterChange()"> Todas as UFs</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-sp" checked onchange="onFilterChange()"> São Paulo (SP)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-rj" checked onchange="onFilterChange()"> Rio de Janeiro (RJ)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-mg" checked onchange="onFilterChange()"> Minas Gerais (MG)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-rs" checked onchange="onFilterChange()"> Rio Grande do Sul (RS)</label>
+                      <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-pr" checked onchange="onFilterChange()"> Paraná (PR)</label>
+                      <div id="uf-more">
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-sc" checked onchange="onFilterChange()"> Santa Catarina (SC)</label>
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-ba" onchange="onFilterChange()"> Bahia (BA)</label>
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-ce" onchange="onFilterChange()"> Ceará (CE)</label>
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-pe" onchange="onFilterChange()"> Pernambuco (PE)</label>
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-go" onchange="onFilterChange()"> Goiás (GO)</label>
+                        <label class="wdc-check wdc-check--indented"><input type="checkbox" id="uf-df" onchange="onFilterChange()"> Distrito Federal (DF)</label>
+                      </div>
+                      <button class="wdc-show-all" onclick="toggleUFMore(this)">
+                        <i class="fas fa-chevron-down" aria-hidden="true"></i> Mostrar todas
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="wdc-filter-group">
+                    <button class="wdc-filter-group__toggle" onclick="toggleFilterGroup(this)" aria-expanded="true">
+                      <i class="fas fa-chevron-down" aria-hidden="true"></i> Origem
+                    </button>
+                    <div class="wdc-filter-group__body">
+                      <label class="wdc-check"><input type="checkbox" id="origem-res" checked onchange="onFilterChange()"> Residentes</label>
+                      <label class="wdc-check"><input type="checkbox" id="origem-nres" onchange="onFilterChange()"> Não residentes</label>
+                    </div>
+                  </div>
+
+                  <div class="wdc-filter-group">
+                    <button class="wdc-filter-group__toggle" onclick="toggleFilterGroup(this)" aria-expanded="true">
+                      <i class="fas fa-chevron-down" aria-hidden="true"></i> Período
+                    </button>
+                    <div class="wdc-filter-group__body">
+                      <div style="display:flex;gap:0.5rem;align-items:flex-start;flex-wrap:wrap;">
+                        <div>
+                          <div style="font-size:0.72rem;font-weight:700;color:#555;margin-bottom:2px;">De</div>
+                          <select id="ano-inicio" style="font-size:0.8rem;border:1px solid #ccc;border-radius:2px;padding:3px 5px;" onchange="onFilterChange()">
+                            <option>2000</option><option>2005</option><option>2010</option><option>2015</option><option selected>2020</option>
+                          </select>
+                        </div>
+                        <div>
+                          <div style="font-size:0.72rem;font-weight:700;color:#555;margin-bottom:2px;">Até</div>
+                          <select id="ano-fim" style="font-size:0.8rem;border:1px solid #ccc;border-radius:2px;padding:3px 5px;" onchange="onFilterChange()">
+                            <option>2020</option><option>2021</option><option>2022</option><option>2023</option><option selected>2024</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+
+                <!-- ÁREA DE RESULTADOS -->
+                <div class="wdc-result-area">
+
+                  <!-- VIEW: TABELA -->
+                  <div class="wdc-view active" id="view-table" role="tabpanel" aria-labelledby="btn-view-table">
+                    <div class="wdc-pagination" aria-label="Paginação">
+                      <span class="wdc-pagination__info">1 de 1</span>
+                      <button class="wdc-page-btn" disabled aria-label="Primeira página">&#x27EA;</button>
+                      <button class="wdc-page-btn" disabled aria-label="Página anterior">&#x2039;</button>
+                      <button class="wdc-page-btn active" aria-current="page">1</button>
+                      <button class="wdc-page-btn" disabled aria-label="Próxima página">&#x203A;</button>
+                      <button class="wdc-page-btn" disabled aria-label="Última página">&#x27EB;</button>
+                      <select class="wdc-per-page" aria-label="Itens por página"><option>27</option><option>50</option><option>100</option><option>500</option></select>
+                    </div>
+
+                    <div class="wdc-table-wrap">
+                      <table class="wdc-table" aria-label="Depósitos de PI por Estado (UF), 2020–2024">
+                        <thead>
+                          <tr>
+                            <th class="row-num"></th>
+                            <th>Tipo <span class="sort-icon">&#x21C5;</span></th>
+                            <th>Estado (UF) <span class="sort-icon">&#x21C5;</span></th>
+                            <th>Origem <span class="sort-icon">&#x21C5;</span></th>
+                            <th class="num">2020 <span class="sort-icon">&#x21C5;</span></th>
+                            <th class="num">2021 <span class="sort-icon">&#x21C5;</span></th>
+                            <th class="num">2022 <span class="sort-icon">&#x21C5;</span></th>
+                            <th class="num">2023 <span class="sort-icon">&#x21C5;</span></th>
+                            <th class="num">2024 <span class="sort-icon">&#x21C5;</span></th>
+                          </tr>
+                        </thead>
+                        <tbody id="wdc-tbody">
+                          <tr><td class="row-num">1</td><td>PI</td><td>São Paulo (SP)</td><td>Residente</td><td class="num">1.788</td><td class="num">1.627</td><td class="num">1.592</td><td class="num">1.781</td><td class="num">1.967</td></tr>
+                          <tr><td class="row-num">2</td><td>PI</td><td>Rio Grande do Sul (RS)</td><td>Residente</td><td class="num">434</td><td class="num">389</td><td class="num">401</td><td class="num">421</td><td class="num">455</td></tr>
+                          <tr><td class="row-num">3</td><td>PI</td><td>Minas Gerais (MG)</td><td>Residente</td><td class="num">411</td><td class="num">377</td><td class="num">393</td><td class="num">405</td><td class="num">442</td></tr>
+                          <tr><td class="row-num">4</td><td>PI</td><td>Paraná (PR)</td><td>Residente</td><td class="num">380</td><td class="num">348</td><td class="num">362</td><td class="num">390</td><td class="num">421</td></tr>
+                          <tr><td class="row-num">5</td><td>PI</td><td>Rio de Janeiro (RJ)</td><td>Residente</td><td class="num">352</td><td class="num">310</td><td class="num">335</td><td class="num">348</td><td class="num">374</td></tr>
+                          <tr><td class="row-num">6</td><td>PI</td><td>Santa Catarina (SC)</td><td>Residente</td><td class="num">289</td><td class="num">274</td><td class="num">281</td><td class="num">301</td><td class="num">324</td></tr>
+                          <tr><td class="row-num">7</td><td>PI</td><td>Bahia (BA)</td><td>Residente</td><td class="num">67</td><td class="num">71</td><td class="num">68</td><td class="num">74</td><td class="num">78</td></tr>
+                          <tr><td class="row-num">8</td><td>PI</td><td>Goiás (GO)</td><td>Residente</td><td class="num">75</td><td class="num">68</td><td class="num">71</td><td class="num">77</td><td class="num">80</td></tr>
+                          <tr><td class="row-num">9</td><td>PI</td><td>Distrito Federal (DF)</td><td>Residente</td><td class="num">62</td><td class="num">55</td><td class="num">60</td><td class="num">63</td><td class="num">67</td></tr>
+                          <tr><td class="row-num">10</td><td>PI</td><td>Pernambuco (PE)</td><td>Residente</td><td class="num">57</td><td class="num">50</td><td class="num">53</td><td class="num">58</td><td class="num">61</td></tr>
+                          <tr><td class="row-num">11</td><td>PI</td><td>Ceará (CE)</td><td>Residente</td><td class="num">51</td><td class="num">46</td><td class="num">49</td><td class="num">53</td><td class="num">56</td></tr>
+                          <tr><td class="row-num">12</td><td>PI</td><td>Espírito Santo (ES)</td><td>Residente</td><td class="num">44</td><td class="num">40</td><td class="num">42</td><td class="num">46</td><td class="num">49</td></tr>
+                          <tr><td class="row-num">13</td><td>PI</td><td>Amazonas (AM)</td><td>Residente</td><td class="num">29</td><td class="num">26</td><td class="num">28</td><td class="num">30</td><td class="num">33</td></tr>
+                          <tr><td class="row-num">14</td><td>PI</td><td>Paraíba (PB)</td><td>Residente</td><td class="num">14</td><td class="num">13</td><td class="num">13</td><td class="num">14</td><td class="num">15</td></tr>
+                          <tr><td class="row-num">15</td><td>PI</td><td>Pará (PA)</td><td>Residente</td><td class="num">12</td><td class="num">11</td><td class="num">12</td><td class="num">13</td><td class="num">14</td></tr>
+                          <tr><td class="row-num">16</td><td>PI</td><td>Rio Grande do Norte (RN)</td><td>Residente</td><td class="num">22</td><td class="num">20</td><td class="num">21</td><td class="num">23</td><td class="num">25</td></tr>
+                          <tr><td class="row-num">17</td><td>PI</td><td>Mato Grosso (MT)</td><td>Residente</td><td class="num">18</td><td class="num">16</td><td class="num">17</td><td class="num">18</td><td class="num">20</td></tr>
+                          <tr><td class="row-num">18</td><td>PI</td><td>Mato Grosso do Sul (MS)</td><td>Residente</td><td class="num">15</td><td class="num">13</td><td class="num">14</td><td class="num">16</td><td class="num">18</td></tr>
+                          <tr><td class="row-num">19</td><td>PI</td><td>Alagoas (AL)</td><td>Residente</td><td class="num">9</td><td class="num">8</td><td class="num">9</td><td class="num">9</td><td class="num">10</td></tr>
+                          <tr><td class="row-num">20</td><td>PI</td><td>Rondônia (RO)</td><td>Residente</td><td class="num">7</td><td class="num">7</td><td class="num">7</td><td class="num">8</td><td class="num">8</td></tr>
+                          <tr><td class="row-num">21</td><td>PI</td><td>Maranhão (MA)</td><td>Residente</td><td class="num">7</td><td class="num">6</td><td class="num">7</td><td class="num">8</td><td class="num">9</td></tr>
+                          <tr><td class="row-num">22</td><td>PI</td><td>Sergipe (SE)</td><td>Residente</td><td class="num">6</td><td class="num">5</td><td class="num">6</td><td class="num">6</td><td class="num">7</td></tr>
+                          <tr><td class="row-num">23</td><td>PI</td><td>Tocantins (TO)</td><td>Residente</td><td class="num">5</td><td class="num">5</td><td class="num">5</td><td class="num">6</td><td class="num">6</td></tr>
+                          <tr><td class="row-num">24</td><td>PI</td><td>Piauí (PI)</td><td>Residente</td><td class="num">4</td><td class="num">4</td><td class="num">4</td><td class="num">5</td><td class="num">5</td></tr>
+                          <tr><td class="row-num">25</td><td>PI</td><td>Amapá (AP)</td><td>Residente</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td></tr>
+                          <tr><td class="row-num">26</td><td>PI</td><td>Roraima (RR)</td><td>Residente</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">2</td><td class="num">2</td></tr>
+                          <tr><td class="row-num">27</td><td>PI</td><td>Acre (AC)</td><td>Residente</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+                          <tr class="total-row">
+                            <td class="row-num"></td>
+                            <td colspan="3"><strong>Total Geral (PI · Residentes)</strong></td>
+                            <td class="num"><strong>4.155</strong></td>
+                            <td class="num"><strong>3.737</strong></td>
+                            <td class="num"><strong>3.793</strong></td>
+                            <td class="num"><strong>4.118</strong></td>
+                            <td class="num"><strong>4.543</strong></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="wdc-pagination" style="margin-top:0.5rem;">
+                      <span class="wdc-pagination__info">1 de 1</span>
+                      <button class="wdc-page-btn" disabled>&#x27EA;</button>
+                      <button class="wdc-page-btn" disabled>&#x2039;</button>
+                      <button class="wdc-page-btn active" aria-current="page">1</button>
+                      <button class="wdc-page-btn" disabled>&#x203A;</button>
+                      <button class="wdc-page-btn" disabled>&#x27EB;</button>
+                      <select class="wdc-per-page"><option>27</option><option>50</option><option>100</option><option>500</option></select>
+                    </div>
+                  </div>
+
+                  <!-- VIEW: GRÁFICO -->
+                  <div class="wdc-view" id="view-chart" role="tabpanel">
+                    <div class="wdc-chart-area">
+                      <div id="chart-wdc" role="img" aria-label="Gráfico de depósitos de PI por UF (2020–2024)"></div>
+                    </div>
+                  </div>
+
+                </div><!-- /wdc-result-area -->
+              </div><!-- /wdc-results-layout -->
+
+              <div class="wdc-footnote" role="note">
+                <strong>Fonte:</strong> INPI/CGEI — BADEPI v11.0. Anuário Estatístico de Propriedade Industrial 2024 (Tabela 4a — Depósitos de PI por Estado).
+                Dados referem-se exclusivamente a depositantes residentes, com base no 1º depositante.
+                N.A. (não avaliados) não incluídos. Dados anuais consolidados; não sujeitos a revisão após publicação.
+              </div>
+
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo"><picture><source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png"></picture></div>
+        <div class="br-list horizontal" id="footer-navigation"><div class="col-auto"><a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div></a></div></div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca"><picture><source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png"></picture><span>Instituto Nacional da Propriedade Industrial</span></div>
+        <div class="info"><div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div></div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <script>
+    /* Controle de visualização */
+    let currentView = 'table';
+
+    function switchView(view) {
+      document.querySelectorAll('.wdc-view-btn[role="tab"]').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      const btn = document.getElementById('btn-view-' + view);
+      if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
+
+      document.querySelectorAll('.wdc-view').forEach(v => v.classList.remove('active'));
+
+      if (view === 'table') {
+        document.getElementById('view-table').classList.add('active');
+        currentView = 'table';
+      } else {
+        document.getElementById('view-chart').classList.add('active');
+        currentView = 'chart';
+        renderChart(view);
+      }
+    }
+
+    function toggleFilterGroup(btn) {
+      const body = btn.nextElementSibling;
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      btn.classList.toggle('closed', isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    }
+
+    function toggleUFMore(btn) {
+      const more = document.getElementById('uf-more');
+      const isHidden = more.style.display === 'none';
+      more.style.display = isHidden ? 'block' : 'none';
+      btn.innerHTML = isHidden
+        ? '<i class="fas fa-chevron-up" aria-hidden="true"></i> Mostrar menos'
+        : '<i class="fas fa-chevron-down" aria-hidden="true"></i> Mostrar todas';
+    }
+
+    function onFilterChange() {
+      if (currentView === 'chart') {
+        const btnActive = document.querySelector('.wdc-view-btn.active[id^="btn-view-"]');
+        if (btnActive) renderChart(btnActive.id.replace('btn-view-', ''));
+      }
+    }
+
+    function downloadCSV() {
+      const rows = [['Tipo','Estado (UF)','Origem','2020','2021','2022','2023','2024']];
+      document.querySelectorAll('#wdc-tbody tr:not(.total-row)').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length >= 9) {
+          rows.push([cells[1].textContent.trim(), cells[2].textContent.trim(), cells[3].textContent.trim(),
+            cells[4].textContent.trim(), cells[5].textContent.trim(), cells[6].textContent.trim(),
+            cells[7].textContent.trim(), cells[8].textContent.trim()]);
+        }
+      });
+      const csv = rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'inpi_depositos_por_uf_2020_2024.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    const DATA_UF = [
+      {uf:'SP',ano:2020,dep:1788},{uf:'SP',ano:2021,dep:1627},{uf:'SP',ano:2022,dep:1592},{uf:'SP',ano:2023,dep:1781},{uf:'SP',ano:2024,dep:1967},
+      {uf:'RS',ano:2020,dep:434},{uf:'RS',ano:2021,dep:389},{uf:'RS',ano:2022,dep:401},{uf:'RS',ano:2023,dep:421},{uf:'RS',ano:2024,dep:455},
+      {uf:'MG',ano:2020,dep:411},{uf:'MG',ano:2021,dep:377},{uf:'MG',ano:2022,dep:393},{uf:'MG',ano:2023,dep:405},{uf:'MG',ano:2024,dep:442},
+      {uf:'PR',ano:2020,dep:380},{uf:'PR',ano:2021,dep:348},{uf:'PR',ano:2022,dep:362},{uf:'PR',ano:2023,dep:390},{uf:'PR',ano:2024,dep:421},
+      {uf:'RJ',ano:2020,dep:352},{uf:'RJ',ano:2021,dep:310},{uf:'RJ',ano:2022,dep:335},{uf:'RJ',ano:2023,dep:348},{uf:'RJ',ano:2024,dep:374},
+      {uf:'SC',ano:2020,dep:289},{uf:'SC',ano:2021,dep:274},{uf:'SC',ano:2022,dep:281},{uf:'SC',ano:2023,dep:301},{uf:'SC',ano:2024,dep:324},
+    ];
+
+    function renderChart(type) {
+      const markType = (type === 'line') ? 'line' : 'bar';
+      const stacked  = (type === 'stacked');
+      const spec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        width: 'container', height: 380,
+        data: { values: DATA_UF },
+        mark: { type: markType, point: type === 'line', tooltip: true },
+        encoding: {
+          x: { field: 'ano', type: 'ordinal', title: 'Ano', axis: { labelAngle: 0 } },
+          y: { field: 'dep', type: 'quantitative', title: 'Depósitos (PI · Residentes)', stack: stacked ? 'zero' : null },
+          color: { field: 'uf', type: 'nominal', title: 'UF', scale: { range: ['#1351b4','#0d6a52','#c86400','#5028a0','#a52834','#007070'] } },
+          tooltip: [{ field: 'uf', title: 'UF' }, { field: 'ano', title: 'Ano' }, { field: 'dep', title: 'Depósitos', format: ',' }]
+        },
+        config: { font: 'Rawline, Raleway, sans-serif', axis: { labelFontSize: 11, titleFontSize: 11 }, legend: { labelFontSize: 11, titleFontSize: 11 } }
+      };
+      vegaEmbed('#chart-wdc', spec, { actions: false, renderer: 'svg' });
+    }
+
+    // Inicializa "Mostrar todas" oculto
+    document.getElementById('uf-more').style.display = 'none';
+  </script>
+</body>
+</html>

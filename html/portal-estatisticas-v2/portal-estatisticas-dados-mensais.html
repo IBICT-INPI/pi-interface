@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dados Preliminares Mensais — Portal de Estatísticas / INPI</title>
+  <meta name="description" content="Estatísticas mensais preliminares de todos os ativos de PI registrados no INPI. Depósitos, Decisões, Contratos, Marcas, DI, IG e TCI.">
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    .pe-back-link { display:inline-flex;align-items:center;gap:.375rem;font-size:.82rem;font-weight:600;color:#1351b4;text-decoration:none;margin-bottom:1.25rem; }
+    .pe-back-link:hover { text-decoration:underline; }
+
+    .pe-page-header { margin-bottom:1.5rem; }
+    .pe-page-badge { display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 10px;border-radius:20px;background:rgba(19,81,180,.1);color:#1351b4;margin-bottom:.5rem; }
+    .pe-page-header h1 { font-size:1.4rem;font-weight:700;color:#071d41;margin:0 0 .5rem;display:flex;align-items:center;gap:.5rem; }
+    .pe-page-header h1 i { color:#1351b4;font-size:1.2rem; }
+    .pe-page-header p { font-size:.875rem;color:#555;line-height:1.6;margin:0; }
+
+    .pe-source-bar { background:#f5f5f5;border:1px solid #ddd;padding:.5rem .875rem;font-size:.8rem;color:#555;border-radius:3px;margin-bottom:1.5rem; }
+
+    .pe-group { margin-bottom:2rem; }
+    .pe-group-title { font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#7a7a7a;margin:0 0 0;padding-bottom:.5rem;border-bottom:2px solid #dee2e6;display:flex;align-items:center;gap:.5rem; }
+    .pe-tag { display:inline-block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:20px;background:#dbe8fb;color:#1351b4; }
+
+    .pe-nav-list { list-style:none;margin:0;padding:0; }
+    .pe-nav-list li { border-bottom:1px solid #f0f0f0; }
+    .pe-nav-list li:last-child { border-bottom:none; }
+
+    .pe-nav-item { display:flex;align-items:center;gap:1rem;padding:.875rem .5rem;text-decoration:none;color:inherit;transition:background .12s;border-radius:4px; }
+    .pe-nav-item:hover { background:#f5f8ff;text-decoration:none;color:inherit; }
+    .pe-nav-item:focus-visible { outline:3px solid #c49c00;outline-offset:2px; }
+
+    .pe-nav-item__icon { width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;background:#eef2fb;color:#1351b4; }
+    .pe-nav-item__icon--gray { background:#f0f0f0;color:#aaa; }
+    .pe-nav-item__text { flex:1;min-width:0; }
+    .pe-nav-item__label { font-size:.9rem;font-weight:600;color:#071d41;display:block;line-height:1.3; }
+    .pe-nav-item:hover .pe-nav-item__label { color:#1351b4; }
+    .pe-nav-item__desc { font-size:.78rem;color:#7a7a7a;display:block;margin-top:2px;line-height:1.4; }
+    .pe-nav-item__arrow { color:#adb5bd;font-size:.75rem;flex-shrink:0;transition:color .12s,transform .12s; }
+    .pe-nav-item:hover .pe-nav-item__arrow { color:#1351b4;transform:translateX(3px); }
+
+    .pe-nav-item--disabled { display:flex;align-items:center;gap:1rem;padding:.875rem .5rem;border-radius:4px;opacity:.45;cursor:not-allowed;pointer-events:none; }
+
+    .pe-status-badge { display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0; }
+    .pe-status-badge--available { background:#d4edda;color:#155724; }
+    .pe-status-badge--soon { background:#f0f0f0;color:#888; }
+
+    .pe-footnote { font-size:.78rem;color:#888;line-height:1.55;border-top:1px solid #dee2e6;padding-top:1rem;margin-top:.5rem; }
+  </style>
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger"><button class="br-button circle" type="button" aria-label="Abrir Busca"><i class="fas fa-search" aria-hidden="true"></i></button></div>
+            <div class="dropdown"><div class="d-flex flex-align-items-center gap-8 flex-wrap"><select id="select-language" title="Alterar idioma"><option value="pt-BR">Português</option><option value="en-US">English</option></select></div></div>
+            <div class="header-login"><div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div><div class="header-avatar"></div></div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation"><button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button></div>
+            <div class="header-info"><div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-home.html">Portal de Estatísticas</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Dados Preliminares Mensais</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4">
+
+              <a href="portal-estatisticas-home.html" class="pe-back-link">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Portal de Estatísticas
+              </a>
+
+              <!-- CABEÇALHO -->
+              <div class="pe-page-header">
+                <div class="pe-page-badge">Mensal · Janeiro/2026</div>
+                <h1><i class="fas fa-calendar-alt" aria-hidden="true"></i> Dados Preliminares Mensais</h1>
+                <p>Estatísticas mensais preliminares de todos os ativos de Propriedade Industrial registrados no INPI. Dados sujeitos a revisão conforme atualização mensal (extração: 03/02/2026).</p>
+              </div>
+
+              <div class="pe-source-bar">
+                Fonte: INPI/CGEI — Estatísticas Mensais Jan/2026. Última atualização: 03/02/2026.
+              </div>
+
+              <!-- LISTA DE INDICADORES -->
+              <div class="pe-group">
+                <div class="pe-group-title">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                  Indicadores Mensais
+                  <span class="pe-tag">Mensal · Janeiro/2026</span>
+                </div>
+                <ul class="pe-nav-list" role="list">
+
+                  <!-- ✅ HABILITADO -->
+                  <li>
+                    <a href="portal-estatisticas-panorama-mensal.html" class="pe-nav-item" id="nav-mensal-depositos">
+                      <span class="pe-nav-item__icon" aria-hidden="true"><i class="fas fa-boxes"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Total de Depósitos por Tipo de Proteção</span>
+                        <span class="pe-nav-item__desc">Marcas, Patentes (PI/MU/CA), Programas de Computador, Desenhos Industriais, Contratos — por origem (residente/não residente) e natureza jurídica</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> Disponível</span>
+                      <i class="fas fa-chevron-right pe-nav-item__arrow" aria-hidden="true"></i>
+                    </a>
+                  </li>
+
+                  <!-- ✅ HABILITADO -->
+                  <li>
+                    <a href="portal-estatisticas-detalhe-mensal-decisoes.html" class="pe-nav-item" id="nav-mensal-decisoes">
+                      <span class="pe-nav-item__icon" aria-hidden="true"><i class="fas fa-gavel"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Principais Decisões — Patentes (PI, MU, CA)</span>
+                        <span class="pe-nav-item__desc">Concessões, indeferimentos, arquivamentos e desistências por subtipo de patente no mês de referência</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> Disponível</span>
+                      <i class="fas fa-chevron-right pe-nav-item__arrow" aria-hidden="true"></i>
+                    </a>
+                  </li>
+
+                  <!-- ✅ HABILITADO -->
+                  <li>
+                    <a href="portal-estatisticas-panorama-mensal.html" class="pe-nav-item" id="nav-mensal-contratos">
+                      <span class="pe-nav-item__icon" aria-hidden="true"><i class="fas fa-file-signature"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Requerimentos de Averbação de Contratos de Tecnologia</span>
+                        <span class="pe-nav-item__desc">Uso de Marcas, Exploração de Patentes/DI, Fornecimento de Tecnologia, Franquia, Assistência Técnica e Alterações de Certificado</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--available"><i class="fas fa-check-circle"></i> Disponível</span>
+                      <i class="fas fa-chevron-right pe-nav-item__arrow" aria-hidden="true"></i>
+                    </a>
+                  </li>
+
+                  <!-- 🔜 EM BREVE -->
+                  <li>
+                    <div class="pe-nav-item--disabled" id="nav-mensal-marcas-decisoes" aria-disabled="true">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--gray" aria-hidden="true"><i class="fas fa-registered"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Principais Decisões — Marcas</span>
+                        <span class="pe-nav-item__desc">Concessões, indeferimentos, arquivamentos e desistências de Marcas no mês de referência</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                    </div>
+                  </li>
+
+                  <!-- 🔜 EM BREVE -->
+                  <li>
+                    <div class="pe-nav-item--disabled" id="nav-mensal-di-decisoes" aria-disabled="true">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--gray" aria-hidden="true"><i class="fas fa-pencil-ruler"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Principais Decisões — Desenhos Industriais</span>
+                        <span class="pe-nav-item__desc">Concessões e indeferimentos de Desenhos Industriais por origem e natureza jurídica</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                    </div>
+                  </li>
+
+                  <!-- 🔜 EM BREVE -->
+                  <li>
+                    <div class="pe-nav-item--disabled" id="nav-mensal-ig" aria-disabled="true">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--gray" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Depósitos de Indicações Geográficas</span>
+                        <span class="pe-nav-item__desc">Indicação de Procedência e Denominação de Origem — por espécie e origem do depositante</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                    </div>
+                  </li>
+
+                  <!-- 🔜 EM BREVE -->
+                  <li>
+                    <div class="pe-nav-item--disabled" id="nav-mensal-tci" aria-disabled="true">
+                      <span class="pe-nav-item__icon pe-nav-item__icon--gray" aria-hidden="true"><i class="fas fa-microchip"></i></span>
+                      <span class="pe-nav-item__text">
+                        <span class="pe-nav-item__label">Depósitos de Topografia de Circuito Integrado (TCI)</span>
+                        <span class="pe-nav-item__desc">Total de depósitos de TCI por origem e natureza jurídica do depositante</span>
+                      </span>
+                      <span class="pe-status-badge pe-status-badge--soon"><i class="fas fa-clock"></i> Em breve</span>
+                    </div>
+                  </li>
+
+                </ul>
+              </div>
+
+              <div class="pe-footnote" role="note">
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                <strong>Fonte:</strong> INPI/CGEI — Estatísticas Mensais, extração de 03/02/2026. Dados preliminares sujeitos a revisão na próxima atualização mensal.
+              </div>
+
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo"><picture><source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png"></picture></div>
+        <div class="br-list horizontal" id="footer-navigation"><div class="col-auto"><a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div></a></div></div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca"><picture><source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png"></picture><span>Instituto Nacional da Propriedade Industrial</span></div>
+        <div class="info"><div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div></div>
+      </div>
+    </footer>
+
+  </div>
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dados Consolidados Anuais — ServiçosPI / INPI</title>
+  <meta name="description" content="Panorama anual de dados consolidados de propriedade industrial — séries históricas 2000 a 2024. INPI/CGEI — BADEPI v11.0.">
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="app.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    body::-webkit-scrollbar { display: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    /* ============================================================
+       PANORAMA ANUAL — Índice de indicadores (navegação analítica)
+    ============================================================ */
+
+    .pan-header { margin-bottom: 2rem; }
+    .pan-back-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.82rem; font-weight: 600; color: #0d6a52;
+      text-decoration: none; margin-bottom: 0.75rem;
+    }
+    .pan-back-link:hover { text-decoration: underline; }
+    .pan-header h1 {
+      font-size: 1.45rem; font-weight: 700; color: #0d6a52;
+      margin: 0 0 0.25rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .pan-header h1 i { opacity: 0.85; font-size: 1.2rem; }
+    .pan-header p {
+      font-size: 0.875rem; color: #555; line-height: 1.6; margin: 0;
+    }
+    .pan-badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; padding: 2px 8px; border-radius: 20px;
+      background: rgba(13,106,82,0.12); color: #0d6a52; margin-left: 0.25rem;
+    }
+
+    /* Aviso dados consolidados */
+    .pan-notice {
+      background: #f0f7f4; border-left: 4px solid #0d6a52;
+      border-radius: 0 4px 4px 0; padding: 0.75rem 1rem;
+      font-size: 0.82rem; color: #0c4a36; margin-bottom: 1.75rem;
+      display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.5;
+    }
+    .pan-notice i { flex-shrink: 0; margin-top: 1px; }
+
+    /* Grupo de indicadores */
+    .pan-group { margin-bottom: 2rem; }
+    .pan-group-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.09em; color: #7a7a7a;
+      padding-bottom: 0.5rem; margin-bottom: 0;
+      border-bottom: 2px solid #dee2e6;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* Lista navegável */
+    .pan-nav-list { list-style: none; margin: 0; padding: 0; }
+    .pan-nav-list li { border-bottom: 1px solid #f0f0f0; }
+    .pan-nav-list li:last-child { border-bottom: none; }
+
+    .pan-nav-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 0.5rem; text-decoration: none;
+      color: inherit; transition: background 0.12s; border-radius: 4px;
+    }
+    .pan-nav-item:hover {
+      background: #f0f7f4; text-decoration: none; color: inherit;
+    }
+    .pan-nav-item:focus-visible { outline: 3px solid #c49c00; outline-offset: 2px; }
+
+    .pan-nav-item__icon {
+      width: 32px; height: 32px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+      background: rgba(13,106,82,0.1); color: #0d6a52;
+    }
+    .pan-nav-item__text { flex: 1; min-width: 0; }
+    .pan-nav-item__label {
+      font-size: 0.9rem; font-weight: 600; color: #071d41;
+      display: block; line-height: 1.3;
+    }
+    .pan-nav-item:hover .pan-nav-item__label { color: #0d6a52; }
+    .pan-nav-item__desc {
+      font-size: 0.78rem; color: #7a7a7a;
+      display: block; margin-top: 2px; line-height: 1.4;
+    }
+    .pan-nav-item__meta {
+      font-size: 0.72rem; color: #aaa;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .pan-nav-item__arrow {
+      color: #adb5bd; font-size: 0.75rem; flex-shrink: 0;
+      transition: color 0.12s, transform 0.12s;
+    }
+    .pan-nav-item:hover .pan-nav-item__arrow {
+      color: #0d6a52; transform: translateX(3px);
+    }
+    .pan-nav-item--disabled {
+      opacity: 0.45; pointer-events: none; cursor: default;
+    }
+    .pan-tag-soon {
+      font-size: 0.62rem; font-weight: 700; padding: 1px 6px;
+      border-radius: 20px; background: #e9ecef; color: #666;
+      margin-left: 0.4rem;
+    }
+
+    /* Nota de rodapé */
+    .pan-footnote {
+      font-size: 0.78rem; color: #888; line-height: 1.55;
+      border-top: 1px solid #dee2e6; padding-top: 1rem; margin-top: 0.5rem;
+    }
+  </style>
+
+</head>
+<body class="">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER (idêntico à base) -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies" title="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste" title="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL (idêntico à base) -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-registered" aria-hidden="true"></i></span><span class="content">Marcas</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span class="content">Programa de computador</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-pencil-ruler" aria-hidden="true"></i></span><span class="content">Desenhos Industriais</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-file-contract" aria-hidden="true"></i></span><span class="content">Contratos</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="portal-estatisticas-home.html">Portal de Estatísticas</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Dados Consolidados Anuais</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4">
+              <!-- =============================================
+                   MIOLO — Panorama Anual
+              ============================================= -->
+              <div class="search-page-theme search-page-theme--estatisticas">
+
+                <!-- CABEÇALHO -->
+                <div class="pan-header">
+                  <a href="portal-estatisticas-home.html" class="pan-back-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Portal de Estatísticas
+                  </a>
+                  <h1>
+                    <i class="fas fa-calendar-check" aria-hidden="true"></i>
+                    Dados Consolidados Anuais
+                    <span class="pan-badge">Anual</span>
+                  </h1>
+                  <p>Séries históricas definitivas de propriedade industrial — 2000 a 2024 — INPI/CGEI · BADEPI v11.0</p>
+                </div>
+
+                <!-- AVISO -->
+                <div class="pan-notice" role="note">
+                  <i class="fas fa-lock" aria-hidden="true"></i>
+                  <span>
+                    <strong>Dados consolidados</strong> — séries definitivas não sujeitas a revisão após publicação do Anuário Estatístico.
+                    Para dados do período corrente, consulte os <a href="portal-estatisticas-panorama-mensal.html" style="color:#0c4a36;font-weight:600;">Dados Mensais Preliminares</a>.
+                  </span>
+                </div>
+
+                <!-- GRUPO: Depósitos -->
+                <div class="pan-group">
+                  <div class="pan-group-title">
+                    <i class="fas fa-inbox" aria-hidden="true"></i> Depósitos
+                  </div>
+                  <ul class="pan-nav-list" role="list">
+
+                    <li>
+                      <a href="portal-estatisticas-detalhe-anual-uf.html" class="pan-nav-item" id="pan-anual-dep-patentes" aria-label="Depósitos de Patentes — série anual">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-copyright"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Depósitos de Patentes (PI, MU, CA)</span>
+                          <span class="pan-nav-item__desc">Série histórica anual de depósitos de invenção, modelo de utilidade e certificado de adição — 2000 a 2024</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="portal-estatisticas-detalhe-anual-uf.html" class="pan-nav-item" id="pan-anual-dep-marcas" aria-label="Depósitos de Marcas — série anual">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-registered"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Depósitos de Marcas</span>
+                          <span class="pan-nav-item__desc">Evolução anual dos pedidos de registro de marca por natureza jurídica e origem do depositante</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="portal-estatisticas-detalhe-anual-uf.html" class="pan-nav-item" id="pan-anual-dep-uf" aria-label="Depósitos por UF — série anual">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-map-marked-alt"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Depósitos por Unidade da Federação</span>
+                          <span class="pan-nav-item__desc">Distribuição territorial dos depósitos de PI por UF — ranking e série histórica de residentes</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="pan-nav-item pan-nav-item--disabled" aria-disabled="true" id="pan-anual-dep-pais">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-globe-americas"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Depósitos por País de Origem <span class="pan-tag-soon">Em breve</span></span>
+                          <span class="pan-nav-item__desc">Ranking dos países com mais depósitos no INPI — residentes e não residentes</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="pan-nav-item pan-nav-item--disabled" aria-disabled="true" id="pan-anual-dep-natjur">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-users"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Depósitos por Natureza Jurídica <span class="pan-tag-soon">Em breve</span></span>
+                          <span class="pan-nav-item__desc">Comparativo entre Pessoa Física, Empresa e Universidade/ICT nos depósitos de PI</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                  </ul>
+                </div>
+
+                <!-- GRUPO: Concessões -->
+                <div class="pan-group">
+                  <div class="pan-group-title">
+                    <i class="fas fa-award" aria-hidden="true"></i> Concessões
+                  </div>
+                  <ul class="pan-nav-list" role="list">
+
+                    <li>
+                      <a href="portal-estatisticas-detalhe-anual-uf.html" class="pan-nav-item" id="pan-anual-conc-patentes" aria-label="Concessões de Patentes — série anual">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-certificate"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Concessões de Patentes</span>
+                          <span class="pan-nav-item__desc">Evolução anual das concessões de PI, MU e CA — taxa de concessão e produtividade do exame técnico</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="pan-nav-item pan-nav-item--disabled" aria-disabled="true" id="pan-anual-conc-marcas">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-registered"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Concessões de Marcas <span class="pan-tag-soon">Em breve</span></span>
+                          <span class="pan-nav-item__desc">Evolução anual dos registros de marca concedidos — por classe e natureza jurídica</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                  </ul>
+                </div>
+
+                <!-- GRUPO: Backlog e Acervo -->
+                <div class="pan-group">
+                  <div class="pan-group-title">
+                    <i class="fas fa-layer-group" aria-hidden="true"></i> Backlog e Acervo
+                  </div>
+                  <ul class="pan-nav-list" role="list">
+
+                    <li>
+                      <a href="#" class="pan-nav-item pan-nav-item--disabled" aria-disabled="true" id="pan-anual-backlog">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-hourglass-half"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Backlog de Patentes <span class="pan-tag-soon">Em breve</span></span>
+                          <span class="pan-nav-item__desc">Estoque de pedidos em exame — evolução histórica do backlog por tipo de ativo</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="pan-nav-item pan-nav-item--disabled" aria-disabled="true" id="pan-anual-vigentes">
+                        <span class="pan-nav-item__icon" aria-hidden="true"><i class="fas fa-check-double"></i></span>
+                        <span class="pan-nav-item__text">
+                          <span class="pan-nav-item__label">Registros Vigentes <span class="pan-tag-soon">Em breve</span></span>
+                          <span class="pan-nav-item__desc">Total de registros de PI ativos e em vigor por tipo de ativo e ano</span>
+                        </span>
+                        <span class="pan-nav-item__meta">2000–2024</span>
+                        <i class="fas fa-chevron-right pan-nav-item__arrow" aria-hidden="true"></i>
+                      </a>
+                    </li>
+
+                  </ul>
+                </div>
+
+                <!-- NOTA DE RODAPÉ -->
+                <div class="pan-footnote" role="note">
+                  <i class="fas fa-info-circle" aria-hidden="true"></i>
+                  <strong>Fonte:</strong> INPI/CGEI — BADEPI v11.0. Anuário Estatístico de Propriedade Industrial 2024 (2000–2024).
+                  Dados consolidados — não sujeitos a revisão após publicação do Anuário.
+                </div>
+
+              </div><!-- /search-page-theme -->
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER (idêntico à base) -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="/patentes"><div class="content">Patentes</div></a>
+              <a class="br-item" href="/desenhos-industriais"><div class="content">Desenhos Industriais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/indicacoes-geograficas"><div class="content">Indicações Geográficas</div></a>
+              <a class="br-item" href="/programas-de-computador"><div class="content">Programas de Computador</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/acoes-e-programas"><div class="content">Ações e Programas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/planejamento-estrategico"><div class="content">Planejamento Estratégico</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="d-none d-sm-block">
+          <div class="row align-items-end justify-content-between py-5">
+            <div class="col">
+              <div class="social-network">
+                <div class="social-network-title">Redes Sociais</div>
+                <div class="d-flex">
+                  <a class="br-button circle" target="_blank" href="https://www.facebook.com/inpibrasil" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.instagram.com/inpibrasil" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.linkedin.com/company/inpibrasil" rel="noopener"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.youtube.com/@institutonacionaldaproprie2128" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /root -->
+
+  <!-- App JS from homologação -->
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <!-- Dados compartilhados -->
+  <script src="dados-estatisticas.js"></script>
+
+  <!-- Lógica dos gráficos e tabelas -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const da  = window.DADOS_ANUAIS;
+      const fmt = window.Utils ? window.Utils.formatNum : function(n){ return n.toLocaleString('pt-BR'); };
+
+      // ── Última entrada (2024) ──
+      const dep2024 = da.depositosPatentesPorTipo[da.depositosPatentesPorTipo.length - 1];
+      const con2024 = da.concessoesPatentesPorTipo[da.concessoesPatentesPorTipo.length - 1];
+
+      // Actualizar KPIs dinamicamente
+      document.getElementById('kpi-depositos-2024').textContent = fmt(dep2024.total);
+      document.getElementById('kpi-concessoes-2024').textContent = fmt(con2024.total);
+      document.getElementById('kpi-pi-2024').textContent = fmt(dep2024.pi);
+
+      // ── Paleta institucional — verde ──
+      const GREEN_MAIN  = '#0d6a52';
+      const GREEN_MID   = 'rgba(13,106,82,0.65)';
+      const BLUE_MAIN   = '#1351b4';
+      const BLUE_MID    = 'rgba(19,81,180,0.75)';
+      const GRAY_MID    = 'rgba(108,117,125,0.70)';
+      const ORANGE_MID  = 'rgba(200,100,20,0.75)';
+      const GRID_COLOR  = 'rgba(0,0,0,0.06)';
+
+      const defaultFont = { family: 'Rawline, Raleway, sans-serif', size: 12 };
+      Chart.defaults.font = defaultFont;
+      Chart.defaults.color = '#555';
+
+      const anos = da.depositosPatentesPorTipo.map(d => d.ano);
+
+      // ── CHART 1: Depósitos Anuais por Tipo (3 linhas: PI, MU, CA) ──
+      (function() {
+        new Chart(document.getElementById('chart-depositos-anual'), {
+          type: 'line',
+          data: {
+            labels: anos,
+            datasets: [
+              {
+                label: 'PI — Patente de Invenção',
+                data: da.depositosPatentesPorTipo.map(d => d.pi),
+                borderColor: BLUE_MAIN,
+                backgroundColor: 'rgba(19,81,180,0.08)',
+                borderWidth: 2.5,
+                pointRadius: 2.5,
+                pointHoverRadius: 5,
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'MU — Modelo de Utilidade',
+                data: da.depositosPatentesPorTipo.map(d => d.mu),
+                borderColor: ORANGE_MID,
+                backgroundColor: 'rgba(200,100,20,0.05)',
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                tension: 0.3,
+                fill: false
+              },
+              {
+                label: 'CA — Certificado de Adição',
+                data: da.depositosPatentesPorTipo.map(d => d.ca),
+                borderColor: GRAY_MID,
+                backgroundColor: 'rgba(108,117,125,0.05)',
+                borderWidth: 1.5,
+                pointRadius: 1.5,
+                pointHoverRadius: 4,
+                borderDash: [5, 3],
+                tension: 0.3,
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { padding: 16, usePointStyle: true, font: { size: 12 } }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y);
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: {
+                  maxTicksLimit: 13,
+                  font: { size: 11 }
+                },
+                border: { display: false }
+              },
+              y: {
+                grid: { color: GRID_COLOR },
+                ticks: { callback: v => fmt(v), font: { size: 11 } },
+                border: { display: false }
+              }
+            }
+          }
+        });
+      })();
+
+      // ── CHART 2: Concessões Anuais (linha única verde) ──
+      (function() {
+        const peakIdx   = da.concessoesPatentesPorTipo.findIndex(d => d.ano === 2021);
+        const pointRadii = da.concessoesPatentesPorTipo.map((d, i) => i === peakIdx ? 7 : 2.5);
+        const pointColors = da.concessoesPatentesPorTipo.map((d, i) =>
+          i === peakIdx ? '#f5a623' : GREEN_MAIN
+        );
+
+        new Chart(document.getElementById('chart-concessoes-anual'), {
+          type: 'line',
+          data: {
+            labels: anos,
+            datasets: [{
+              label: 'Concessões Totais (PI + MU + CA)',
+              data: da.concessoesPatentesPorTipo.map(d => d.total),
+              borderColor: GREEN_MAIN,
+              backgroundColor: 'rgba(13,106,82,0.09)',
+              borderWidth: 2.5,
+              pointRadius: pointRadii,
+              pointBackgroundColor: pointColors,
+              pointHoverRadius: 6,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { padding: 16, usePointStyle: true, font: { size: 12 } }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    const suffix = ctx.dataIndex === peakIdx ? ' ⭐ Pico histórico' : '';
+                    return ' ' + fmt(ctx.parsed.y) + ' concessões' + suffix;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { maxTicksLimit: 13, font: { size: 11 } },
+                border: { display: false }
+              },
+              y: {
+                grid: { color: GRID_COLOR },
+                ticks: { callback: v => fmt(v), font: { size: 11 } },
+                border: { display: false }
+              }
+            }
+          }
+        });
+      })();
+
+      // ── TABELA: Top UFs por PI 2024 ──
+      (function() {
+        // Índice 2024 é o último (índice 24, anos 2000-2024)
+        const idx2024 = da.anosUF.indexOf(2024);
+
+        // Montar lista {sigla, nome, val2024}
+        const ufs = da.depositosPIporUF.map(u => ({
+          sigla: u.sigla,
+          nome:  u.nome,
+          val:   u.valores[idx2024] || 0
+        })).sort((a, b) => b.val - a.val);
+
+        // Total nacional PI 2024 (soma de todos os estados)
+        const totalNacional = ufs.reduce((s, u) => s + u.val, 0);
+        document.getElementById('total-pi-2024').textContent = fmt(totalNacional);
+
+        const tbody = document.getElementById('uf-table-body');
+        const ESTADOS = {
+          AC:'Acre', AL:'Alagoas', AM:'Amazonas', AP:'Amapá', BA:'Bahia',
+          CE:'Ceará', DF:'Distrito Federal', ES:'Espírito Santo', GO:'Goiás',
+          MA:'Maranhão', MG:'Minas Gerais', MS:'Mato Grosso do Sul',
+          MT:'Mato Grosso', PA:'Pará', PB:'Paraíba', PE:'Pernambuco',
+          PI:'Piauí', PR:'Paraná', RJ:'Rio de Janeiro', RN:'Rio Grande do Norte',
+          RO:'Rondônia', RR:'Roraima', RS:'Rio Grande do Sul',
+          SC:'Santa Catarina', SE:'Sergipe', SP:'São Paulo', TO:'Tocantins'
+        };
+
+        ufs.forEach(function(uf, i) {
+          const pos      = i + 1;
+          const pct      = totalNacional > 0 ? (uf.val / totalNacional * 100) : 0;
+          const pctStr   = pct.toFixed(1).replace('.', ',') + '%';
+          const isTop10  = pos <= 10;
+
+          let rankClass = 'pa-table__rank--other';
+          if (pos === 1) rankClass = 'pa-table__rank--1';
+          else if (pos === 2) rankClass = 'pa-table__rank--2';
+          else if (pos === 3) rankClass = 'pa-table__rank--3';
+
+          const tr = document.createElement('tr');
+          if (!isTop10) tr.classList.add('pa-table-extra');
+
+          tr.innerHTML =
+            '<td><span class="pa-table__rank ' + rankClass + '">' + pos + '</span></td>' +
+            '<td><strong>' + uf.sigla + '</strong></td>' +
+            '<td>' + (ESTADOS[uf.sigla] || uf.nome) + '</td>' +
+            '<td style="text-align:center;font-weight:600;">' + fmt(uf.val) + '</td>' +
+            '<td>' +
+              '<div class="pa-table__pct-bar">' +
+                '<div class="pa-table__pct-bar__track">' +
+                  '<div class="pa-table__pct-bar__fill" style="width:' + Math.min(pct, 100).toFixed(1) + '%"></div>' +
+                '</div>' +
+                '<span class="pa-table__pct-num">' + pctStr + '</span>' +
+              '</div>' +
+            '</td>';
+
+          tbody.appendChild(tr);
+        });
+
+        // Toggle "ver mais"
+        var expanded = false;
+        document.getElementById('btn-ver-mais').addEventListener('click', function() {
+          expanded = !expanded;
+          var extras = tbody.querySelectorAll('.pa-table-extra');
+          extras.forEach(function(row) {
+            if (expanded) row.classList.add('visible');
+            else row.classList.remove('visible');
+          });
+          this.setAttribute('aria-expanded', expanded);
+          var icon = this.querySelector('i');
+          if (expanded) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+            this.lastChild.textContent = ' Recolher';
+            // re-insert textNode
+            this.innerHTML = '<i class="fas fa-chevron-up" aria-hidden="true"></i> Recolher';
+          } else {
+            this.innerHTML = '<i class="fas fa-chevron-down" aria-hidden="true"></i> Ver todos os estados';
+          }
+        });
+      })();
+
+    }); // DOMContentLoaded
+  </script>
+
+</body>
+</html>
