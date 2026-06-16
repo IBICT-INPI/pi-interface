@@ -5,264 +5,16 @@
   <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal de Estatísticas — ServiçosPI / INPI</title>
-  <meta name="description" content="Acesse dados e indicadores sobre propriedade industrial no Brasil. Estatísticas mensais e anuais consolidadas do INPI.">
+  <meta name="description" content="Explore dados de propriedade industrial com tabela dinâmica interativa. Arraste campos, filtre por período e exporte em CSV.">
 
   <!-- DS Gov.br CDN -->
   <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-  <!-- App CSS (cópia local da homologação) -->
+  <!-- App CSS (cópia local da homologação) e Pivot CSS -->
   <link rel="stylesheet" href="app.css">
-
-  <style>
-    body::-webkit-scrollbar { display: none; }
-    html::-webkit-scrollbar { display: none; }
-
-    /* ============================================================
-       PORTAL DE ESTATÍSTICAS — HOME
-       Estilos escopados ao miolo, sem sobrescrever globais
-    ============================================================ */
-
-    .pe-home-intro {
-      margin-bottom: 2rem;
-    }
-
-    .pe-home-intro h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--color-primary-default, #1351b4);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.625rem;
-    }
-
-    .pe-home-intro h1 i {
-      font-size: 1.5rem;
-      opacity: 0.85;
-    }
-
-    .pe-home-intro p {
-      font-size: 1rem;
-      color: var(--color-secondary-07, #555);
-      line-height: 1.65;
-      margin-bottom: 0;
-    }
-
-    .pe-badge-period {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px 8px;
-      border-radius: 20px;
-      background: var(--color-primary-lighten-05, #dbe8fb);
-      color: var(--color-primary-default, #1351b4);
-      margin-bottom: 0.75rem;
-    }
-
-    /* --- Tiles principais --- */
-    .pe-tiles-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    @media (max-width: 768px) {
-      .pe-tiles-grid { grid-template-columns: 1fr; }
-    }
-
-    .pe-tile {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid var(--border-color, #dee2e6);
-      border-radius: 8px;
-      background: var(--background, #fff);
-      overflow: hidden;
-      transition: box-shadow 0.2s, transform 0.15s;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .pe-tile:hover,
-    .pe-tile:focus-visible {
-      box-shadow: 0 6px 24px rgba(19, 81, 180, 0.14);
-      transform: translateY(-3px);
-      border-color: var(--interactive, #1351b4);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .pe-tile:focus-visible {
-      outline: 3px solid var(--focus-color, #c49c00);
-      outline-offset: 2px;
-    }
-
-    .pe-tile__header {
-      padding: 1.5rem 1.5rem 1rem;
-      border-bottom: 1px solid var(--border-color, #dee2e6);
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    .pe-tile__icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-
-    .pe-tile--mensal .pe-tile__icon {
-      background: rgba(19, 81, 180, 0.1);
-      color: var(--interactive, #1351b4);
-    }
-
-    .pe-tile--anual .pe-tile__icon {
-      background: rgba(13, 106, 82, 0.1);
-      color: #0d6a52;
-    }
-
-    .pe-tile--mensal .pe-tile__header-text h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0c44ac;
-      margin: 0 0 0.25rem;
-      line-height: 1.3;
-    }
-
-    .pe-tile--anual .pe-tile__header-text h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0a7b5a;
-      margin: 0 0 0.25rem;
-      line-height: 1.3;
-    }
-
-    .pe-tile__header-text .pe-subtitle {
-      font-size: 0.82rem;
-      color: var(--color-secondary-06, #7a7a7a);
-      font-weight: 500;
-    }
-
-    .pe-tile__body {
-      padding: 1rem 1.5rem;
-      flex: 1;
-    }
-
-    .pe-tile__body p {
-      font-size: 0.9rem;
-      color: var(--color-secondary-07, #555);
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .pe-tile__footer {
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--gray-2, #f8f9fa);
-      border-top: 1px solid var(--border-color, #dee2e6);
-    }
-
-    .pe-tile__footer .pe-periodicidade {
-      font-size: 0.78rem;
-      color: var(--color-secondary-06, #7a7a7a);
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-
-    .pe-tile__footer .pe-cta {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--interactive, #1351b4);
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .pe-tile--anual .pe-tile__footer .pe-cta {
-      color: #0d6a52;
-    }
-
-    /* --- Aviso informativo --- */
-    .pe-info-box {
-      margin-top: 2.5rem;
-      background: var(--gray-2, #f8f9fa);
-      border-left: 4px solid var(--interactive, #1351b4);
-      border-radius: 0 4px 4px 0;
-      padding: 1rem 1.25rem;
-      font-size: 0.875rem;
-      color: var(--color-secondary-07, #555);
-      line-height: 1.6;
-    }
-
-    .pe-info-box strong {
-      color: var(--color-primary-default, #1351b4);
-    }
-
-    /* --- Seção "Sobre os dados" --- */
-    .pe-about {
-      margin-top: 2.5rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border-color, #dee2e6);
-    }
-
-    .pe-about h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--color-primary-default, #1351b4);
-      margin-bottom: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .pe-about-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .pe-about-grid { grid-template-columns: 1fr; }
-    }
-
-    .pe-about-item {
-      display: flex;
-      gap: 0.75rem;
-      align-items: flex-start;
-    }
-
-    .pe-about-item i {
-      color: var(--interactive, #1351b4);
-      font-size: 1.1rem;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-
-    .pe-about-item p {
-      font-size: 0.85rem;
-      color: var(--color-secondary-07, #555);
-      line-height: 1.55;
-      margin: 0;
-    }
-
-    .pe-about-item strong {
-      display: block;
-      font-size: 0.875rem;
-      color: var(--color-primary-pastel-01, #071d41);
-      margin-bottom: 2px;
-    }
-  </style>
+  <link rel="stylesheet" href="pivot-styles.css">
 </head>
 <body class="">
   <div id="root">
@@ -272,7 +24,7 @@
       <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
     </nav>
 
-    <!-- HEADER (idêntico à base) -->
+    <!-- HEADER -->
     <header class="br-header mb-4" id="header" data-sticky="data-sticky">
       <div class="container">
         <div class="header-top">
@@ -331,7 +83,7 @@
       </div>
     </header>
 
-    <!-- MENU LATERAL (idêntico à base) -->
+    <!-- MENU LATERAL -->
     <div class="br-menu" id="main-navigation" style="width: 250px;">
       <div class="menu-container">
         <div class="menu-panel">
@@ -368,107 +120,136 @@
             </nav>
 
             <div class="mt-4">
-              <!-- =============================================
-                   MIOLO — Portal de Estatísticas Home
-                   Área editável: class="search-page-theme"
-              ============================================= -->
               <div class="search-page-theme search-page-theme--estatisticas">
 
-                <!-- CABEÇALHO DA PÁGINA -->
-                <div class="search-page-header">
-                  <span class="search-page-header__icon" aria-hidden="true"><i class="fas fa-chart-bar"></i></span>
-                  <h1 class="search-page-header__title">Portal de Estatísticas</h1>
+                <!-- CABEÇALHO -->
+                <div class="pe-pivot-badge">Exploração de Dados</div>
+                <div class="pe-pivot-header">
+                  <h1><i class="fas fa-chart-bar" aria-hidden="true"></i> Portal de Estatísticas do INPI</h1>
+                  <p>Explore indicadores de propriedade industrial por meio de uma tabela dinâmica interativa. Arraste campos para as áreas de configuração, filtre por período e exporte os resultados.</p>
                 </div>
 
-                <!-- INTRODUÇÃO -->
-                <div class="pe-home-intro">
-                  <p>
-                    Acesse indicadores e séries históricas sobre registro de propriedade industrial no Brasil.
-                    Os dados estão organizados em duas perspectivas complementares: <strong>dados preliminares mensais</strong>
-                    e <strong>dados consolidados anuais</strong>, permitindo acompanhamento contínuo da atividade do INPI.
-                  </p>
+                <!-- BARRA DE INFORMAÇÃO -->
+                <div class="pe-info-bar" id="indicator" role="status" aria-live="polite">
+                  Fonte: <strong>Instituto Nacional da Propriedade Industrial</strong> — dados demonstrativos (BADEPI v11).
                 </div>
 
-                <!-- TILES PRINCIPAIS -->
-                <div class="pe-tiles-grid" role="list">
+                <!-- LAYOUT PRINCIPAL -->
+                <div class="pe-pivot-layout">
 
-                  <!-- TILE: Dados Preliminares -->
-                  <a href="portal-estatisticas-panorama-mensal.html" class="pe-tile pe-tile--mensal" role="listitem" id="tile-dados-preliminares" aria-label="Acessar Dados Preliminares — atualização mensal">
-                    <div class="pe-tile__header">
-                      <div class="pe-tile__icon" aria-hidden="true">
-                        <i class="fas fa-calendar-alt"></i>
+                  <!-- SIDEBAR -->
+                  <aside class="pe-sidebar" aria-label="Campos da tabela dinâmica">
+                    <div class="pe-sidebar-title"><i class="fas fa-th-list" aria-hidden="true"></i> Campos da Tabela Dinâmica</div>
+
+                    <div class="pe-sidebar-search">
+                      <input id="fieldSearch" type="search" placeholder="Pesquisar campo..." aria-label="Pesquisar campo">
+                    </div>
+
+                    <div class="pe-fields-list" id="fieldsList" role="listbox" aria-label="Campos disponíveis"></div>
+
+                    <div class="pe-zones">
+                      <h3><i class="fas fa-arrows-alt" aria-hidden="true"></i> Arraste os campos</h3>
+
+                      <div class="pe-drop-zone" data-zone="filters" aria-label="Área de filtros">
+                        <div class="pe-zone-label">Filtros <small>dropdown</small></div>
+                        <div class="pe-zone-items" id="zone-filters"></div>
                       </div>
-                      <div class="pe-tile__header-text">
-                        <div class="pe-badge-period">Mensal</div>
-                        <h2>Dados Preliminares</h2>
-                        <span class="pe-subtitle">Panorama do período corrente</span>
+
+                      <div class="pe-drop-zone" data-zone="slicers" aria-label="Área de segmentações">
+                        <div class="pe-zone-label">Segmentações <small>botões visuais</small></div>
+                        <div class="pe-zone-items" id="zone-slicers"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="rows" aria-label="Área de linhas">
+                        <div class="pe-zone-label">Linhas <small>dimensões</small></div>
+                        <div class="pe-zone-items" id="zone-rows"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="columns" aria-label="Área de colunas">
+                        <div class="pe-zone-label">Colunas <small>dimensões</small></div>
+                        <div class="pe-zone-items" id="zone-columns"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="values" aria-label="Área de valores">
+                        <div class="pe-zone-label">Valores <small>medidas</small></div>
+                        <div class="pe-zone-items" id="zone-values"></div>
                       </div>
                     </div>
-                    <div class="pe-tile__body">
-                      <p>
-                        Indicadores com atualização mensal: decisões por tipo de ativo, depósitos por origem
-                        do depositante (residente e não residente), país e natureza jurídica.
-                        Ideal para acompanhar tendências de curto prazo.
-                      </p>
-                    </div>
-                    <div class="pe-tile__footer">
-                      <span class="pe-periodicidade"><i class="fas fa-sync-alt" aria-hidden="true"></i> Atualizado mensalmente</span>
-                      <span class="pe-cta">Acessar <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                    </div>
-                  </a>
+                  </aside>
 
-                  <!-- TILE: Dados Consolidados Anuais -->
-                  <a href="portal-estatisticas-panorama-anual.html" class="pe-tile pe-tile--anual" role="listitem" id="tile-dados-consolidados" aria-label="Acessar Dados Consolidados Anuais">
-                    <div class="pe-tile__header">
-                      <div class="pe-tile__icon" aria-hidden="true">
-                        <i class="fas fa-calendar-check"></i>
+                  <!-- ÁREA PRINCIPAL -->
+                  <div class="pe-main-area">
+
+                    <!-- BARRA DE CONFIGURAÇÃO -->
+                    <div class="pe-config-bar">
+                      <label>Agregação:
+                        <select id="aggregation">
+                          <option value="sum">Soma</option>
+                          <option value="count">Contagem de registros</option>
+                        </select>
+                      </label>
+                      <label><input type="checkbox" id="showSubtotals" checked> Subtotais</label>
+                      <label><input type="checkbox" id="showGrandTotal" checked> Total geral</label>
+                      <button class="pe-btn" type="button" onclick="window.expandAll()" title="Expandir todos os níveis"><i class="fas fa-expand-alt" aria-hidden="true"></i> Expandir</button>
+                      <button class="pe-btn" type="button" onclick="window.collapseAll()" title="Recolher todos os níveis"><i class="fas fa-compress-alt" aria-hidden="true"></i> Recolher</button>
+                      <button class="pe-btn" type="button" onclick="window.resetPivot()" title="Restaurar layout padrão"><i class="fas fa-undo" aria-hidden="true"></i> Restaurar</button>
+                      <button class="pe-btn pe-btn--primary" type="button" onclick="window.exportarCSV()" title="Exportar tabela como CSV"><i class="fas fa-download" aria-hidden="true"></i> CSV</button>
+                    </div>
+
+                    <!-- FILTRO DE PERÍODO -->
+                    <section class="pe-period-panel" id="periodRangePanel">
+                      <h3><i class="fas fa-calendar-alt" aria-hidden="true"></i> Filtro de período</h3>
+                      <div class="pe-period-grid">
+                        <div class="pe-period-group">
+                          <label for="periodStart">Período inicial</label>
+                          <select id="periodStart"></select>
+                        </div>
+                        <div class="pe-period-group">
+                          <label for="periodEnd">Período final</label>
+                          <select id="periodEnd"></select>
+                        </div>
+                        <div class="pe-period-group">
+                          <label>&nbsp;</label>
+                          <button class="pe-btn" type="button" onclick="window.aplicarPeriodoCompleto()"><i class="fas fa-arrows-alt-h" aria-hidden="true"></i> Todo o período</button>
+                        </div>
                       </div>
-                      <div class="pe-tile__header-text">
-                        <div class="pe-badge-period" style="background: rgba(13,106,82,0.1); color: #0d6a52;">Anual</div>
-                        <h2>Dados Consolidados Anuais</h2>
-                        <span class="pe-subtitle">Séries históricas e análises de longo prazo</span>
-                      </div>
-                    </div>
-                    <div class="pe-tile__body">
-                      <p>
-                        Séries históricas consolidadas por ano-calendário: depósitos e concessões de ativos
-                        de PI por UF, país, município e natureza jurídica, com rankings e comparações
-                        de longo prazo.
-                      </p>
-                    </div>
-                    <div class="pe-tile__footer">
-                      <span class="pe-periodicidade"><i class="fas fa-calendar" aria-hidden="true"></i> Atualizado anualmente</span>
-                      <span class="pe-cta" style="color: #0d6a52;">Acessar <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                    </div>
-                  </a>
+                    </section>
 
-                </div><!-- /pe-tiles-grid -->
+                    <!-- FILTROS ATIVOS -->
+                    <section class="pe-filters-panel" id="filtersPanel">
+                      <h3><i class="fas fa-filter" aria-hidden="true"></i> Filtros ativos</h3>
+                      <div class="pe-filter-grid" id="activeFilters"></div>
+                    </section>
 
-                <!-- AVISO INFORMATIVO -->
-                <div class="pe-info-box" role="note">
-                  <strong><i class="fas fa-info-circle" aria-hidden="true"></i> Sobre os dados:</strong>
-                  Os dados preliminares mensais podem sofrer ajustes posteriores quando incorporados às estatísticas
-                  consolidadas. Para análises definitivas, recomenda-se utilizar os dados consolidados anuais.
-                </div>
+                    <!-- SEGMENTAÇÕES ATIVAS -->
+                    <section class="pe-slicers-panel" id="slicersPanel">
+                      <h3><i class="fas fa-tags" aria-hidden="true"></i> Segmentações</h3>
+                      <div class="pe-filter-grid" id="activeSlicers"></div>
+                    </section>
 
-                <!-- SOBRE OS DADOS -->
-                <div class="pe-about">
-                  <h2><i class="fas fa-question-circle" aria-hidden="true"></i> Como navegar</h2>
-                  <div class="pe-about-grid">
-                    <div class="pe-about-item">
-                      <i class="fas fa-hand-pointer" aria-hidden="true"></i>
-                      <p><strong>Escolha a perspectiva</strong>Selecione entre dados mensais (preliminares) ou anuais (consolidados) conforme seu objetivo de análise.</p>
+                    <!-- TOOLBAR DA TABELA -->
+                    <div class="pe-table-toolbar">
+                      <span id="pageInfo"><i class="fas fa-table" aria-hidden="true"></i> Carregando...</span>
                     </div>
-                    <div class="pe-about-item">
-                      <i class="fas fa-th-large" aria-hidden="true"></i>
-                      <p><strong>Explore os panoramas</strong>Cada seção apresenta um painel executivo com indicadores-chave e acesso às análises detalhadas.</p>
+
+                    <!-- HINT PARA MOBILE -->
+                    <div class="pe-scroll-hint"><i class="fas fa-arrows-alt-h" aria-hidden="true"></i> Deslize para ver todas as colunas</div>
+
+                    <!-- TABELA -->
+                    <div class="pe-table-wrap" role="region" aria-label="Tabela dinâmica de dados" tabindex="0">
+                      <table id="pivotTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                      </table>
                     </div>
-                    <div class="pe-about-item">
-                      <i class="fas fa-download" aria-hidden="true"></i>
-                      <p><strong>Exporte os dados</strong>Nas telas de detalhe você pode filtrar e exportar os dados nos formatos CSV ou JSON.</p>
+
+                    <div class="pe-note">
+                      <i class="fas fa-info-circle" aria-hidden="true"></i>
+                      Dados demonstrativos para validação do protótipo. Fonte: BADEPI v11 — INPI.
                     </div>
-                  </div>
-                </div>
+
+                  </div><!-- /pe-main-area -->
+                </div><!-- /pe-pivot-layout -->
 
               </div><!-- /search-page-theme -->
             </div>
@@ -478,7 +259,7 @@
       </div>
     </div>
 
-    <!-- FOOTER (idêntico à base) -->
+    <!-- FOOTER -->
     <footer class="br-footer" id="footer">
       <div class="container-lg">
         <div class="logo">
@@ -552,8 +333,13 @@
 
   </div><!-- /root -->
 
-  <!-- App JS from homologação -->
+  <!-- App JS -->
   <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <!-- Pivot JS -->
+  <script src="pivot-data.js"></script>
+  <script src="pivot-engine.js"></script>
+  <script src="pivot-ui.js"></script>
 
 </body>
 </html>
