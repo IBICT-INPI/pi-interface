@@ -1,0 +1,208 @@
+/* ============================================================
+   UX Mobile Prototype — Melhorias de Acessibilidade e Toque
+   Escopado apenas para body.mobile-ux-prototype
+============================================================ */
+
+/* 1. Alvos de toque maiores (WCAG 44px) */
+@media (max-width: 768px) {
+  body.mobile-ux-prototype .pe-btn,
+  body.mobile-ux-prototype .pe-config-bar select,
+  body.mobile-ux-prototype .pe-period-group select,
+  body.mobile-ux-prototype .pe-filter-box select,
+  body.mobile-ux-prototype .pe-sidebar-search input {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  body.mobile-ux-prototype .pe-slicer-chip,
+  body.mobile-ux-prototype .pe-zone-chip {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  body.mobile-ux-prototype .pe-chip-remove,
+  body.mobile-ux-prototype .pe-chip-move {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-left: 4px;
+  }
+
+  body.mobile-ux-prototype .pe-drop-zone {
+    min-height: 54px;
+  }
+
+  /* 2. Alternativa ao Drag and Drop */
+  body.mobile-ux-prototype .pe-mobile-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #f0f4ff;
+    border: 1px solid #dbe8fb;
+    border-radius: 4px;
+    color: #1351b4;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  body.mobile-ux-prototype .pe-field-item {
+    padding: 4px 8px;
+    min-height: 52px;
+  }
+
+  body.mobile-ux-prototype .pe-field-type {
+    margin-right: 8px;
+  }
+
+  /* Menu de Contexto (bottom sheet / grande) para toque */
+  body.mobile-ux-prototype #pe-field-menu {
+    width: 90% !important;
+    left: 5% !important;
+    bottom: 20px !important;
+    top: auto !important;
+    position: fixed !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.2) !important;
+    padding: 10px 0 !important;
+    border-radius: 12px !important;
+  }
+  
+  body.mobile-ux-prototype #pe-field-menu button {
+    min-height: 54px !important;
+    font-size: 1rem !important;
+    border-bottom: 1px solid #eee !important;
+  }
+
+  body.mobile-ux-prototype #pe-field-menu .pe-menu-title {
+    padding: 10px 14px;
+    font-weight: bold;
+    color: #071d41;
+    border-bottom: 2px solid #1351b4;
+    font-size: 1.1rem;
+  }
+
+  /* 3. Agrupamento de Ações da Tabela */
+  body.mobile-ux-prototype .pe-config-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group-toggle {
+    width: 100%;
+    min-height: 48px;
+    background: #f8f9fa;
+    border: none;
+    font-weight: 700;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group-content {
+    display: none;
+    flex-direction: column;
+    gap: 1px;
+    background: #eee;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group-content.expanded {
+    display: flex;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group-content .pe-btn {
+    border: none;
+    border-radius: 0;
+    justify-content: flex-start;
+    padding: 0 1rem;
+    background: #fff;
+    color: #333;
+  }
+
+  body.mobile-ux-prototype .pe-actions-group-content .pe-btn--primary {
+    background: #1351b4;
+    color: #fff;
+  }
+
+  /* 4. Filtros Ativos: Limpar Todos */
+  body.mobile-ux-prototype .pe-clear-filters-btn {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+    border-color: #c0392b;
+    color: #c0392b;
+  }
+  body.mobile-ux-prototype .pe-clear-filters-btn:hover {
+    background: #c0392b;
+    color: #fff;
+  }
+
+  /* 5. Scroll Warning (apenas mobile, reforçado) */
+  body.mobile-ux-prototype .pe-scroll-hint {
+    background: linear-gradient(to right, rgba(19,81,180,0.1), rgba(19,81,180,0));
+    border-left: 4px solid #1351b4;
+    padding: 0.75rem 1rem;
+    color: #1351b4;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+    animation: pulseHint 2.5s infinite;
+  }
+
+  body.mobile-ux-prototype .pe-scroll-hint.hidden {
+    display: none !important;
+  }
+
+  @keyframes pulseHint {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+}
+
+/* Ocultar elementos exclusivos de mobile no desktop */
+@media (min-width: 769px) {
+  body.mobile-ux-prototype .pe-mobile-add-btn {
+    display: none;
+  }
+  body.mobile-ux-prototype .pe-actions-group-toggle {
+    display: none;
+  }
+  body.mobile-ux-prototype .pe-actions-group-content {
+    display: flex !important;
+    flex-direction: row;
+    gap: 0.5rem;
+    background: transparent;
+  }
+  body.mobile-ux-prototype .pe-actions-group {
+    border: none;
+    display: contents;
+    margin-top: 0;
+  }
+  body.mobile-ux-prototype .pe-clear-filters-btn {
+    margin-top: 1rem;
+  }
+}

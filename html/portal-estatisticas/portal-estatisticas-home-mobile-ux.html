@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Estatísticas — ServiçosPI / INPI</title>
+  <meta name="description" content="Explore dados de propriedade industrial com tabela dinâmica interativa. Arraste campos, filtre por período e exporte em CSV.">
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- App CSS (cópia local da homologação) e Pivot CSS -->
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="pivot-styles.css">
+  <link rel="stylesheet" href="portal-estatisticas-mobile-ux.css">
+</head>
+<body class="mobile-ux-prototype">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="/"><picture><source srcset="https://pi-homol.ibict.br/logo-inpi.jpg" type="image/jpg"><img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/logo-inpi.jpg"></picture></a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies" title="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste" title="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><img alt="Imagem ilustrativa" src="img-template.png"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-registered" aria-hidden="true"></i></span><span class="content">Marcas</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span class="content">Programa de computador</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-pencil-ruler" aria-hidden="true"></i></span><span class="content">Desenhos Industriais</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-file-contract" aria-hidden="true"></i></span><span class="content">Contratos</span></a></div>
+            <div class="menu-folder drop-menu"><a href="portal-estatisticas-home.html" class="menu-item active" role="treeitem" tabindex="0" aria-level="1" aria-current="true"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Portal de Estatísticas</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4">
+              <div class="search-page-theme search-page-theme--estatisticas">
+
+                <!-- CABEÇALHO -->
+                <div class="pe-pivot-badge">Exploração de Dados</div>
+                <div class="pe-pivot-header">
+                  <h1><i class="fas fa-chart-bar" aria-hidden="true"></i> Portal de Estatísticas do INPI</h1>
+                  <p>Explore indicadores de propriedade industrial por meio de uma tabela dinâmica interativa. Arraste campos para as áreas de configuração, filtre por período e exporte os resultados.</p>
+                </div>
+
+                <!-- BARRA DE INFORMAÇÃO -->
+                <div class="pe-info-bar" id="indicator" role="status" aria-live="polite">
+                  Fonte: <strong>Instituto Nacional da Propriedade Industrial</strong> — dados demonstrativos (BADEPI v11).
+                </div>
+
+                <!-- LAYOUT PRINCIPAL -->
+                <div class="pe-pivot-layout">
+
+                  <!-- SIDEBAR -->
+                  <aside class="pe-sidebar" aria-label="Campos da tabela dinâmica">
+                    <div class="pe-sidebar-title"><i class="fas fa-th-list" aria-hidden="true"></i> Campos da Tabela Dinâmica</div>
+
+                    <div class="pe-sidebar-search">
+                      <input id="fieldSearch" type="search" placeholder="Pesquisar campo..." aria-label="Pesquisar campo">
+                    </div>
+
+                    <div class="pe-fields-list" id="fieldsList" role="listbox" aria-label="Campos disponíveis"></div>
+
+                    <div class="pe-zones">
+                      <h3><i class="fas fa-arrows-alt" aria-hidden="true"></i> Arraste os campos</h3>
+
+                      <div class="pe-drop-zone" data-zone="filters" aria-label="Área de filtros">
+                        <div class="pe-zone-label">Filtros <small>dropdown</small></div>
+                        <div class="pe-zone-items" id="zone-filters"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="slicers" aria-label="Área de segmentações">
+                        <div class="pe-zone-label">Segmentações <small>botões visuais</small></div>
+                        <div class="pe-zone-items" id="zone-slicers"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="rows" aria-label="Área de linhas">
+                        <div class="pe-zone-label">Linhas <small>dimensões</small></div>
+                        <div class="pe-zone-items" id="zone-rows"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="columns" aria-label="Área de colunas">
+                        <div class="pe-zone-label">Colunas <small>dimensões</small></div>
+                        <div class="pe-zone-items" id="zone-columns"></div>
+                      </div>
+
+                      <div class="pe-drop-zone" data-zone="values" aria-label="Área de valores">
+                        <div class="pe-zone-label">Valores <small>medidas</small></div>
+                        <div class="pe-zone-items" id="zone-values"></div>
+                      </div>
+                    </div>
+                  </aside>
+
+                  <!-- ÁREA PRINCIPAL -->
+                  <div class="pe-main-area">
+
+                    <!-- BARRA DE CONFIGURAÇÃO -->
+                    <div class="pe-config-bar">
+                      <label>Agregação:
+                        <select id="aggregation">
+                          <option value="sum">Soma</option>
+                          <option value="count">Contagem de registros</option>
+                        </select>
+                      </label>
+                      <label><input type="checkbox" id="showSubtotals" checked> Subtotais</label>
+                      <label><input type="checkbox" id="showGrandTotal" checked> Total geral</label>
+                      <button class="pe-btn" type="button" onclick="window.expandAll()" title="Expandir todos os níveis"><i class="fas fa-expand-alt" aria-hidden="true"></i> Expandir</button>
+                      <button class="pe-btn" type="button" onclick="window.collapseAll()" title="Recolher todos os níveis"><i class="fas fa-compress-alt" aria-hidden="true"></i> Recolher</button>
+                      <button class="pe-btn" type="button" onclick="window.resetPivot()" title="Restaurar layout padrão"><i class="fas fa-undo" aria-hidden="true"></i> Restaurar</button>
+                      <button class="pe-btn pe-btn--primary" type="button" onclick="window.exportarCSV()" title="Exportar tabela como CSV"><i class="fas fa-download" aria-hidden="true"></i> CSV</button>
+                    </div>
+
+                    <!-- FILTRO DE PERÍODO -->
+                    <section class="pe-period-panel" id="periodRangePanel">
+                      <h3><i class="fas fa-calendar-alt" aria-hidden="true"></i> Filtro de período</h3>
+                      <div class="pe-period-grid">
+                        <div class="pe-period-group">
+                          <label for="periodStart">Período inicial</label>
+                          <select id="periodStart"></select>
+                        </div>
+                        <div class="pe-period-group">
+                          <label for="periodEnd">Período final</label>
+                          <select id="periodEnd"></select>
+                        </div>
+                        <div class="pe-period-group">
+                          <label>&nbsp;</label>
+                          <button class="pe-btn" type="button" onclick="window.aplicarPeriodoCompleto()"><i class="fas fa-arrows-alt-h" aria-hidden="true"></i> Todo o período</button>
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- FILTROS ATIVOS -->
+                    <section class="pe-filters-panel" id="filtersPanel">
+                      <h3><i class="fas fa-filter" aria-hidden="true"></i> Filtros ativos</h3>
+                      <div class="pe-filter-grid" id="activeFilters"></div>
+                    </section>
+
+                    <!-- SEGMENTAÇÕES ATIVAS -->
+                    <section class="pe-slicers-panel" id="slicersPanel">
+                      <h3><i class="fas fa-tags" aria-hidden="true"></i> Segmentações</h3>
+                      <div class="pe-filter-grid" id="activeSlicers"></div>
+                    </section>
+
+                    <!-- TOOLBAR DA TABELA -->
+                    <div class="pe-table-toolbar">
+                      <span id="pageInfo"><i class="fas fa-table" aria-hidden="true"></i> Carregando...</span>
+                    </div>
+
+                    <!-- HINT PARA MOBILE -->
+                    <div class="pe-scroll-hint"><i class="fas fa-arrows-alt-h" aria-hidden="true"></i> Deslize para ver todas as colunas</div>
+
+                    <!-- TABELA -->
+                    <div class="pe-table-wrap" role="region" aria-label="Tabela dinâmica de dados" tabindex="0">
+                      <table id="pivotTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+
+                    <div class="pe-note">
+                      <i class="fas fa-info-circle" aria-hidden="true"></i>
+                      Dados demonstrativos para validação do protótipo. Fonte: BADEPI v11 — INPI.
+                    </div>
+
+                  </div><!-- /pe-main-area -->
+                </div><!-- /pe-pivot-layout -->
+
+              </div><!-- /search-page-theme -->
+            </div>
+
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="/patentes"><div class="content">Patentes</div></a>
+              <a class="br-item" href="/desenhos-industriais"><div class="content">Desenhos Industriais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/indicacoes-geograficas"><div class="content">Indicações Geográficas</div></a>
+              <a class="br-item" href="/programas-de-computador"><div class="content">Programas de Computador</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/acoes-e-programas"><div class="content">Ações e Programas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/planejamento-estrategico"><div class="content">Planejamento Estratégico</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="d-none d-sm-block">
+          <div class="row align-items-end justify-content-between py-5">
+            <div class="col">
+              <div class="social-network">
+                <div class="social-network-title">Redes Sociais</div>
+                <div class="d-flex">
+                  <a class="br-button circle" target="_blank" href="https://www.facebook.com/inpibrasil" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.instagram.com/inpibrasil" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.linkedin.com/company/inpibrasil" rel="noopener"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.youtube.com/@institutonacionaldaproprie2128" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /root -->
+
+  <!-- App JS -->
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <!-- Pivot JS -->
+  <script src="pivot-data.js"></script>
+  <script src="pivot-engine.js"></script>
+  <script src="pivot-ui.js"></script>
+  
+  <!-- Mobile UX Overrides -->
+  <script src="portal-estatisticas-mobile-ux.js"></script>
+
+</body>
+</html>

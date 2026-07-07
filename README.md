@@ -3,6 +3,7 @@
 ## Portal de Estatísticas
 
 - Home: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home.html)
+- Home (Mobile UX Prototype): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home-mobile-ux.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home-mobile-ux.html)
 - Panorama Mensal: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-mensal.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-mensal.html)
 - Panorama Anual: [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-anual.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-panorama-anual.html)
 - Detalhe Mensal (Decisões): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-mensal-decisoes.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-detalhe-mensal-decisoes.html)
