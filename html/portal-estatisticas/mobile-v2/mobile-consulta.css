@@ -1,0 +1,366 @@
+/* ============================================================
+   MOBILE CONSULTA (NOVA UX SEMÂNTICA)
+   Estilos isolados pela classe .mobile-consulta-prototype
+============================================================ */
+
+/* Apenas aplica estilos no Mobile para garantir Desktop 100% inalterado */
+@media (max-width: 768px) {
+  
+  /* ====== CORREÇÕES DE ESQUELETO ====== */
+  body.mobile-consulta-prototype,
+  body.mobile-consulta-prototype #root,
+  body.mobile-consulta-prototype #main,
+  body.mobile-consulta-prototype .br-header,
+  body.mobile-consulta-prototype .br-footer,
+  body.mobile-consulta-prototype .container,
+  body.mobile-consulta-prototype .search-page-theme {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: clip !important;
+  }
+
+  body.mobile-consulta-prototype .row,
+  body.mobile-consulta-prototype #main-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body.mobile-consulta-prototype .header-top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    height: auto !important;
+    padding: 10px 0 !important;
+  }
+  body.mobile-consulta-prototype .header-actions {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+  }
+  body.mobile-consulta-prototype .header-actions > * {
+    flex: 0 0 auto !important;
+    margin-bottom: 5px !important;
+  }
+
+  /* ====== OCULTAR ELEMENTOS ORIGINAIS DO DESKTOP ====== */
+  body.mobile-consulta-prototype .pe-sidebar,
+  body.mobile-consulta-prototype .pe-config-bar,
+  body.mobile-consulta-prototype #indicator,
+  body.mobile-consulta-prototype #filtersPanel,
+  body.mobile-consulta-prototype #slicersPanel,
+  body.mobile-consulta-prototype .pe-table-toolbar {
+    display: none !important;
+  }
+
+  /* O painel de período original será movido pelo JS, então não ocultamos globalmente se precisarmos dele, 
+     mas na nova versão vamos recriar o select ou apenas ocultar o panel original e usar a API dele. */
+  body.mobile-consulta-prototype #periodRangePanel {
+    display: none !important; /* Vamos usar nossos próprios selects no mobile */
+  }
+
+  /* Tabela Dynamics Width Override */
+  body.mobile-consulta-prototype .pe-main-area {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  body.mobile-consulta-prototype .pe-table-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-top: 1.5rem !important;
+    overflow-x: auto !important;
+  }
+  body.mobile-consulta-prototype .pe-table-wrap table {
+    min-width: 100%;
+    width: max-content !important;
+  }
+
+
+  /* ====== NOVOS COMPONENTES UX SEMÂNTICA ====== */
+  
+  .pe-mobile-guided-view {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    border: 1px solid #e5e7eb;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .pe-mobile-guided-view h2 {
+    font-size: 1.25rem;
+    color: #1351b4;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pe-mobile-guided-view p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+  }
+
+  .pe-step {
+    margin-bottom: 1.5rem;
+  }
+
+  .pe-step-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .pe-guided-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    height: auto !important;
+    min-height: 48px;
+    line-height: normal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: #fff;
+    color: #333;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+
+  .pe-guided-control:focus {
+    border-color: #1351b4;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(19,81,180,0.2);
+  }
+
+  .pe-period-grid-mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  /* Chips */
+  .pe-asset-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pe-asset-chip {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background: #f8f9fa;
+    color: #555;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pe-asset-chip.selected {
+    background: #1351b4;
+    color: #fff;
+    border-color: #1351b4;
+  }
+
+  .pe-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pe-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #333;
+  }
+  .pe-filter-chip button {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pe-filter-chip button:hover {
+    color: #d32f2f;
+  }
+
+  /* Resumo */
+  .pe-context-summary {
+    background: #f0f7ff;
+    border-left: 4px solid #1351b4;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 1rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .pe-summary-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+  }
+  .pe-summary-card .title {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .pe-summary-card .value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1351b4;
+  }
+
+  /* Gráfico */
+  .pe-guided-chart-wrapper {
+    margin-top: 1.5rem;
+    width: 100%;
+    min-height: 250px;
+    overflow: hidden;
+  }
+
+  /* ====== AÇÕES E CONFIGURAÇÃO AVANÇADA ====== */
+  .pe-mobile-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .pe-mobile-actions .pe-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    text-align: center;
+    min-height: 48px;
+  }
+  .pe-mobile-actions .pe-btn.pe-btn--primary {
+    background: #1351b4;
+    color: #fff;
+    border-color: #1351b4;
+  }
+
+  .pe-advanced-config-toggle {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: #1351b4;
+    cursor: pointer;
+    min-height: 48px;
+    display: block;
+    width: 100%;
+  }
+
+  .pe-advanced-config-content {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .pe-advanced-config-content.open {
+    display: block;
+  }
+
+  /* Quando a configuração avançada está aberta, precisamos forçar a exibição dos originais (mas contidos) */
+  body.mobile-consulta-prototype.advanced-open .pe-sidebar,
+  body.mobile-consulta-prototype.advanced-open .pe-config-bar {
+    display: block !important;
+  }
+  body.mobile-consulta-prototype.advanced-open .pe-config-bar {
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* ====== ACESSIBILIDADE E MELHORIAS ====== */
+  .pe-asset-chip {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pe-asset-chip:focus-visible {
+    outline: 2px solid #1351b4;
+    outline-offset: 2px;
+  }
+  .pe-asset-chip.selected {
+    box-shadow: inset 0 0 0 2px #0c3882;
+  }
+
+  .pe-filter-chip button {
+    min-height: 32px;
+    min-width: 32px;
+    border-radius: 4px;
+  }
+  .pe-filter-chip button:focus-visible {
+    outline: 2px solid #1351b4;
+    outline-offset: 2px;
+  }
+}
+
+/* Oculta os elementos da view guiada no desktop. */
+@media (min-width: 769px) {
+  #mobileGuidedView {
+    display: none !important;
+  }
+  #mobileChartContainer {
+    display: none !important;
+  }
+  #mobileContextSummary {
+    display: none !important;
+  }
+  #mobileSummaryCard {
+    display: none !important;
+  }
+}
+
+/* ====== CONTROLE DE EXIBIÇÃO DE TEXTO INTRODUTÓRIO (700px) ====== */
+.pe-intro-desktop {
+  display: none;
+}
+.pe-intro-mobile {
+  display: block;
+}
+@media (min-width: 700px) {
+  .pe-intro-desktop {
+    display: block;
+  }
+  .pe-intro-mobile {
+    display: none;
+  }
+}
