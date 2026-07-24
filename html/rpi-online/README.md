@@ -10,13 +10,17 @@ Transformar a experiência atual de download da RPI (disponível em https://revi
 - Navegação por edições da RPI e seções por tipo de ativo
 - Individualização de publicações em páginas HTML próprias
 
-## Páginas disponíveis
+## Versões Publicadas (Ordem Cronológica)
 
-| Página | Arquivo | Descrição |
-|--------|---------|-----------|
-| Página inicial | `index.html` | Pesquisa nas revistas e navegação por edições/seções |
-| Resultados | `resultados.html` | Lista de publicações encontradas com filtros |
-| Detalhe | `detalhe.html` | Publicação individual com metadados completos |
+### 1. Protótipo Base (Julho/2026)
+Primeira versão exploratória com foco em detalhamento individual de publicação e busca básica de texto e seções.
+- **Página inicial:** [`index.html`](index.html) (Pesquisa nas revistas e navegação básica)
+- **Resultados:** [`resultados.html`](resultados.html) (Lista de publicações encontradas com filtros)
+- **Detalhe:** [`detalhe.html`](detalhe.html) (Publicação individual com metadados completos)
+
+### 2. Protótipo V2 — Localização e Lote (Agosto/2026)
+Evolução para suportar navegação expandida por edições, busca por número/período e fluxo completo de download (seleção múltipla e pacotes).
+- **Página inicial V2:** [`index-v2.html`](index-v2.html) (Com barra "Localizar edição" e Painel de Seleção Múltipla)
 
 ## Estrutura de arquivos
 
