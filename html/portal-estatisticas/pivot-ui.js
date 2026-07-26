@@ -236,7 +236,7 @@
   window.collapseAll = function() {
     collapsedNodes.clear();
     const aggType = document.getElementById('aggregation').value;
-    const fData = getFilteredData(dados, pivotState, filterSelections, slicerSelections, periodRange);
+    const fData = getFilteredData(window.pivotData, pivotState, filterSelections, slicerSelections, periodRange);
     const { rowLeafMap } = buildPivotBase(fData, pivotState, aggType);
     buildHierarchicalRows(rowLeafMap, pivotState.rows).filter(n => n.hasChildren).forEach(n => collapsedNodes.add(n.key));
     renderTable();
@@ -244,7 +244,7 @@
 
   function renderTable() {
     const aggType = document.getElementById('aggregation').value;
-    const fData = getFilteredData(dados, pivotState, filterSelections, slicerSelections, periodRange);
+    const fData = getFilteredData(window.pivotData, pivotState, filterSelections, slicerSelections, periodRange);
     const { rowLeafMap, colKeys, colMap, matrix, valueFields } = buildPivotBase(fData, pivotState, aggType);
     const rows = buildHierarchicalRows(rowLeafMap, pivotState.rows);
     const visibleRows = rows.filter(r => !isHiddenByCollapse(r, collapsedNodes) && !(r.label==='Sem segmentação' && r.isLeaf));
