@@ -342,6 +342,10 @@
 
     setupDropZones();
     renderAll();
+
+    // Exposição segura para módulos experimentais (Modo Mobile)
+    window.appPivotState = pivotState;
+    window.appRenderAll = renderAll;
   });
 
 })();
