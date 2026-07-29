@@ -292,6 +292,12 @@ function injetarInterfaceMobile() {
 
   // Inserir antes da Pivot Table Base. A Pivot Table Base será usada Apenas para exibir a tabela no CSS.
   layoutBase.insertAdjacentHTML('beforebegin', html);
+
+  // Reordenar: colocar a tabela ANTES do gráfico
+  const chartContainer = document.getElementById('mobileChartContainer');
+  if (chartContainer) {
+    chartContainer.insertAdjacentElement('beforebegin', layoutBase);
+  }
 }
 
 function popularSelectsPeriodo() {
