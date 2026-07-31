@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://pi-homol.ibict.br/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- O title será atualizado por JavaScript com o número do pedido -->
+  <title>Publicação | Revista da Propriedade Industrial</title>
+  <meta name="description" content="Publicação individual da Revista da Propriedade Industrial do INPI.">
+  <!-- TODO: Definir canonical quando houver URL oficial -->
+  <!-- <link rel="canonical" href="https://..."> -->
+
+  <!-- DS Gov.br CDN -->
+  <link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- CSS da aplicação ServiçosPI (cópia local) -->
+  <link rel="stylesheet" href="assets/css/app.css">
+  <!-- CSS exclusivo da RPI Online -->
+  <link rel="stylesheet" href="assets/css/rpi-online.css">
+</head>
+<body class="rpi-online">
+  <div id="root">
+    <nav class="br-skiplink">
+      <a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/4)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a>
+      <a class="br-item" href="#header-navigation" role="menuitem" accesskey="2">Ir para o menu <span aria-hidden="true">(2/4)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a>
+      <a class="br-item" href="#footer" role="menuitem" accesskey="4">Ir para o rodapé <span aria-hidden="true">(4/4)</span> <span aria-hidden="true" class="br-tag text ml-1">4</span></a>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="br-header mb-4" id="header" data-sticky="data-sticky">
+      <div class="container">
+        <div class="header-top">
+          <div class="header-logo">
+            <a href="https://www.gov.br/inpi">
+              <picture>
+                <source srcset="assets/img/logo-inpi.jpg" type="image/jpeg">
+                <img alt="Instituto Nacional da Propriedade Industrial" src="assets/img/logo-inpi.jpg">
+              </picture>
+            </a>
+            <span class="br-divider vertical"></span>
+            <div class="header-sign">Instituto Nacional da Propriedade Industrial</div>
+          </div>
+          <div class="header-actions">
+            <div class="header-links dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Acesso Rápido</div></div>
+                <a class="br-item" href="https://www.gov.br/pt-br/orgaos-do-governo">Órgãos do Governo</a>
+                <a class="br-item" href="https://www.gov.br/acessoainformacao/pt-br">Acesso à Informação</a>
+                <a class="br-item" href="http://www4.planalto.gov.br/legislacao">Legislação</a>
+                <a class="br-item" href="https://www.gov.br/governodigital/pt-br/acessibilidade-digital">Acessibilidade</a>
+              </div>
+            </div>
+            <span class="br-divider vertical mx-half mx-sm-1"></span>
+            <div class="header-functions dropdown">
+              <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i></button>
+              <div class="br-list">
+                <div class="header"><div class="title">Funcionalidades do Sistema</div></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-label="Política de Cookies" title="Política de Cookies"><i class="fas fa-cookie-bite" aria-hidden="true"></i><span class="text">Política de Cookies</span></button></div>
+                <div class="br-item"><button class="br-button circle small" type="button" aria-pressed="false" aria-label="Ativar alto contraste" title="Ativar alto contraste"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span></button></div>
+              </div>
+            </div>
+            <div class="header-search-trigger">
+              <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <div class="dropdown">
+              <div class="d-flex flex-align-items-center gap-8 flex-wrap">
+                <select id="select-language" title="Alterar idioma">
+                  <option value="pt-BR">Português</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="header-login">
+              <div class="header-sign-in"><button class="br-sign-in primary" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar com gov.br</span></button></div>
+              <div class="header-avatar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="header-menu">
+            <div class="header-menu-trigger" id="header-navigation">
+              <button class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"><i class="fas fa-bars" aria-hidden="true"></i></button>
+            </div>
+            <div class="header-info">
+              <div class="header-title text-accent">Plataforma de Serviços de Propriedade Industrial (versão Beta)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU LATERAL -->
+    <div class="br-menu" id="main-navigation" style="width: 250px;">
+      <div class="menu-container">
+        <div class="menu-panel">
+          <div class="menu-header" data-visible="false">
+            <div class="menu-title"><span>Propriedade Industrial</span></div>
+            <div class="menu-close"><button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+          </div>
+          <div class="menu-body" role="tree">
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-home" aria-hidden="true"></i></span><span class="content">Home</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-registered" aria-hidden="true"></i></span><span class="content">Marcas</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-copyright" aria-hidden="true"></i></span><span class="content">Patentes</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-code" aria-hidden="true"></i></span><span class="content">Programa de computador</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-pencil-ruler" aria-hidden="true"></i></span><span class="content">Desenhos Industriais</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-file-contract" aria-hidden="true"></i></span><span class="content">Contratos</span></a></div>
+            <div class="menu-folder drop-menu"><a href="#" class="menu-item" role="treeitem" tabindex="0" aria-level="1"><span class="icon"><i class="fas fa-chart-bar" aria-hidden="true"></i></span><span class="content">Estatísticas</span></a></div>
+          </div>
+        </div>
+        <div class="menu-scrim" data-dismiss="menu"></div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="d-flex flex-fill mb-5" id="main">
+      <div class="container d-flex">
+        <main class="row" id="main-content">
+          <div class="col mb-5">
+
+            <!-- BREADCRUMB (atualizado dinamicamente por JavaScript) -->
+            <nav class="br-breadcrumb" aria-label="Breadcrumbs">
+              <ol class="crumb-list" id="rpi-breadcrumb-list">
+                <li class="crumb home"><a class="br-button circle" href="https://www.gov.br/inpi"><span class="sr-only">Home</span><i class="fas fa-home"></i></a></li>
+                <li class="crumb"><i class="icon fas fa-chevron-right"></i><a href="index.html">Revista da Propriedade Industrial</a></li>
+                <li class="crumb" data-active="active"><i class="icon fas fa-chevron-right"></i><span>Publicação</span></li>
+              </ol>
+            </nav>
+
+            <div class="mt-4" id="rpi-detail-container">
+
+              <!-- Cabeçalho da publicação (preenchido por JS) -->
+              <div class="rpi-detail-header" id="rpi-detail-header">
+                <h1>Carregando...</h1>
+              </div>
+
+              <!-- Metadados -->
+              <section class="rpi-metadata" aria-labelledby="rpi-meta-title">
+                <h2 id="rpi-meta-title">Dados da publicação</h2>
+                <dl id="rpi-meta-dl"></dl>
+              </section>
+
+              <!-- Conteúdo da publicação -->
+              <section class="rpi-publication-content" aria-labelledby="rpi-pub-title">
+                <h2 id="rpi-pub-title">Conteúdo da publicação</h2>
+                <div class="rpi-pub-text" id="rpi-pub-text"></div>
+              </section>
+
+              <!-- Ações -->
+              <div class="rpi-detail-actions">
+                <!-- TODO: O botão de download apontará para assets/docs/Desenhos_Industriais2897.pdf.
+                     Quando o arquivo for adicionado, o download funcionará automaticamente. -->
+                <a href="assets/docs/Desenhos_Industriais2897.pdf" class="rpi-btn-secondary" id="rpi-detail-download-pdf" download>
+                  <i class="fas fa-file-pdf" aria-hidden="true"></i> Baixar PDF oficial
+                </a>
+                <button type="button" class="rpi-btn-secondary" id="rpi-print">
+                  <i class="fas fa-print" aria-hidden="true"></i> Imprimir
+                </button>
+                <button type="button" class="rpi-btn-secondary" id="rpi-copy-link">
+                  <i class="fas fa-link" aria-hidden="true"></i> Copiar link
+                </button>
+                <a href="resultados.html" class="rpi-btn-text" id="rpi-back-results">
+                  <i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar aos resultados
+                </a>
+              </div>
+
+              <!-- Navegação contextual -->
+              <nav class="rpi-context-nav" aria-label="Navegação entre publicações">
+                <a href="#" class="rpi-nav-prev" id="rpi-nav-prev" hidden>
+                  <span class="rpi-nav-label"><i class="fas fa-arrow-left" aria-hidden="true"></i> Publicação anterior</span>
+                  <span class="rpi-nav-number"></span>
+                </a>
+                <a href="#" class="rpi-nav-next" id="rpi-nav-next" hidden>
+                  <span class="rpi-nav-label">Próxima publicação <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                  <span class="rpi-nav-number"></span>
+                </a>
+              </nav>
+
+              <!-- Nota institucional -->
+              <div class="rpi-institutional-note">
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                Esta página apresenta uma versão estruturada da publicação. O PDF oficial da Revista da Propriedade Industrial permanece como documento de referência.
+              </div>
+
+            </div><!-- /rpi-detail-container -->
+          </div><!-- /col -->
+        </main>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="br-footer" id="footer">
+      <div class="container-lg">
+        <div class="logo">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/gov-br-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/gov-br-white.png">
+          </picture>
+        </div>
+        <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/servicos"><div class="content text-down-01 text-bold text-uppercase">Serviços</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/marcas"><div class="content">Marcas</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/patentes"><div class="content">Patentes</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/desenhos-industriais"><div class="content">Desenhos Industriais</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/indicacoes-geograficas"><div class="content">Indicações Geográficas</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/servicos/programas-de-computador"><div class="content">Programas de Computador</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao"><div class="content text-down-01 text-bold text-uppercase">Acesso à Informação</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/institucional"><div class="content">Institucional</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/acesso-a-informacao/acoes-e-programas"><div class="content">Ações e Programas</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+          <div class="col-2">
+            <a class="br-item header" href="https://www.gov.br/inpi/pt-br/governanca"><div class="content text-down-01 text-bold text-uppercase">Governança</div><div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+            <div class="br-list">
+              <span class="br-divider d-md-none"></span>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/planejamento-estrategico"><div class="content">Planejamento Estratégico</div></a>
+              <a class="br-item" href="https://www.gov.br/inpi/pt-br/governanca/ouvidoria"><div class="content">Ouvidoria</div></a>
+              <span class="br-divider d-md-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="d-none d-sm-block">
+          <div class="row align-items-end justify-content-between py-5">
+            <div class="col">
+              <div class="social-network">
+                <div class="social-network-title">Redes Sociais</div>
+                <div class="d-flex">
+                  <a class="br-button circle" target="_blank" href="https://www.facebook.com/inpibrasil" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.instagram.com/inpibrasil" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.linkedin.com/company/inpibrasil" rel="noopener"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                  <a class="br-button circle" target="_blank" href="https://www.youtube.com/@institutonacionaldaproprie2128" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="br-divider my-3"></span>
+      <div class="container copyright my-3">
+        <div class="logomarca">
+          <picture>
+            <source srcset="https://pi-homol.ibict.br/inpi-white.png" type="image/png">
+            <img alt="Instituto Nacional da Propriedade Industrial" src="https://pi-homol.ibict.br/inpi-white.png">
+          </picture>
+          <span>Instituto Nacional da Propriedade Industrial</span>
+        </div>
+        <div class="info">
+          <div class="text-down-01 text-medium">Todo o conteúdo deste site está publicado sob a licença <a rel="license" href="https://creativecommons.org/licenses/by-nd/3.0/deed.pt_BR">Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada</a>.</div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Feedback de ação (copiar link) -->
+    <div class="rpi-action-feedback" id="rpi-action-feedback" aria-hidden="true"></div>
+    <!-- Região live para ações -->
+    <div class="rpi-sr-only" id="rpi-action-live" aria-live="assertive" role="status"></div>
+
+  </div><!-- /root -->
+
+  <!-- App JS -->
+  <script type="module" crossorigin="" src="https://pi-homol.ibict.br/assets/index-D0OAx6S8.js"></script>
+
+  <!-- RPI Online JS -->
+  <script src="assets/js/rpi-data.js"></script>
+  <script src="assets/js/rpi-online.js"></script>
+
+</body>
+</html>

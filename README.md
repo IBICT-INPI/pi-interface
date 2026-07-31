@@ -3,6 +3,7 @@
 Este repositório contém os protótipos de interface para o projeto Serviços PI, organizados em ordem cronológica de publicação (do mais recente para o mais antigo).
 
 ## Julho 2026
+- RPI Online (V4): [https://ibict-inpi.github.io/pi-interface/html/rpi-online/V4/index.html](https://ibict-inpi.github.io/pi-interface/html/rpi-online/V4/index.html)
 - RPI Online: [https://ibict-inpi.github.io/pi-interface/html/rpi-online/index.html](https://ibict-inpi.github.io/pi-interface/html/rpi-online/index.html)
 - Portal de Estatísticas - Home (Mobile UX Prototype - v2): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/mobile-v2/index.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/mobile-v2/index.html)
 - Portal de Estatísticas - Home (Mobile UX Prototype): [https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home-mobile-ux.html](https://ibict-inpi.github.io/pi-interface/html/portal-estatisticas/portal-estatisticas-home-mobile-ux.html)
