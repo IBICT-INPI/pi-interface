@@ -75,16 +75,24 @@
 .rpi-online .rpi-col-ativo { grid-column: 1 / 2; }
 .rpi-online .rpi-col-numero { grid-column: 2 / 3; }
 .rpi-online .rpi-col-partes { grid-column: 3 / 4; }
-.rpi-online .rpi-col-data-ini { grid-column: 1 / 2; }
-.rpi-online .rpi-col-data-fim { grid-column: 2 / 3; }
+.rpi-online .rpi-col-despacho { grid-column: 1 / 2; }
+.rpi-online .rpi-col-data-ini { grid-column: 2 / 3; }
+.rpi-online .rpi-col-data-fim { grid-column: 3 / 4; }
 .rpi-online .rpi-col-actions { 
-  grid-column: 3 / 4;
+  grid-column: 1 / -1;
   align-self: end;
+}
+
+/* Alinhamento horizontal da segunda linha do formulário */
+.rpi-online .rpi-form-group.rpi-col-data-ini input[type="date"],
+.rpi-online .rpi-form-group.rpi-col-data-fim input[type="date"] {
+  margin-top: 1.25rem !important;
 }
 
 .rpi-online .rpi-form-group {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .rpi-online .rpi-form-group label {
@@ -127,6 +135,16 @@
 
 .rpi-online .rpi-form-group select option:disabled {
   color: #999;
+}
+
+/* Correção para evitar corte vertical nos selects (Tipo de Ativo, Ano, Mês) */
+.rpi-online #rpi-field-ativo,
+.rpi-online #rpi-locate-ano,
+.rpi-online #rpi-locate-mes {
+  box-sizing: border-box;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  line-height: normal;
 }
 
 .rpi-online .rpi-form-actions {
@@ -1073,6 +1091,7 @@
   .rpi-online .rpi-col-ativo,
   .rpi-online .rpi-col-numero,
   .rpi-online .rpi-col-partes,
+  .rpi-online .rpi-col-despacho,
   .rpi-online .rpi-col-data-ini,
   .rpi-online .rpi-col-data-fim,
   .rpi-online .rpi-col-actions {
@@ -1080,6 +1099,7 @@
   }
   
   .rpi-online .rpi-col-partes,
+  .rpi-online .rpi-col-despacho,
   .rpi-online .rpi-col-actions {
     grid-column: 1 / -1;
   }
