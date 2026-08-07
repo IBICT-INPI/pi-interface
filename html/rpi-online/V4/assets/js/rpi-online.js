@@ -145,6 +145,14 @@
       });
     }
 
+    if (params.despacho) {
+      var normalizedDespacho = normalizeText(params.despacho);
+      results = results.filter(function (r) {
+        return (r.despacho && normalizeText(r.despacho).indexOf(normalizedDespacho) > -1) ||
+               (r.codigoDespacho && normalizeText(r.codigoDespacho).indexOf(normalizedDespacho) > -1);
+      });
+    }
+
     // Filtro por data de publicação (NÃO inclui data de depósito)
     if (params.dataInicial) {
       var dataIni = parseInputDate(params.dataInicial);
@@ -313,11 +321,12 @@
       var ativo = document.getElementById('rpi-field-ativo').value;
       var numero = document.getElementById('rpi-field-numero').value.trim();
       var partes = document.getElementById('rpi-field-partes').value.trim();
+      var despacho = document.getElementById('rpi-field-despacho').value.trim();
       var dataInicial = document.getElementById('rpi-field-data-inicial').value;
       var dataFinal = document.getElementById('rpi-field-data-final').value;
 
       // Validar: pelo menos um critério
-      if (!ativo && !numero && !partes && !dataInicial && !dataFinal) {
+      if (!ativo && !numero && !partes && !despacho && !dataInicial && !dataFinal) {
         errorMsg.setAttribute('aria-hidden', 'false');
         errorMsg.focus();
         return;
@@ -329,6 +338,7 @@
       if (ativo) params.push('ativo=' + encodeURIComponent(ativo));
       if (numero) params.push('numero=' + encodeURIComponent(numero));
       if (partes) params.push('partes=' + encodeURIComponent(partes));
+      if (despacho) params.push('despacho=' + encodeURIComponent(despacho));
       if (dataInicial) params.push('dataInicial=' + encodeURIComponent(dataInicial));
       if (dataFinal) params.push('dataFinal=' + encodeURIComponent(dataFinal));
 
@@ -352,6 +362,7 @@
         document.getElementById('rpi-field-ativo').value = '';
         document.getElementById('rpi-field-numero').value = '';
         document.getElementById('rpi-field-partes').value = '';
+        document.getElementById('rpi-field-despacho').value = '';
         document.getElementById('rpi-field-data-inicial').value = '';
         document.getElementById('rpi-field-data-final').value = '';
         errorMsg.setAttribute('aria-hidden', 'true');
@@ -389,7 +400,8 @@
       dataInicial: 'Data inicial',
       dataFinal: 'Data final',
       rpi: 'Edição RPI',
-      categoria: 'Categoria'
+      categoria: 'Categoria',
+      despacho: 'Despacho'
     };
 
     function renderChips() {
@@ -444,6 +456,7 @@
       var parts = [];
       if (params.numero) parts.push('"' + escapeHtml(params.numero) + '"');
       if (params.partes) parts.push('"' + escapeHtml(params.partes) + '"');
+      if (params.despacho) parts.push('"' + escapeHtml(params.despacho) + '"');
       if (params.categoria) parts.push('na categoria "' + escapeHtml(params.categoria) + '"');
 
       var ativoText = params.ativo ? ' em ' + escapeHtml(params.ativo) : '';
@@ -461,7 +474,7 @@
 
       if (!listContainer) return;
 
-      var highlightTerm = params.numero || params.partes || '';
+      var highlightTerm = params.despacho || params.numero || params.partes || '';
 
       if (results.length === 0) {
         listContainer.innerHTML = '';

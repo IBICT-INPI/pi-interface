@@ -17,7 +17,7 @@
   <!-- CSS da aplicação ServiçosPI (cópia local) -->
   <link rel="stylesheet" href="assets/css/app.css">
   <!-- CSS exclusivo da RPI Online -->
-  <link rel="stylesheet" href="assets/css/rpi-online.css">
+  <link rel="stylesheet" href="assets/css/rpi-online.css?v=2">
 </head>
 <body class="rpi-online">
   <div id="root">
@@ -167,6 +167,12 @@
                       <label for="rpi-field-partes">Partes</label>
                       <span class="rpi-field-hint" id="rpi-partes-hint">Pesquise por titular, depositante, requerente ou procurador.</span>
                       <input type="text" id="rpi-field-partes" placeholder="Universidade Federal de Uberlândia" aria-describedby="rpi-partes-hint" autocomplete="off">
+                    </div>
+
+                    <div class="rpi-form-group rpi-col-despacho">
+                      <label for="rpi-field-despacho">Despacho</label>
+                      <span class="rpi-field-hint" id="rpi-despacho-hint">Pesquise pelo nome ou código do despacho.</span>
+                      <input type="text" id="rpi-field-despacho" placeholder="Ex.: Notificação de depósito ou 860" aria-describedby="rpi-despacho-hint" autocomplete="off">
                     </div>
 
                     <div class="rpi-form-group rpi-col-data-ini">
