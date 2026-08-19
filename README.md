@@ -2,6 +2,9 @@
 
 Este repositório contém os protótipos de interface para o projeto Serviços PI, organizados em ordem cronológica de publicação (do mais recente para o mais antigo).
 
+## Agosto 2026
+- RPI Online (V6): [https://ibict-inpi.github.io/pi-interface/html/rpi-online/V6/index.html](https://ibict-inpi.github.io/pi-interface/html/rpi-online/V6/index.html)
+
 ## Julho 2026
 - RPI Online (V4): [https://ibict-inpi.github.io/pi-interface/html/rpi-online/V4/index.html](https://ibict-inpi.github.io/pi-interface/html/rpi-online/V4/index.html)
 - RPI Online: [https://ibict-inpi.github.io/pi-interface/html/rpi-online/index.html](https://ibict-inpi.github.io/pi-interface/html/rpi-online/index.html)
