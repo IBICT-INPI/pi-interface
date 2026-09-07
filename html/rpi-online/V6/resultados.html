@@ -146,9 +146,29 @@
                   <span class="rpi-results-count" id="rpi-results-count"></span>
                 </div>
                 <div class="rpi-results-controls">
+                  <label for="rpi-per-page" class="sr-only">Itens por página</label>
+                  <select id="rpi-per-page" aria-label="Itens por página" class="rpi-sort-select mr-3" style="background-color: #fff; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; font-size: 14px; font-family: inherit;">
+                    <option value="10">10 por página</option>
+                    <option value="20" selected>20 por página</option>
+                    <option value="50">50 por página</option>
+                  </select>
+                  <label for="rpi-sort" class="sr-only">Ordenar por</label>
+                  <select id="rpi-sort" aria-label="Ordenar por" class="rpi-sort-select">
+                    <option value="mais-recentes">Mais recentes</option>
+                    <option value="mais-antigos">Mais antigos</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Barra de seleção -->
+              <div class="rpi-selection-toolbar" id="rpi-selection-toolbar" style="display: none; background-color: #f2f5fd; border: 1px solid #d3e2f5; border-radius: 4px; padding: 12px 16px; margin-top: 16px; justify-content: space-between; align-items: center;">
+                <div class="rpi-selection-toolbar-left">
+                  <span style="color: #1351b4; font-weight: 600; font-size: 14px;" id="rpi-selection-count-text">0 publicações selecionadas</span>
+                </div>
+                <div class="rpi-selection-toolbar-right" style="display: flex; align-items: center; gap: 24px;">
                   <div class="dropdown rpi-dropdown-wrapper">
-                    <button type="button" class="rpi-btn-secondary" id="btn-bulk-download" disabled aria-expanded="false">
-                      <i class="fas fa-download"></i> Baixar Selecionados <i class="fas fa-chevron-down ml-1"></i>
+                    <button type="button" class="rpi-btn-secondary" id="btn-bulk-download" aria-expanded="false" style="color: #1351b4; border-color: #1351b4; background-color: #fff;">
+                      <i class="fas fa-download"></i> Baixar selecionadas <i class="fas fa-chevron-down ml-1"></i>
                     </button>
                     <div class="br-list rpi-dropdown-menu" hidden="hidden" id="rpi-bulk-download-list">
                       <div class="header rpi-dropdown-header"><div class="title rpi-dropdown-title">Apenas os atos selecionados</div></div>
@@ -161,11 +181,7 @@
                       <a class="br-item rpi-dropdown-item" href="#" data-action="download-full" data-format="csv">Formato CSV</a>
                     </div>
                   </div>
-                  <label for="rpi-sort" class="sr-only">Ordenar por</label>
-                  <select id="rpi-sort" aria-label="Ordenar por" class="rpi-sort-select">
-                    <option value="mais-recentes">Mais recentes</option>
-                    <option value="mais-antigos">Mais antigos</option>
-                  </select>
+                  <button type="button" class="br-button link" id="btn-clear-selection" style="color: #1351b4; font-weight: 600; padding: 0; font-size: 14px; background: transparent; border: none; cursor: pointer;">Limpar seleção</button>
                 </div>
               </div>
 
@@ -309,6 +325,44 @@
         checkAllBtn.indeterminate = false;
       }
     }
+  </script>
+  <script>
+    document.addEventListener('change', function(e) {
+      if (e.target.id === 'check-all' || e.target.classList.contains('rpi-item-checkbox')) {
+        setTimeout(function() {
+          var checkedCount = document.querySelectorAll('.rpi-item-checkbox:checked').length;
+          var selectionToolbar = document.getElementById('rpi-selection-toolbar');
+          var countText = document.getElementById('rpi-selection-count-text');
+          if (checkedCount > 0) {
+            selectionToolbar.style.display = 'flex';
+            countText.textContent = checkedCount + (checkedCount === 1 ? ' publicação selecionada' : ' publicações selecionadas');
+          } else {
+            selectionToolbar.style.display = 'none';
+          }
+        }, 50);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var btnClear = document.getElementById('btn-clear-selection');
+      if (btnClear) {
+        btnClear.addEventListener('click', function() {
+          var checkAll = document.getElementById('check-all');
+          var allCheckboxes = document.querySelectorAll('.rpi-item-checkbox');
+          
+          if(checkAll) checkAll.checked = false;
+          
+          allCheckboxes.forEach(function(cb) { cb.checked = false; });
+          
+          // Trigger change event so existing JS picks it up
+          if(checkAll) {
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            checkAll.dispatchEvent(evt);
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>
