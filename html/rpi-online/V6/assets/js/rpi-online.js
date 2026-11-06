@@ -738,9 +738,25 @@
       var dataInicial = document.getElementById('rpi-field-data-inicial').value;
       var dataFinal = document.getElementById('rpi-field-data-final').value;
 
-      // Validar: pelo menos um critério
-      if (!ativo && !numero && !partes && !despacho && !dataInicial && !dataFinal) {
-        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Preencha pelo menos um critério de pesquisa.';
+      var hasDate = Boolean(dataInicial || dataFinal);
+
+      // Validar campos obrigatórios: Tipo de ativo e pelo menos uma data do período
+      if (!ativo && !hasDate) {
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Selecione o tipo de ativo e informe pelo menos uma data do período para realizar a pesquisa.';
+        errorMsg.setAttribute('aria-hidden', 'false');
+        errorMsg.focus();
+        return;
+      }
+
+      if (!ativo) {
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Selecione o tipo de ativo para realizar a pesquisa.';
+        errorMsg.setAttribute('aria-hidden', 'false');
+        errorMsg.focus();
+        return;
+      }
+
+      if (!hasDate) {
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Informe pelo menos uma data do período (Data inicial ou Data final) para realizar a pesquisa.';
         errorMsg.setAttribute('aria-hidden', 'false');
         errorMsg.focus();
         return;
@@ -785,11 +801,13 @@
     // Ocultar erro ao interagir com campos
     var fields = searchForm.querySelectorAll('input, select');
     fields.forEach(function (field) {
-      field.addEventListener('input', function () {
+      var hideError = function () {
         if (errorMsg.getAttribute('aria-hidden') === 'false') {
           errorMsg.setAttribute('aria-hidden', 'true');
         }
-      });
+      };
+      field.addEventListener('input', hideError);
+      field.addEventListener('change', hideError);
     });
 
     // Limpar campos

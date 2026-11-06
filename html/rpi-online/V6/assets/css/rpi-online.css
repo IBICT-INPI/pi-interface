@@ -86,7 +86,7 @@
 /* Alinhamento horizontal da segunda linha do formulário */
 .rpi-online .rpi-form-group.rpi-col-data-ini input[type="date"],
 .rpi-online .rpi-form-group.rpi-col-data-fim input[type="date"] {
-  margin-top: 1.25rem !important;
+  margin-top: 0 !important;
 }
 
 .rpi-online .rpi-form-group {
@@ -975,8 +975,8 @@
 
 .rpi-online .rpi-metadata dt {
   font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--rpi-text-secondary);
+  font-weight: 700;
+  color: var(--rpi-primary);
   text-transform: uppercase;
   letter-spacing: 0.025em;
   margin-bottom: 0.25rem;

@@ -143,9 +143,9 @@
                   <div class="rpi-form-grid">
 
                     <div class="rpi-form-group rpi-col-ativo">
-                      <label for="rpi-field-ativo">Tipo de ativo</label>
-                      <span class="rpi-field-hint rpi-invisible-hint" aria-hidden="true">&nbsp;</span>
-                      <select id="rpi-field-ativo">
+                      <label for="rpi-field-ativo">Tipo de ativo <span class="text-danger" aria-hidden="true">*</span></label>
+                      <span class="rpi-field-hint" id="rpi-ativo-hint">Campo obrigatório.</span>
+                      <select id="rpi-field-ativo" required aria-required="true" aria-describedby="rpi-ativo-hint">
                         <option value="">Selecione...</option>
                         <option value="Desenho Industrial" selected>Desenho Industrial</option>
                         <option value="Marcas">Marcas</option>
@@ -184,13 +184,15 @@
                     </div>
 
                     <div class="rpi-form-group rpi-col-data-ini">
-                      <label for="rpi-field-data-inicial">Data inicial</label>
-                      <input type="date" id="rpi-field-data-inicial">
+                      <label for="rpi-field-data-inicial">Data inicial <span class="text-danger" aria-hidden="true">*</span></label>
+                      <span class="rpi-field-hint" id="rpi-data-ini-hint">Informe ao menos uma data do período.</span>
+                      <input type="date" id="rpi-field-data-inicial" aria-describedby="rpi-data-ini-hint">
                     </div>
 
                     <div class="rpi-form-group rpi-col-data-fim">
-                      <label for="rpi-field-data-final">Data final</label>
-                      <input type="date" id="rpi-field-data-final">
+                      <label for="rpi-field-data-final">Data final <span class="text-danger" aria-hidden="true">*</span></label>
+                      <span class="rpi-field-hint rpi-invisible-hint" aria-hidden="true">&nbsp;</span>
+                      <input type="date" id="rpi-field-data-final" aria-describedby="rpi-data-ini-hint">
                     </div>
 
                     <div class="rpi-form-actions rpi-col-actions">
@@ -206,8 +208,8 @@
 
                   <!-- Mensagem de erro -->
                   <div class="rpi-error-message" id="rpi-search-error" role="alert" aria-live="assertive" aria-hidden="true" tabindex="-1">
-                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span>Informe pelo menos um critério para realizar a pesquisa.</span>
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                    <span>Selecione o tipo de ativo e informe pelo menos uma data do período para realizar a pesquisa.</span>
                   </div>
                 </form>
               </section>
