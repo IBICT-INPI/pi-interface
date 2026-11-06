@@ -727,6 +727,47 @@
     if (!searchForm) return;
 
     var errorMsg = document.getElementById('rpi-search-error');
+    var inputDataIni = document.getElementById('rpi-field-data-inicial');
+    var inputDataFim = document.getElementById('rpi-field-data-final');
+
+    function getTodayIso() {
+      var now = new Date();
+      var y = now.getFullYear();
+      var m = String(now.getMonth() + 1).padStart(2, '0');
+      var d = String(now.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    function updateDateConstraints() {
+      var today = getTodayIso();
+      if (!inputDataIni || !inputDataFim) return;
+
+      var valIni = inputDataIni.value;
+      var valFim = inputDataFim.value;
+
+      // Data final não pode ser superior a hoje e não pode ser inferior à data inicial
+      inputDataFim.setAttribute('max', today);
+      if (valIni) {
+        inputDataFim.setAttribute('min', valIni);
+      } else {
+        inputDataFim.removeAttribute('min');
+      }
+
+      // Data inicial não pode ser superior a hoje (nem superior à data final, se preenchida)
+      if (valFim && valFim < today) {
+        inputDataIni.setAttribute('max', valFim);
+      } else {
+        inputDataIni.setAttribute('max', today);
+      }
+    }
+
+    if (inputDataIni && inputDataFim) {
+      updateDateConstraints();
+      inputDataIni.addEventListener('change', updateDateConstraints);
+      inputDataIni.addEventListener('input', updateDateConstraints);
+      inputDataFim.addEventListener('change', updateDateConstraints);
+      inputDataFim.addEventListener('input', updateDateConstraints);
+    }
 
     searchForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -735,8 +776,9 @@
       var numero = document.getElementById('rpi-field-numero').value.trim();
       var partes = document.getElementById('rpi-field-partes').value.trim();
       var despacho = document.getElementById('rpi-field-despacho').value.trim();
-      var dataInicial = document.getElementById('rpi-field-data-inicial').value;
-      var dataFinal = document.getElementById('rpi-field-data-final').value;
+      var dataInicial = inputDataIni ? inputDataIni.value : '';
+      var dataFinal = inputDataFim ? inputDataFim.value : '';
+      var today = getTodayIso();
 
       var hasDate = Boolean(dataInicial || dataFinal);
 
@@ -757,6 +799,22 @@
 
       if (!hasDate) {
         errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Informe pelo menos uma data do período (Data inicial ou Data final) para realizar a pesquisa.';
+        errorMsg.setAttribute('aria-hidden', 'false');
+        errorMsg.focus();
+        return;
+      }
+
+      // Validar que as datas não sejam superiores ao dia atual
+      if ((dataInicial && dataInicial > today) || (dataFinal && dataFinal > today)) {
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> As datas informadas não podem ser superiores à data atual.';
+        errorMsg.setAttribute('aria-hidden', 'false');
+        errorMsg.focus();
+        return;
+      }
+
+      // Validar que a data final não seja anterior à data inicial
+      if (dataInicial && dataFinal && dataFinal < dataInicial) {
+        errorMsg.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> A data final deve ser igual ou superior à data inicial.';
         errorMsg.setAttribute('aria-hidden', 'false');
         errorMsg.focus();
         return;
@@ -820,6 +878,7 @@
         document.getElementById('rpi-field-despacho').value = '';
         document.getElementById('rpi-field-data-inicial').value = '';
         document.getElementById('rpi-field-data-final').value = '';
+        updateDateConstraints();
         errorMsg.setAttribute('aria-hidden', 'true');
         document.getElementById('rpi-field-ativo').focus();
       });
