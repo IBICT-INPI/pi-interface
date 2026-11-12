@@ -1437,6 +1437,131 @@
 
 
   function initV3Modals() {
+    var mesesNomeGlobal = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    // 0. Barra Localizar Edição e Rótulo Contextual das Abas
+    var btnLocate = document.getElementById('rpi-btn-locate');
+    var inputLocateAno = document.getElementById('rpi-locate-ano');
+    var inputLocateMes = document.getElementById('rpi-locate-mes');
+    var inputLocateNum = document.getElementById('rpi-locate-numero');
+    var locateError = document.getElementById('rpi-locate-error');
+    var contextLabel = document.getElementById('rpi-edition-context-label');
+
+    function updateEditionContextLabel(ano, mes, isDefaultMonth) {
+      if (!contextLabel) return;
+      var idx = parseInt(mes, 10) - 1;
+      var nomeMes = (idx >= 0 && idx < 12) ? mesesNomeGlobal[idx] : mes;
+      if (isDefaultMonth) {
+        contextLabel.textContent = 'Edições do mês corrente (' + nomeMes + '/' + ano + '):';
+      } else {
+        contextLabel.textContent = 'Edições de ' + nomeMes + '/' + ano + ':';
+      }
+      var btnDlMonthToggle = document.getElementById('rpi-btn-download-month-toggle');
+      if (btnDlMonthToggle) {
+        btnDlMonthToggle.innerHTML = '<i class="fas fa-file-archive" aria-hidden="true"></i> Baixar RPIs de ' + nomeMes.toLowerCase() + ' de ' + ano + ' <i class="fas fa-caret-down ml-1" aria-hidden="true"></i>';
+      }
+    }
+
+    function selectEditionInPanel(ed) {
+      if (!ed) return;
+      var h3 = document.querySelector('.rpi-edition-info h3');
+      var span = document.querySelector('.rpi-edition-info span');
+      var btnPdf = document.getElementById('rpi-download-pdf');
+      if (h3) h3.textContent = 'RPI nº ' + ed.numero;
+      if (span) span.textContent = ed.dataFormatada;
+      if (btnPdf && ed.pdf) {
+        btnPdf.href = 'assets/docs/' + ed.pdf;
+        btnPdf.style.display = 'inline-flex';
+      } else if (btnPdf) {
+        btnPdf.style.display = 'none';
+      }
+    }
+
+    function renderEditionTabs(editionsList, selectedEdition) {
+      var tablist = document.getElementById('rpi-edition-tablist');
+      if (!tablist || !editionsList || editionsList.length === 0) return;
+      tablist.innerHTML = '';
+
+      editionsList.forEach(function (ed, idx) {
+        var isSelected = selectedEdition ? (ed.numero === selectedEdition.numero) : (idx === 0);
+        var btn = document.createElement('button');
+        btn.setAttribute('role', 'tab');
+        btn.id = 'rpi-tab-' + ed.numero;
+        btn.setAttribute('aria-controls', 'rpi-panel-2897');
+        btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        btn.setAttribute('tabindex', isSelected ? '0' : '-1');
+        btn.className = 'rpi-tab';
+        if (!ed.ativa) {
+          btn.disabled = true;
+          btn.innerHTML = 'RPI ' + escapeHtml(ed.numero) + ' <span class="rpi-tab-badge">sem dados</span>';
+        } else {
+          btn.textContent = 'RPI ' + ed.numero;
+        }
+        btn.addEventListener('click', function () {
+          if (btn.disabled) return;
+          Array.from(tablist.querySelectorAll('[role="tab"]')).forEach(function (t) {
+            var sel = t === btn;
+            t.setAttribute('aria-selected', sel ? 'true' : 'false');
+            t.setAttribute('tabindex', sel ? '0' : '-1');
+          });
+          selectEditionInPanel(ed);
+        });
+        tablist.appendChild(btn);
+      });
+
+      selectEditionInPanel(selectedEdition || editionsList[0]);
+    }
+
+    if (btnLocate) {
+      btnLocate.addEventListener('click', function () {
+        var num = inputLocateNum ? inputLocateNum.value.trim() : '';
+        var ano = inputLocateAno ? inputLocateAno.value : '2026';
+        var mes = inputLocateMes ? inputLocateMes.value : '07';
+
+        if (num) {
+          var foundByNum = RPI_EDICOES.find(function (e) { return e.numero === num; });
+          if (foundByNum) {
+            if (locateError) locateError.hidden = true;
+            if (inputLocateAno) inputLocateAno.value = foundByNum.ano;
+            if (inputLocateMes) inputLocateMes.value = foundByNum.mes;
+            var sameMonthEds = RPI_EDICOES.filter(function (e) {
+              return e.ano === foundByNum.ano && e.mes === foundByNum.mes;
+            });
+            var isCurrent = (foundByNum.ano === '2026' && foundByNum.mes === '07');
+            updateEditionContextLabel(foundByNum.ano, foundByNum.mes, isCurrent);
+            renderEditionTabs(sameMonthEds.length > 0 ? sameMonthEds : [foundByNum], foundByNum);
+          } else if (locateError) {
+            locateError.hidden = false;
+          }
+          return;
+        }
+
+        var foundList = RPI_EDICOES.filter(function (e) { return e.ano === ano && e.mes === mes; });
+        if (foundList.length > 0) {
+          if (locateError) locateError.hidden = true;
+          var isDefault = (ano === '2026' && mes === '07');
+          // No mês padrão (07/2026), mantém as 4 edições originais da visualização inicial se aplicável
+          var tabsToRender = isDefault ? RPI_EDICOES.slice(0, 4) : foundList;
+          updateEditionContextLabel(ano, mes, isDefault);
+          renderEditionTabs(tabsToRender, tabsToRender[0]);
+        } else if (locateError) {
+          locateError.hidden = false;
+        }
+      });
+
+      [inputLocateNum, inputLocateAno, inputLocateMes].forEach(function (el) {
+        if (el) {
+          el.addEventListener('input', function () { if (locateError) locateError.hidden = true; });
+          el.addEventListener('change', function () {
+            if (locateError) locateError.hidden = true;
+            if (el !== inputLocateNum && inputLocateNum) {
+              inputLocateNum.value = '';
+            }
+          });
+        }
+      });
+    }
+
     // Modal de Download
         var modalDl = document.getElementById('rpi-download-modal');
         var btnDownloadMonth = document.getElementById('rpi-btn-download-month');
@@ -1591,8 +1716,12 @@
             if (formatRadio) formatRadio.checked = true;
             
             if (context === 'monthly-editions') {
-              var rpisJuly = RPI_EDICOES.filter(function(ed) { return ed.mes === '07' && ed.ano === '2026'; });
-              openDownloadModal(rpisJuly, 'Julho de 2026', 'RPIs_Julho_2026');
+              var curAno = inputLocateAno ? inputLocateAno.value : '2026';
+              var curMes = inputLocateMes ? inputLocateMes.value : '07';
+              var idxM = parseInt(curMes, 10) - 1;
+              var nomeM = (idxM >= 0 && idxM < 12) ? mesesNomeGlobal[idxM] : 'Julho';
+              var rpisMonth = RPI_EDICOES.filter(function(ed) { return ed.mes === curMes && ed.ano === curAno; });
+              openDownloadModal(rpisMonth, nomeM + ' de ' + curAno, 'RPIs_' + nomeM + '_' + curAno);
             } else if (context === 'selected-editions') {
               openDownloadModal(selectedRPIsForDownload, 'Seleção Personalizada', 'RPIs_Selecao_Multipla');
             }

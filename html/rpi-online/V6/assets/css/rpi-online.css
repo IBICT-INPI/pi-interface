@@ -330,6 +330,26 @@
   margin-bottom: 1.5rem;
 }
 
+.rpi-online .rpi-tablist-bar {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--rpi-border);
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rpi-online .rpi-tablist-context {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--rpi-primary-dark);
+  padding: 0.5rem 0.75rem;
+  background: var(--rpi-bg-section);
+  border: 1px solid var(--rpi-border);
+  border-radius: var(--rpi-radius);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .rpi-online .rpi-tablist {
   display: flex;
   list-style: none;
@@ -340,6 +360,11 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+}
+
+.rpi-online .rpi-tablist-bar .rpi-tablist {
+  border-bottom: none;
+  flex: 1;
 }
 
 .rpi-online .rpi-tab {

@@ -17,7 +17,7 @@
   <!-- CSS da aplicação ServiçosPI (cópia local) -->
   <link rel="stylesheet" href="assets/css/app.css">
   <!-- CSS exclusivo da RPI Online -->
-  <link rel="stylesheet" href="assets/css/rpi-online.css?v=3">
+  <link rel="stylesheet" href="assets/css/rpi-online.css?v=5">
 </head>
 <body class="rpi-online">
   <div id="root">
@@ -262,19 +262,22 @@
 
                 <!-- TABS NÍVEL 1 — EDIÇÕES DA RPI -->
                 <div class="rpi-tabs">
-                  <div role="tablist" aria-label="Edições da Revista da Propriedade Industrial" id="rpi-edition-tablist" class="rpi-tablist">
-                    <button role="tab" id="rpi-tab-2897" aria-controls="rpi-panel-2897" aria-selected="true" tabindex="0" class="rpi-tab">
-                      RPI 2897
-                    </button>
-                    <button role="tab" id="rpi-tab-2896" aria-controls="rpi-panel-2896" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
-                      RPI 2896 <span class="rpi-tab-badge">sem dados</span>
-                    </button>
-                    <button role="tab" id="rpi-tab-2895" aria-controls="rpi-panel-2895" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
-                      RPI 2895 <span class="rpi-tab-badge">sem dados</span>
-                    </button>
-                    <button role="tab" id="rpi-tab-2894" aria-controls="rpi-panel-2894" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
-                      RPI 2894 <span class="rpi-tab-badge">sem dados</span>
-                    </button>
+                  <div class="rpi-tablist-bar">
+                    <span class="rpi-tablist-context" id="rpi-edition-context-label">Edições do mês corrente (Julho/2026):</span>
+                    <div role="tablist" aria-label="Edições da Revista da Propriedade Industrial" id="rpi-edition-tablist" class="rpi-tablist">
+                      <button role="tab" id="rpi-tab-2897" aria-controls="rpi-panel-2897" aria-selected="true" tabindex="0" class="rpi-tab">
+                        RPI 2897
+                      </button>
+                      <button role="tab" id="rpi-tab-2896" aria-controls="rpi-panel-2896" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
+                        RPI 2896 <span class="rpi-tab-badge">sem dados</span>
+                      </button>
+                      <button role="tab" id="rpi-tab-2895" aria-controls="rpi-panel-2895" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
+                        RPI 2895 <span class="rpi-tab-badge">sem dados</span>
+                      </button>
+                      <button role="tab" id="rpi-tab-2894" aria-controls="rpi-panel-2894" aria-selected="false" tabindex="-1" class="rpi-tab" disabled>
+                        RPI 2894 <span class="rpi-tab-badge">sem dados</span>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Painel RPI 2897 -->
@@ -851,7 +854,7 @@
 
   <script src="assets/js/rpi-despachos.js"></script>
   <script src="assets/js/rpi-data.js"></script>
-  <script src="assets/js/rpi-online.js?v=4"></script>
+  <script src="assets/js/rpi-online.js?v=5"></script>
 
 </body>
 </html>
