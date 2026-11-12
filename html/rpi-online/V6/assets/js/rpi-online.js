@@ -1521,7 +1521,7 @@
         if (num) {
           var foundByNum = RPI_EDICOES.find(function (e) { return e.numero === num; });
           if (foundByNum) {
-            if (locateError) locateError.hidden = true;
+            if (locateError) locateError.setAttribute('aria-hidden', 'true');
             if (inputLocateAno) inputLocateAno.value = foundByNum.ano;
             if (inputLocateMes) inputLocateMes.value = foundByNum.mes;
             var sameMonthEds = RPI_EDICOES.filter(function (e) {
@@ -1531,29 +1531,41 @@
             updateEditionContextLabel(foundByNum.ano, foundByNum.mes, isCurrent);
             renderEditionTabs(sameMonthEds.length > 0 ? sameMonthEds : [foundByNum], foundByNum);
           } else if (locateError) {
-            locateError.hidden = false;
+            locateError.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> <span>RPI nº ' + escapeHtml(num) + ' não encontrada na base demonstrativa.</span>';
+            locateError.setAttribute('aria-hidden', 'false');
+            locateError.focus();
           }
           return;
         }
 
         var foundList = RPI_EDICOES.filter(function (e) { return e.ano === ano && e.mes === mes; });
         if (foundList.length > 0) {
-          if (locateError) locateError.hidden = true;
+          if (locateError) locateError.setAttribute('aria-hidden', 'true');
           var isDefault = (ano === '2026' && mes === '07');
           // No mês padrão (07/2026), mantém as 4 edições originais da visualização inicial se aplicável
           var tabsToRender = isDefault ? RPI_EDICOES.slice(0, 4) : foundList;
           updateEditionContextLabel(ano, mes, isDefault);
           renderEditionTabs(tabsToRender, tabsToRender[0]);
         } else if (locateError) {
-          locateError.hidden = false;
+          var idxMes = parseInt(mes, 10) - 1;
+          var nomeMesErro = (idxMes >= 0 && idxMes < 12) ? mesesNomeGlobal[idxMes] : mes;
+          locateError.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> <span>Nenhuma RPI encontrada para ' + escapeHtml(nomeMesErro) + ' de ' + escapeHtml(ano) + ' na base demonstrativa.</span>';
+          locateError.setAttribute('aria-hidden', 'false');
+          locateError.focus();
         }
       });
 
       [inputLocateNum, inputLocateAno, inputLocateMes].forEach(function (el) {
         if (el) {
-          el.addEventListener('input', function () { if (locateError) locateError.hidden = true; });
+          el.addEventListener('input', function () {
+            if (locateError && locateError.getAttribute('aria-hidden') === 'false') {
+              locateError.setAttribute('aria-hidden', 'true');
+            }
+          });
           el.addEventListener('change', function () {
-            if (locateError) locateError.hidden = true;
+            if (locateError && locateError.getAttribute('aria-hidden') === 'false') {
+              locateError.setAttribute('aria-hidden', 'true');
+            }
             if (el !== inputLocateNum && inputLocateNum) {
               inputLocateNum.value = '';
             }
